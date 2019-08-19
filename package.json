@@ -6,7 +6,8 @@
   "private": true,
   "scripts": {
     "dev": "nuxt",
-    "build": "nuxt build",
+    "build": "npm-run-all --parallel build:**",
+    "build:app": "nuxt build",
     "build:functions": "netlify-lambda build functions -c ./webpack.functions.js",
     "start": "nuxt start",
     "start:server": "netlify-lambda serve functions -c ./webpack.functions.js",
@@ -25,6 +26,7 @@
   "devDependencies": {
     "netlify-lambda": "^1.6.1",
     "node-sass": "^4.12.0",
+    "npm-run-all": "^4.1.5",
     "sass-loader": "^7.2.0"
   }
 }

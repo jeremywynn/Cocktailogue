@@ -152,6 +152,7 @@ export default {
   &__title {
     bottom: 0;
     position: absolute;
+    text-shadow: 0 0 3px black;
     // transition: 10000ms color;
   }
   &__contents {
