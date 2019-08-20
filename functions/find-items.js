@@ -37,7 +37,6 @@ exports.handler = async (event, context, callback) => {
       .find({ content: searchRegex }, { score: { $meta: "textScore" } })
       // .sort({ score: { $meta: "textScore" } })
       .toArray();
-    console.log(items);
     return {
       statusCode: 200,
       headers,
