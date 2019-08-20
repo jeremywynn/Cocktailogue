@@ -7,7 +7,7 @@ import {
   UserApiKeyCredential
 } from "mongodb-stitch-server-sdk";
 
-const client = Stitch.initializeDefaultAppClient(
+const client = Stitch.initializeAppClient(
   "catalogue-fjarv",
   new StitchAppClientConfiguration.Builder().withDataDirectory("/tmp").build()
 );
