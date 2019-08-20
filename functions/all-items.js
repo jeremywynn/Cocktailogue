@@ -14,16 +14,18 @@ const mongoClient = client.getServiceClient(
 
 const credential = new UserApiKeyCredential(process.env.MONGODB_API_KEY);
 
+await client.auth.loginWithCredential(credential);
+const db = mongoClient.db("catalogue");
+const itemsCollection = db.collection("items");
+
 const headers = {
   Accept: "application/json",
   "Content-Type": "application/json"
 };
 
 exports.handler = async (event, context, callback) => {
+  context.callbackWaitsForEmptyEventLoop = false;
   try {
-    await client.auth.loginWithCredential(credential);
-    const db = mongoClient.db("catalogue");
-    const itemsCollection = db.collection("items");
     const items = await itemsCollection.find({}, { limit: 50 }).toArray();
     return {
       statusCode: 200,
