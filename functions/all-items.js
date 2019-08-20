@@ -9,7 +9,7 @@ import {
 
 const client = Stitch.initializeAppClient(
   "catalogue-fjarv",
-  new StitchAppClientConfiguration.Builder().withDataDirectory("/tmp").build()
+  new StitchAppClientConfiguration.Builder().withDataDirectory("").build()
 );
 const mongoClient = client.getServiceClient(
   RemoteMongoClient.factory,
