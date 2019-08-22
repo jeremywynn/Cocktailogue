@@ -3,12 +3,20 @@ require("dotenv").config();
 
 import {
   Stitch,
+  StitchAppClientConfiguration,
   RemoteMongoClient,
   BSON,
   UserApiKeyCredential
 } from "mongodb-stitch-server-sdk";
 
-const client = Stitch.initializeDefaultAppClient("catalogue-fjarv");
+// const client = Stitch.initializeDefaultAppClient(
+//   "catalogue-fjarv",
+//   new StitchAppClientConfiguration.Builder().withDataDirectory("/tmp").build()
+// );
+const client = Stitch.initializeDefaultAppClient(
+  "catalogue-fjarv",
+  new StitchAppClientConfiguration.Builder().withDataDirectory("").build()
+);
 const mongoClient = client.getServiceClient(
   RemoteMongoClient.factory,
   "mongodb-atlas"

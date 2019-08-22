@@ -3,6 +3,7 @@ require("dotenv").config();
 import {
   Stitch,
   StitchAppClientConfiguration,
+  BSON,
   RemoteMongoClient,
   UserApiKeyCredential
 } from "mongodb-stitch-server-sdk";
@@ -27,20 +28,28 @@ const headers = {
   "Content-Type": "application/json"
 };
 
+RegExp.escape = function(s) {
+  return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+};
+
 exports.handler = async (event, context, callback) => {
   try {
+    const id = JSON.parse(event.body);
+
+    const query = { _id: new BSON.ObjectId(id) };
+    const options = { limit: 1 };
+
     await client.auth.loginWithCredential(credential);
     const db = mongoClient.db("catalogue");
     const itemsCollection = db.collection("items");
-    const pipeline = [{ $skip: 1040 }, { $limit: 30 }];
-    const items = await itemsCollection.aggregate(pipeline).toArray();
+    const item = await itemsCollection.findOne(query, options);
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify(items)
+      body: JSON.stringify(item)
     };
   } catch (error) {
-    console.log(error);
+    console.log(error); // output to netlify function log
     return {
       statusCode: 500,
       headers,

@@ -1,17 +1,19 @@
 <template>
-  <div class="item" ref="item">
+  <div class="item" v-bind:class="{ 'editing': editingItem, 'reveal': revealed }" ref="item">
     <div class="item__header" ref="itemHeader">
       <div class="item__title">
-        <h2>Item Title</h2>
+        <div class="title-interior">
+          <div class="item-name" ref="itemName">{{ itemName }}</div>
+        </div>
       </div>
       <div class="item__media">
         <div class="carousel-wrapper" v-if="item.media.length > 1">
-          <div class="carousel snap" ref="carousel" v-on:resize="resize">
+          <!-- <div class="carousel snap" ref="carousel" v-on:resize="resize"> -->
+          <div class="carousel snap" ref="carousel">
             <div class="media-item" v-for="media in item.media">
               <img
                 v-bind:src="'https://ik.imagekit.io/94ka2dfnz' + media.path"
                 v-if="media.path"
-                loading="lazy"
                 alt
               />
             </div>
@@ -21,29 +23,64 @@
             <button v-on:click="nextSlide" ref="next">Next</button>
           </div>
         </div>
-        <div class="media-item" v-if="item.media.length === 1" v-for="media in item.media">
-          <img
-            v-bind:src="'https://ik.imagekit.io/94ka2dfnz' + media.path"
-            v-if="media.path"
-            loading="lazy"
-            alt
-          />
-          <img v-bind:src="media.url" v-else loading="lazy" alt />
+        <div
+          class="media-item"
+          v-if="item.media.length === 1"
+          v-for="media in item.media"
+          ref="mediaItem"
+        >
+          <img v-bind:src="'https://ik.imagekit.io/94ka2dfnz' + media.path" v-if="media.path" alt />
+          <img v-bind:src="media.url" v-else alt />
+        </div>
+        <div class="media-item" v-if="item.media.length === 0">
+          <img src="~/assets/drunk-uncle-720x720-recipe.jpg" alt />
         </div>
       </div>
     </div>
 
     <div class="item__contents" ref="itemContents">
-      <div class="item__content">{{ item.content }}</div>
-      <div class="item__source-category">{{ item.sourceCategory }}</div>
-      <div class="item__source-url">
-        <a :href="reconstructedUrl">{{ reconstructedUrl }}</a>
+      <div class="item__content">
+        <div class="item-content" ref="itemContent">{{ itemContent }}</div>
+      </div>
+      <div class="item__meta">
+        <div class="item__source-category">{{ item.sourceCategory }}</div>
+        <div class="item__source-url">
+          <a :href="reconstructedUrl" target="_blank" rel="noreferrer">{{ reconstructedUrl }}</a>
+        </div>
       </div>
       <div class="item__actions">
-        <button v-on:click="showEdit = !showEdit">Edit item</button>
-        <button v-on:click="removeItem">Remove Item</button>
+        <div class="action-group action-group--editing">
+          <button v-on:click="triggerEditItem" :disabled="itemProcessing">
+            <span v-if="editingItem">Cancel Edits</span>
+            <span v-else>Edit Item</span>
+          </button>
+          <button v-on:click="editItem" v-show="editingItem" :disabled="itemProcessing">Save Edits</button>
+        </div>
+        <div class="action-group" v-if="!editingItem">
+          <transition name="fade">
+            <div class="button-group">
+              <transition name="fade" mode="out-in">
+                <div class="original-removal" v-if="confirmRemoval === false" key="hideChoice">
+                  <button
+                    v-on:click="confirmRemoval = true"
+                    v-show="!editingItem"
+                    :disabled="itemProcessing"
+                  >Remove Item</button>
+                </div>
+                <div class="confirm-removal" v-if="confirmRemoval === true" key="showChoice">
+                  <span class="confirm-text">Remove?</span>
+                  <div class="choice">
+                    <!-- <button v-on:click="removeItem">Yes</button> -->
+                  </div>
+                  <div class="choice">
+                    <button v-on:click="confirmRemoval = false">No</button>
+                  </div>
+                </div>
+              </transition>
+            </div>
+          </transition>
+        </div>
       </div>
-      <div class="item__edit" v-if="showEdit">Editing Item</div>
     </div>
   </div>
 </template>
@@ -53,18 +90,78 @@ export default {
   data: function() {
     return {
       carouselScrollMarker: 0,
+      confirmRemoval: false,
+      // editedName: this.item.name,
+      // editedContent: this.item.content,
+      editingItem: false,
+      itemContent: this.item.content,
+      itemName: this.item.name,
+      itemProcessing: false,
       mediaCount: this.item.media.length,
       mediaUrl: null,
       reconstructedUrl:
         "https://www.instagram.com/p/" + this.item.sourceIdentifier,
-      showEdit: false
+      revealed: false
     };
   },
   methods: {
-    editItem(item) {},
-    removeItem(item) {
-      this.$emit("remove-item", item);
+    disableEditMode() {
+      this.$refs.itemContent.setAttribute("contenteditable", false);
+      this.$refs.itemName.setAttribute("contenteditable", false);
+      this.$refs.itemName.textContent = this.item.name;
+      this.$refs.itemContent.innerText = this.item.content;
+      this.editingItem = false;
     },
+    enableEditMode() {
+      this.editingItem = true;
+      this.$refs.itemName.setAttribute("contenteditable", true);
+      this.$refs.itemContent.setAttribute("contenteditable", true);
+      /*
+      document.addEventListener("keydown", function(e) {
+        console.log(e);
+        if (e.key == "Escape") {
+          console.log("escape");
+          this.disableEditMode();
+          document.removeEventListener("keypress");
+        }
+      });
+      */
+    },
+    triggerEditItem() {
+      if (this.editingItem === false) {
+        this.enableEditMode();
+      } else {
+        this.disableEditMode();
+      }
+    },
+    async editItem() {
+      this.itemProcessing = true;
+      let payload = {
+        ID: this.$vnode.key,
+        name: this.$refs.itemName.textContent,
+        // content: this.$refs.itemContent.innerText
+        // media: this.newItemMedia,
+        content: this.$refs.itemContent.innerText
+      };
+      this.editingItem = false;
+      this.$refs.itemName.setAttribute("contenteditable", false);
+      this.$refs.itemContent.setAttribute("contenteditable", false);
+      await this.$store.dispatch("EDIT_ITEM", payload);
+      this.itemProcessing = false;
+    },
+    async removeItem() {
+      this.itemProcessing = true;
+      this.confirmRemoval = false;
+      let payload = {
+        ID: this.$vnode.key,
+        media: this.media
+      };
+      await this.$store.dispatch("DELETE_ITEM", payload);
+      this.itemProcessing = false;
+    },
+    // removeItem(item) {
+    //   this.$emit("remove-item", item);
+    // },
     nextSlide() {
       this.carouselScrollMarker += this.$refs.carousel.clientWidth;
       this.$refs.carousel.scrollTo({
@@ -78,40 +175,67 @@ export default {
         left: this.carouselScrollMarker,
         behavior: "smooth"
       });
-    },
-    /*
-    scrollToItem(itemPosition, numItems, scroller) {
-      scroller.scrollTo({
-        scrollLeft: Math.floor(
-          scroller.scrollWidth * (itemPosition / numItems)
-        ),
-        behavior: "smooth"
-      });
-    },
-    */
-    resize() {
-      this.$refs.carousel.scrollTo({
-        left: this.$refs.carousel.scrollLeft - 1,
-        behavior: "smooth"
-      });
     }
+    /*
+      Uncaught TypeError: Cannot read property 'scrollTo' of undefined
+      at VueComponent.resize (pages_index.js:504)
+    */
+    // resize() {
+    //   this.$refs.carousel.scrollTo({
+    //     left: this.$refs.carousel.scrollLeft - 1,
+    //     behavior: "smooth"
+    //   });
+    // }
   },
   computed: {},
   created: function() {
     // console.log("true"); // Does this each time
   },
   mounted: function() {
-    if (this.$refs.carousel) {
-      window.addEventListener("resize", this.resize); // Eventually use resizeObserver here
-    }
+    // if (this.$refs.carousel) {
+    //   window.addEventListener("resize", this.resize); // Eventually use resizeObserver here
+    // }
+
+    this.observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.intersectionRatio > 0) {
+          // console.log("in the view");
+          entry.target.classList.add("unveil");
+          this.observer.unobserve(entry.target);
+        } else {
+          // console.log("out of view");
+        }
+      });
+    });
+
+    // itemImageObserver.observe(this.$el);
+    // console.log(this.$refs.mediaItem);
+
+    this.observer.observe(this.$el);
+
+    // console.log(this);
+    // console.log(this.$el);
+    // console.log(this.$refs.mediaItem);
+
+    this.$el.querySelectorAll(".media-item").forEach(item => {
+      this.observer.observe(item);
+    });
+
+    // this.$refs.mediaItem.forEach(mediaItem => {
+    //   itemMediaObserver.observe(mediaItem);
+    // });
+
+    this.$refs.itemContent.spellcheck = false;
+    this.$refs.itemName.spellcheck = false;
+
     if (this.$refs.prev && this.$refs.carousel.scrollLeft === 0) {
       this.$refs.prev.setAttribute("disabled", "");
     }
     let itemHeader = this.$refs.itemHeader;
     itemHeader.addEventListener("click", event => {
-      // console.log(event);
-      let focusedItem = this.$refs.item;
-      focusedItem.classList.toggle("reveal");
+      if (!this.editingItem) {
+        this.revealed = !this.revealed;
+      }
     });
   },
   watch: {
@@ -138,42 +262,118 @@ export default {
 </script>
 
 <style lang="scss">
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
+
+.confirm-removal {
+  display: flex;
+  margin-left: 0.5rem;
+}
+.confirm-text {
+  font-size: 80%;
+  margin-right: 0.5rem;
+}
+
+.original-removal {
+  button {
+    display: block;
+  }
+}
+
+.action-group {
+  &--editing {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+}
+
+.button-group {
+  display: flex;
+  margin-left: 2rem;
+}
+
+.carousel-wrapper {
+  position: relative;
+}
+.carousel-controls {
+  position: absolute;
+  top: 50%;
+}
+
+.item__actions {
+  align-items: flex-start;
+  display: flex;
+  margin-top: 1rem;
+  justify-content: space-between;
+  padding: 0 1rem 1rem;
+  button {
+    display: block;
+    white-space: nowrap;
+  }
+}
+.media-item {
+  opacity: 0;
+  transition: opacity 400ms;
+  &.unveil {
+    opacity: 1;
+  }
+}
+
+.item__meta {
+  padding: 0 1rem;
+}
+.item-content {
+  padding: 1rem;
+}
 .item {
   border: 1px solid;
   border-top: 0;
-  // padding: 0.5rem;
-  // margin: 0 0 2rem;
-  // max-width: 40rem;
-  // max-width: 1080px;
   overflow: hidden;
   &__header {
     position: relative;
   }
-  &__title {
-    bottom: 0;
-    position: absolute;
-    text-shadow: 0 0 3px black;
-    // transition: 10000ms color;
-  }
+
   &__contents {
     display: none;
+    padding: 0.5rem;
+    position: relative;
   }
   &__content {
+    position: relative;
     white-space: pre-line;
+    textarea {
+      -webkit-appearance: none;
+      background: transparent;
+      border: 0;
+      border-radius: 0;
+      color: inherit;
+      font-size: inherit;
+      line-height: inherit;
+      min-height: 20vh;
+      // overflow: hidden;
+      padding: 1rem;
+      resize: none;
+      // resize: vertical;
+      width: 100%;
+
+      // min-height: 100%;
+      // position: absolute;
+      // top: 0;
+    }
   }
   &__media {
     bottom: 0;
     left: 0;
-    // position: absolute;
     right: 0;
     top: 0;
-    // z-index: -1;
-
-    // opacity: 0;
     img {
       display: block;
-      // height: 100%;
-      // position: absolute;
       object-fit: contain;
 
       width: 100%;
@@ -227,18 +427,272 @@ export default {
 }
 
 .item__title {
-  // background: yellow;
+  background-color: rgba(0, 0, 0, 0.667);
+  bottom: 0;
+  font-size: 1.5rem;
+  // font-weight: 700;
   padding: 0.5rem;
-
+  position: absolute;
+  text-shadow: 0 0 3px black;
   width: 100%;
+  .item-name {
+    // font: inherit;
+    padding: 0.5rem 1rem;
+    width: 100%;
+  }
+  input[type="text"] {
+    -webkit-appearance: none;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: 0;
+    border-radius: 0;
+    color: inherit;
+    font: inherit;
+    opacity: 0;
+    padding: 0.5rem 1rem;
+    pointer-events: none;
+    position: absolute;
+    // text-shadow: inherit;
+    width: 100%;
+    z-index: -1;
+  }
 }
 
-.item__contents {
-  padding: 1rem 0.5rem;
+.item-name {
+  position: relative;
+  transition: box-shadow 200ms;
+  &:after,
+  &:before {
+    background-color: white;
+    content: "";
+    display: block;
+    opacity: 0;
+    position: absolute;
+    transition: opacity 400ms;
+  }
+  &:after {
+    bottom: 0;
+    height: 2px;
+    left: 2px;
+    transform-origin: left;
+    width: calc(100% - 4px);
+  }
+  &:before {
+    height: calc(100% - 1px);
+    right: 0;
+    top: 1px;
+    transform-origin: top;
+    width: 2px;
+  }
+}
+
+.title-interior {
+  position: relative;
+  &:after,
+  &:before {
+    background-color: white;
+    content: "";
+    display: block;
+    opacity: 0;
+    position: absolute;
+    transition: opacity 400ms;
+  }
+  &:after {
+    // animation: editIndicatorTopLtR 150ms linear reverse;
+    height: 2px;
+    top: 0;
+    transform-origin: left;
+    width: 100%;
+  }
+  &:before {
+    height: calc(100% - 2px);
+    left: 0;
+    top: 2px;
+    transform-origin: top;
+    width: 2px;
+  }
+  // &:focus {
+  //   &:after,
+  //   &:before {
+  //     background-color: yellow;
+  //   }
+  // }
+}
+
+.item__source-url {
+  a {
+    color: yellow;
+  }
 }
 
 .item__content {
+  // font-size: calc(0.825rem + 0.375vw);
   line-height: 1.4;
   margin-bottom: 1rem;
+  position: relative;
+  &:after,
+  &:before {
+    background-color: white;
+    content: "";
+    display: block;
+    opacity: 0;
+    position: absolute;
+    transition: opacity 400ms;
+  }
+  &:after {
+    height: 2px;
+    top: 0;
+    transform-origin: left;
+    width: 100%;
+  }
+  &:before {
+    height: calc(100% - 2px);
+    left: 0;
+    top: 2px;
+    transform-origin: top;
+    width: 2px;
+  }
+  @media only all and (min-width: 40em) {
+    // font-size: 1.05rem;
+  }
+}
+
+.item-content {
+  // font-size: 90%;
+  line-height: 1.5;
+  position: relative;
+  transition: box-shadow 200ms;
+  &:after,
+  &:before {
+    background-color: white;
+    content: "";
+    display: block;
+    opacity: 0;
+    position: absolute;
+    transition: opacity 400ms;
+  }
+  &:after {
+    bottom: 0;
+    height: 2px;
+    left: 2px;
+    transform-origin: left;
+    width: calc(100% - 4px);
+  }
+  &:before {
+    height: calc(100% - 2px);
+    right: 0;
+    top: 2px;
+    transform-origin: top;
+    width: 2px;
+  }
+}
+
+.editing {
+  .item__header {
+    cursor: default;
+  }
+  .title-interior {
+    &:after {
+      animation: editIndicatorTopLtR 150ms linear forwards;
+      opacity: 1;
+      transition: none;
+    }
+    &:before {
+      animation: editIndicatorTopLtB 150ms linear forwards;
+      opacity: 1;
+      transition: none;
+    }
+  }
+  .item__title {
+    // position: relative;
+    // z-index: 2;
+  }
+  .item-name {
+    cursor: text;
+    // outline: 1px solid;
+    // opacity: 0;
+    // position: absolute;
+    // z-index: -1;
+    &:after {
+      animation: editIndicatorTopLtR 150ms linear forwards 150ms;
+      opacity: 1;
+      transition-delay: 150ms;
+      transition-duration: 0s;
+    }
+    &:before {
+      animation: editIndicatorTopLtB 150ms linear forwards 150ms;
+      opacity: 1;
+      transition-delay: 150ms;
+      transition-duration: 0s;
+    }
+    &:focus,
+    &:active,
+    &:hover {
+      box-shadow: 0 0 1rem yellow inset;
+    }
+  }
+  .item__content {
+    &:after {
+      animation: editIndicatorTopLtR 150ms linear forwards;
+      opacity: 1;
+      transition: none;
+    }
+    &:before {
+      animation: editIndicatorTopLtB 150ms linear forwards;
+      opacity: 1;
+      transition: none;
+    }
+  }
+  .item-content {
+    &:after {
+      animation: editIndicatorTopLtR 150ms linear forwards 150ms;
+      opacity: 1;
+      transition-delay: 150ms;
+      transition-duration: 0s;
+    }
+    &:before {
+      animation: editIndicatorTopLtB 150ms linear forwards 150ms;
+      opacity: 1;
+      transition-delay: 150ms;
+      transition-duration: 0s;
+    }
+    &:focus,
+    &:active,
+    &:hover {
+      box-shadow: 0 0 1rem yellow inset;
+    }
+  }
+  /*
+  input[type="text"] {
+    opacity: 1;
+    pointer-events: auto;
+    position: static;
+    z-index: 1;
+  }
+  */
+  .item-content {
+    // border: 1px solid;
+    // outline: 1px solid;
+    // opacity: 0;
+    // pointer-events: none;
+    // z-index: -1;
+  }
+}
+
+@keyframes editIndicatorTopLtR {
+  0% {
+    transform: scaleX(0);
+  }
+  100% {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes editIndicatorTopLtB {
+  0% {
+    transform: scaleY(0);
+  }
+  100% {
+    transform: scaleY(1);
+  }
 }
 </style>

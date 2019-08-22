@@ -1,5 +1,6 @@
 export const state = () => ({
-  items: []
+  items: [],
+  loading: false
 });
 
 export const mutations = {
@@ -13,13 +14,30 @@ export const mutations = {
     state.items.push(item);
   },
   deleteItem(state, payload) {
-    var item = state.items.find(item => item._id === payload._id);
+    const item = state.items.find(item => item._id === payload._id);
     state.items.splice(state.items.indexOf(item), 1);
+  },
+  editItem(state, payload) {
+    const item = state.items.find(item => item._id === payload._id);
+    state.items.splice(state.items.indexOf(item), 1, payload);
+  },
+  startBusyState(state) {
+    state.loading = true;
+  },
+  endBusyState(state) {
+    state.loading = false;
   }
 };
 
 export const actions = {
-  async GET_ITEMS({ commit }) {
+  triggerBusyState({ commit }) {
+    commit("startBusyState");
+  },
+  stopBusyState({ commit }) {
+    commit("endBusyState");
+  },
+  async GET_ITEMS({ commit, dispatch }) {
+    dispatch("triggerBusyState");
     try {
       let items = await fetch("/.netlify/functions/all-items").then(res =>
         res.json()
@@ -28,8 +46,10 @@ export const actions = {
     } catch (err) {
       console.log(err);
     }
+    dispatch("stopBusyState");
   },
-  async SEARCH_ITEMS({ commit }, payload) {
+  async SEARCH_ITEMS({ commit, dispatch }, payload) {
+    dispatch("triggerBusyState");
     try {
       let data = {
         searchTerms: payload.searchTerms
@@ -42,8 +62,10 @@ export const actions = {
     } catch (err) {
       console.log(err);
     }
+    dispatch("stopBusyState");
   },
-  async ADD_ITEM({ commit }, payload) {
+  async ADD_ITEM({ commit, dispatch }, payload) {
+    dispatch("triggerBusyState");
     try {
       let data = {
         name: payload.name,
@@ -60,8 +82,10 @@ export const actions = {
     } catch (err) {
       console.log(err);
     }
+    dispatch("stopBusyState");
   },
-  async DELETE_ITEM({ commit }, payload) {
+  async DELETE_ITEM({ commit, dispatch }, payload) {
+    dispatch("triggerBusyState");
     try {
       let data = {
         ID: payload.ID,
@@ -75,17 +99,41 @@ export const actions = {
     } catch (err) {
       console.log(err);
     }
-
-    /*
-    // IMPORTANT: Query for the deleted item to ensure that it was truly deleted before removing it from the state store (doing the commit)
-    client.query(q.Delete(q.Ref(q.Class("Items"), this.$vnode.key))).then((ret) => {
-      client.query(q.Get(q.Ref(q.Class("Items"), this.$vnode.key))).then((ret) => console.log(ret)).catch((ret) => {
-        // Do the deletion on the front-end
-        this.show = false
-      })
-    })
-    */
-
-    // commit("deleteItem", deletedItem);
+    dispatch("stopBusyState");
+  },
+  async EDIT_ITEM({ commit, dispatch }, payload) {
+    dispatch("triggerBusyState");
+    try {
+      let data = {
+        ID: payload.ID,
+        name: payload.name,
+        content: payload.content
+      };
+      const editedItem = await fetch("/.netlify/functions/edit-item", {
+        method: "POST",
+        body: JSON.stringify(data)
+      }).then(res => res.json());
+      // console.log(editedItem);
+      // commit("editItem", editedItem);
+      if (editedItem.matchedCount && editedItem.modifiedCount) {
+        dispatch("REFRESH_ITEM", payload.ID);
+      } else {
+        // Compose error message
+      }
+    } catch (err) {
+      console.log(err);
+    }
+    commit("endBusyState");
+  },
+  async REFRESH_ITEM({ commit }, id) {
+    try {
+      const refreshedItem = await fetch("/.netlify/functions/refresh-item", {
+        method: "POST",
+        body: JSON.stringify(id)
+      }).then(res => res.json());
+      commit("editItem", refreshedItem);
+    } catch (err) {
+      console.log(err);
+    }
   }
 };

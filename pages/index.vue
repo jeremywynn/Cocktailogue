@@ -6,33 +6,25 @@
       <button v-on:click="searchItems">Search</button>
     </div>
 
-    <!-- <div class="add">
-      <form action>
-      <fieldset>
-      
+    <div class="add">
       <div class="form-field">
         <label for="a1">Name</label>
         <input type="text" v-model="newItemName" />
       </div>
-      
-      <div class="form-field">
-        <label for>Search</label>
-        <input type="text" v-model="searchTerms" />
-        <button v-on:click="searchItems">Search</button>
-      </div>
+
       <div class="form-field">
         <label for="a2">Media</label>
         <div class="carousel-wrapper" v-if="newItemMedia.length > 1">
           <div class="carousel snap" ref="carousel">
             <div class="carousel-item" v-for="media in newItemMedia">
               <img v-bind:src="media.url" v-if="media.type === 'GraphImage'" alt />
-              <video
-                controls
-                v-bind:src="media.video_url"
-                v-bind:poster="media.url"
-                v-if="media.type === 'GraphVideo'"
-                type="video/mp4"
-              ></video>
+              <!-- <video
+                    controls
+                    v-bind:src="media.video_url"
+                    v-bind:poster="media.url"
+                    v-if="media.type === 'GraphVideo'"
+                    type="video/mp4"
+              ></video>-->
               <img v-bind:src="media.url" v-else-if="media.type === 'GraphVideo'" alt />
             </div>
           </div>
@@ -54,45 +46,33 @@
             ></video>
           </div>
         </div>
-        
-        <FilePond
-          accepted-file-types="image/png, image/jpeg, image/gif"
-          allowDrop="false"
-          stylePanelLayout="integrated"
-          instantUpload="false"
-          :server="{ process }"
-          ref="pondNew"
-          labelIdle="<span class='filepond--label-action'>Add Image</span>"
-        />
-        
-        <input type="text" v-model="newItemImage" />
+
+        <!-- <input type="text" v-model="newItemImage" /> -->
       </div>
-      
+
+      <!-- <div class="form-field">
+            <label for="a3">Ingredients</label>
+            <textarea name id="a3" cols="30" rows="10" v-model="ingredientsTextarea"></textarea>
+            <button v-on:click="addIngredient">+</button>
+            <ingredient
+              v-for="(ingredient) in ingredients"
+              v-on:remove-ingredient="removeIngredient"
+              v-on:add-ingredient-here="addIngredientHere"
+              v-on:update:content="ingredient.content = $event"
+              v-bind:content.sync="ingredient.content"
+              :ingredient="ingredient"
+              :key="ingredient.id"
+            />
+      </div>-->
+
       <div class="form-field">
-        <label for="a3">Ingredients</label>
-        <textarea name id="a3" cols="30" rows="10" v-model="ingredientsTextarea"></textarea>
-        <button v-on:click="addIngredient">+</button>
-        <ingredient
-          v-for="(ingredient) in ingredients"
-          v-on:remove-ingredient="removeIngredient"
-          v-on:add-ingredient-here="addIngredientHere"
-          v-on:update:content="ingredient.content = $event"
-          v-bind:content.sync="ingredient.content"
-          :ingredient="ingredient"
-          :key="ingredient.id"
-        />
-      </div>
-      
-      <div class="form-field">
-        <label for="a4">Instructions</label>
+        <label for="a4">Content</label>
         <textarea name id cols="30" rows="10" v-model="newItemContent"></textarea>
       </div>
       <input type="file" accept="application/json" @change="processFile($event)" ref="jsonFile" />
 
-      <button v-on:click="addItem">Add Item</button>
-      <</fieldset>
-      </form>
-    </div>-->
+      <button v-on:click="addItem" :disabled="itemAddProcessing">Add Item</button>
+    </div>
     <div class="items" ref="items" id="items">
       <item
         v-for="(item, index) in items"
@@ -102,12 +82,17 @@
         v-on:remove-item="removeItem(item)"
       />
     </div>
+    <div class="lower-brow">
+      <loading />
+      <!-- <div class="message">Edits successfully made</div> -->
+    </div>
   </div>
 </template>
 
 <script>
 import ingredient from "@@/components/ingredient.vue";
 import item from "@@/components/item.vue";
+import loading from "@@/components/loading.vue";
 
 export default {
   async fetch({ store }) {
@@ -122,6 +107,7 @@ export default {
       ingredientIncrementer: 0,
       itemIncrementer: 0,
       ingredients: [],
+      itemAddProcessing: false,
       // ingredientsTextarea: null,
       jsonData: null,
       newItemMedia: [],
@@ -230,18 +216,12 @@ export default {
       this.ingredients.splice(ingredientIndex, 1);
     },
     */
-    async removeItem(item) {
-      let payload = {
-        ID: item._id,
-        media: item.media
-      };
-
-      await this.$store.dispatch("DELETE_ITEM", payload);
-    },
     async saveItems() {
       // Local Storage
       // const parsed = JSON.stringify(this.items);
       // localStorage.setItem("items", parsed);
+
+      this.itemAddProcessing = true;
 
       let payload = {
         name: this.newItemName,
@@ -250,7 +230,7 @@ export default {
         sourceCategory: "Instagram",
         sourceIdentifier: this.newItemSourceIdentifier
       };
-      // console.log(payload);
+
       await this.$store.dispatch("ADD_ITEM", payload);
 
       // Resetting Addition Form Values
@@ -260,6 +240,8 @@ export default {
       this.$refs.jsonFile.value = "";
       this.newItemSourceCategory = null;
       this.newItemSourceIdentifier = null;
+
+      this.itemAddProcessing = true;
     },
     nextSlide() {
       this.carouselScrollMarker += this.$refs.carousel.clientWidth;
@@ -375,8 +357,8 @@ export default {
     }
   },
   components: {
-    // ingredient,
-    item
+    item,
+    loading
   }
 };
 </script>
@@ -385,13 +367,22 @@ export default {
 html {
   background-color: #000;
   color: #fff;
-  // padding: calc(1rem + 2vw);
 }
 img {
   max-width: 100%;
 }
 textarea {
   display: block;
+}
+
+button {
+  cursor: pointer;
+}
+
+.container {
+  margin: 0 auto;
+  max-width: 40rem;
+  padding-bottom: 2rem;
 }
 
 .carousel {
@@ -448,6 +439,23 @@ textarea {
 
 .items {
   margin: 0 auto;
-  max-width: 40rem;
+  // max-width: 40rem;
+}
+
+.lower-brow {
+  bottom: 0;
+  pointer-events: none;
+  position: fixed;
+  right: 0;
+  z-index: 2;
+}
+
+.message {
+  background-color: green;
+  color: white;
+  display: inline-block;
+  font-size: 70%;
+  line-height: 1;
+  padding: 0.25rem;
 }
 </style>

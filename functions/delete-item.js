@@ -3,12 +3,20 @@ require("dotenv").config();
 
 import {
   Stitch,
+  StitchAppClientConfiguration,
   RemoteMongoClient,
   BSON,
   UserApiKeyCredential
 } from "mongodb-stitch-server-sdk";
 
-const client = Stitch.initializeDefaultAppClient("catalogue-fjarv");
+// const client = Stitch.initializeDefaultAppClient(
+//   "catalogue-fjarv",
+//   new StitchAppClientConfiguration.Builder().withDataDirectory("/tmp").build()
+// );
+const client = Stitch.initializeDefaultAppClient(
+  "catalogue-fjarv",
+  new StitchAppClientConfiguration.Builder().withDataDirectory("").build()
+);
 const mongoClient = client.getServiceClient(
   RemoteMongoClient.factory,
   "mongodb-atlas"
@@ -61,14 +69,26 @@ exports.handler = async (event, context, callback) => {
       _id: new BSON.ObjectId(data.ID)
     });
 
+    if (response.deletedCount) {
+      // Should we query for the deleted document to make doubly sure it was deleted?
+      let payload = {
+        _id: data.ID
+      };
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify(payload)
+      };
+    }
+
     // console.log(response);
     // { deletedCount: 1 }
 
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify(response)
-    };
+    // return {
+    //   statusCode: 200,
+    //   headers,
+    //   body: JSON.stringify(response)
+    // };
   } catch (error) {
     console.log(error); // output to netlify function log
     return {
