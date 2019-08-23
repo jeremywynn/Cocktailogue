@@ -7,19 +7,16 @@ import {
   UserApiKeyCredential
 } from "mongodb-stitch-server-sdk";
 
-const environment = process.env.NODE_ENV || 'development';
+const environment = process.env.NODE_ENV || "development";
 
-if (environment === 'development') {
+if (environment === "development") {
+  let client = Stitch.initializeDefaultAppClient("catalogue-fjarv");
+} else {
   let client = Stitch.initializeDefaultAppClient(
-    "catalogue-fjarv"
+    "catalogue-fjarv",
+    new StitchAppClientConfiguration.Builder().withDataDirectory("/tmp").build()
   );
 }
-else {
-  let client = Stitch.initializeDefaultAppClient(
-  "catalogue-fjarv",
-  new StitchAppClientConfiguration.Builder().withDataDirectory("/tmp").build()
-);
-
 
 // const client = Stitch.initializeDefaultAppClient(
 //   "catalogue-fjarv",
