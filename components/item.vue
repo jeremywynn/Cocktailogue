@@ -38,7 +38,12 @@
       </div>
     </div>
 
-    <div class="item__contents" ref="itemContents">
+    <div
+      class="item__contents"
+      ref="itemContents"
+      transition="v-expand-transition"
+      v-show="revealed"
+    >
       <div class="item__content">
         <div class="item-content" ref="itemContent">{{ itemContent }}</div>
       </div>
@@ -86,6 +91,8 @@
 </template>
 
 <script>
+// import Vuetify from 'vuetify/lib'
+
 export default {
   data: function() {
     return {
@@ -340,7 +347,7 @@ export default {
   }
 
   &__contents {
-    display: none;
+    // display: none;
     padding: 0.5rem;
     position: relative;
   }
@@ -411,7 +418,7 @@ export default {
       display: block;
     }
     .item__contents {
-      display: block;
+      // display: block;
     }
   }
   &.intersected {
