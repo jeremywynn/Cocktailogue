@@ -30,7 +30,7 @@ export default {
   /*
    ** Global CSS
    */
-  css: [],
+  css: ["normalize.css/normalize.css"],
   /*
    ** Plugins to load before mounting the App
    */
@@ -38,10 +38,16 @@ export default {
   /*
    ** Nuxt.js dev-modules
    */
-  buildModules: [],
+  buildModules: ["@nuxtjs/vuetify"],
   /*
    ** Nuxt.js modules
    */
+  vuetify: {
+    // css: false,
+    defaultAssets: false,
+    // materialIcons: true,
+    treeShake: true
+  },
   modules: ["@nuxtjs/proxy", "@nuxtjs/dotenv"],
   proxy: {
     "/.netlify": {

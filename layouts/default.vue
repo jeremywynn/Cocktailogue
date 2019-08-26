@@ -35,8 +35,17 @@ h6,
 }
 
 textarea,
-input {
-  /* font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI",
-    Roboto, "Helvetica Neue", Arial, sans-serif; */
+input[type="text"] {
+  /* background-color: white; */
+  border: 2px solid white;
+}
+
+button {
+  border: 1px solid yellow;
+  padding: 0.25rem 0.5rem;
+  &:hover,
+  &:focus,
+  &:active {
+  }
 }
 </style>

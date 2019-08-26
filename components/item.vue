@@ -37,56 +37,58 @@
         </div>
       </div>
     </div>
-
-    <div
-      class="item__contents"
-      ref="itemContents"
-      transition="v-expand-transition"
-      v-show="revealed"
-    >
-      <div class="item__content">
-        <div class="item-content" ref="itemContent">{{ itemContent }}</div>
-      </div>
-      <div class="item__meta">
-        <div class="item__source-category">{{ item.sourceCategory }}</div>
-        <div class="item__source-url">
-          <a :href="reconstructedUrl" target="_blank" rel="noreferrer">{{ reconstructedUrl }}</a>
-        </div>
-      </div>
-      <div class="item__actions">
-        <div class="action-group action-group--editing">
-          <button v-on:click="triggerEditItem" :disabled="itemProcessing">
-            <span v-if="editingItem">Cancel Edits</span>
-            <span v-else>Edit Item</span>
-          </button>
-          <button v-on:click="editItem" v-show="editingItem" :disabled="itemProcessing">Save Edits</button>
-        </div>
-        <div class="action-group" v-if="!editingItem">
-          <transition name="fade">
-            <div class="button-group">
-              <transition name="fade" mode="out-in">
-                <div class="original-removal" v-if="confirmRemoval === false" key="hideChoice">
-                  <button
-                    v-on:click="confirmRemoval = true"
-                    v-show="!editingItem"
-                    :disabled="itemProcessing"
-                  >Remove Item</button>
-                </div>
-                <div class="confirm-removal" v-if="confirmRemoval === true" key="showChoice">
-                  <span class="confirm-text">Remove?</span>
-                  <div class="choice">
-                    <!-- <button v-on:click="removeItem">Yes</button> -->
-                  </div>
-                  <div class="choice">
-                    <button v-on:click="confirmRemoval = false">No</button>
-                  </div>
+    <v-expand-transition>
+      <div class="expander" v-show="revealed">
+        <div class="item__contents">
+          <div class="item__content">
+            <div class="item-content" ref="itemContent">{{ itemContent }}</div>
+          </div>
+          <div class="item__meta">
+            <div class="item__source-category" v-if="sourceCategory">{{ sourceCategory }}</div>
+            <div class="item__source-url" v-if="sourceIdentifier">
+              <a :href="reconstructedUrl" target="_blank" rel="noreferrer">{{ reconstructedUrl }}</a>
+            </div>
+          </div>
+          <div class="item__actions">
+            <div class="action-group action-group--editing">
+              <button v-on:click="triggerEditItem" :disabled="itemProcessing">
+                <span v-if="editingItem">Cancel Edits</span>
+                <span v-else>Edit Item</span>
+              </button>
+              <button
+                v-on:click="editItem"
+                v-show="editingItem"
+                :disabled="itemProcessing"
+              >Save Edits</button>
+            </div>
+            <div class="action-group" v-if="!editingItem">
+              <transition name="fade">
+                <div class="button-group">
+                  <transition name="fade" mode="out-in">
+                    <div class="original-removal" v-if="confirmRemoval === false" key="hideChoice">
+                      <button
+                        v-on:click="confirmRemoval = true"
+                        v-show="!editingItem"
+                        :disabled="itemProcessing"
+                      >Remove Item</button>
+                    </div>
+                    <div class="confirm-removal" v-if="confirmRemoval === true" key="showChoice">
+                      <span class="confirm-text">Remove?</span>
+                      <div class="choice">
+                        <button v-on:click="removeItem">Yes</button>
+                      </div>
+                      <div class="choice">
+                        <button v-on:click="confirmRemoval = false">No</button>
+                      </div>
+                    </div>
+                  </transition>
                 </div>
               </transition>
             </div>
-          </transition>
+          </div>
         </div>
       </div>
-    </div>
+    </v-expand-transition>
   </div>
 </template>
 
@@ -98,8 +100,6 @@ export default {
     return {
       carouselScrollMarker: 0,
       confirmRemoval: false,
-      // editedName: this.item.name,
-      // editedContent: this.item.content,
       editingItem: false,
       itemContent: this.item.content,
       itemName: this.item.name,
@@ -108,7 +108,9 @@ export default {
       mediaUrl: null,
       reconstructedUrl:
         "https://www.instagram.com/p/" + this.item.sourceIdentifier,
-      revealed: false
+      revealed: false,
+      sourceCategory: this.item.sourceCategory,
+      sourceIdentifier: this.item.sourceIdentifier
     };
   },
   methods: {
@@ -224,7 +226,7 @@ export default {
     // console.log(this.$el);
     // console.log(this.$refs.mediaItem);
 
-    this.$el.querySelectorAll(".media-item").forEach(item => {
+    this.$el.querySelectorAll(".item__media").forEach(item => {
       this.observer.observe(item);
     });
 
@@ -325,11 +327,6 @@ export default {
   }
 }
 .media-item {
-  opacity: 0;
-  transition: opacity 400ms;
-  &.unveil {
-    opacity: 1;
-  }
 }
 
 .item__meta {
@@ -379,6 +376,11 @@ export default {
     left: 0;
     right: 0;
     top: 0;
+    opacity: 0;
+    transition: opacity 400ms;
+    &.unveil {
+      opacity: 1;
+    }
     img {
       display: block;
       object-fit: contain;
@@ -608,6 +610,9 @@ export default {
       opacity: 1;
       transition: none;
     }
+  }
+  .item__title {
+    z-index: 2;
   }
   .item__title {
     // position: relative;

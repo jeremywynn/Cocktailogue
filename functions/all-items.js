@@ -7,16 +7,9 @@ import {
   UserApiKeyCredential
 } from "mongodb-stitch-server-sdk";
 
-const environment = process.env.NODE_ENV || "development";
+// const environment = process.env.NODE_ENV || "development";
 
-if (environment === "development") {
-  let client = Stitch.initializeDefaultAppClient("catalogue-fjarv");
-} else {
-  let client = Stitch.initializeDefaultAppClient(
-    "catalogue-fjarv",
-    new StitchAppClientConfiguration.Builder().withDataDirectory("/tmp").build()
-  );
-}
+// console.log(environment);
 
 // const client = Stitch.initializeDefaultAppClient(
 //   "catalogue-fjarv",
@@ -40,11 +33,22 @@ const headers = {
 
 exports.handler = async (event, context, callback) => {
   try {
+    const data = JSON.parse(event.body);
+    let skipAmount = 0;
+    if (data.skip) {
+      skipAmount = data.skip;
+    }
     await client.auth.loginWithCredential(credential);
     const db = mongoClient.db("catalogue");
     const itemsCollection = db.collection("items");
-    const pipeline = [{ $skip: 1040 }, { $limit: 30 }];
+    // const itemsCount = await itemsCollection.count();
+    // console.log(itemsCount);
+
+    // skipAmount 1040
+
+    const pipeline = [{ $skip: skipAmount }, { $limit: 100 }];
     const items = await itemsCollection.aggregate(pipeline).toArray();
+
     return {
       statusCode: 200,
       headers,

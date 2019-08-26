@@ -1,56 +1,75 @@
 <template>
   <div class="container">
-    <div class="form-field">
-      <label for>Search</label>
-      <input type="text" v-model="searchTerms" />
-      <button v-on:click="searchItems">Search</button>
-    </div>
-
-    <div class="add">
-      <div class="form-field">
-        <label for="a1">Name</label>
-        <input type="text" v-model="newItemName" />
+    <!-- <div class="communicator">
+      <div class="message">
+        <div class="message__body">Item has been successfully edited.</div>
+        <div class="message__status">
+          <canvas height="32" width="32" ref="lifespan"></canvas>
+        </div>
       </div>
+    </div>-->
 
-      <div class="form-field">
-        <label for="a2">Media</label>
-        <div class="carousel-wrapper" v-if="newItemMedia.length > 1">
-          <div class="carousel snap" ref="carousel">
-            <div class="carousel-item" v-for="media in newItemMedia">
-              <img v-bind:src="media.url" v-if="media.type === 'GraphImage'" alt />
-              <!-- <video
-                    controls
-                    v-bind:src="media.video_url"
-                    v-bind:poster="media.url"
-                    v-if="media.type === 'GraphVideo'"
-                    type="video/mp4"
-              ></video>-->
-              <img v-bind:src="media.url" v-else-if="media.type === 'GraphVideo'" alt />
+    <form @submit.prevent="searchItems" class="form form--search">
+      <fieldset>
+        <div class="form-field">
+          <input type="text" v-model="searchTerms" id="search-field" />
+          <button type="submit">Search</button>
+        </div>
+      </fieldset>
+    </form>
+
+    <form @submit.prevent class="form form--add">
+      <fieldset>
+        <v-expand-transition>
+          <div class="item-preview" v-show="newItemContent">
+            <div class="item editing">
+              <div class="item__header">
+                <div class="item__title">
+                  <div class="title-interior">
+                    <div
+                      class="item-name"
+                      contenteditable="true"
+                      v-html="newItemName"
+                      ref="newItemName"
+                    ></div>
+                  </div>
+                </div>
+                <div class="item__media">
+                  <div class="carousel-wrapper" v-if="newItemMedia.length > 1">
+                    <div class="carousel snap" ref="carousel">
+                      <div class="carousel-item" v-for="media in newItemMedia">
+                        <img v-bind:src="media.url" v-if="media.type === 'GraphImage'" alt />
+                        <img v-bind:src="media.url" v-else-if="media.type === 'GraphVideo'" alt />
+                      </div>
+                    </div>
+                    <div class="carousel-controls">
+                      <button v-on:click="prevSlide" ref="prev">Prev</button>
+                      <button v-on:click="nextSlide" ref="next">Next</button>
+                    </div>
+                  </div>
+                  <div v-for="media in newItemMedia" v-if="newItemMedia.length < 2">
+                    <img v-bind:src="media.url" v-if="media.type === 'GraphImage'" alt />
+                    <img v-bind:src="media.url" v-else-if="media.type === 'GraphVideo'" alt />
+                  </div>
+                  <div class="media-item" v-if="newItemMedia.length === 0">
+                    <img src="~/assets/drunk-uncle-720x720-recipe.jpg" alt />
+                  </div>
+                </div>
+              </div>
+              <div class="item__contents">
+                <div class="item__content">
+                  <div
+                    class="item-content"
+                    contenteditable="true"
+                    v-html="newItemContent"
+                    ref="newItemContent"
+                  ></div>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="carousel-controls">
-            <button v-on:click="prevSlide" ref="prev">Prev</button>
-            <button v-on:click="nextSlide" ref="next">Next</button>
-          </div>
-        </div>
-        <div v-for="media in newItemMedia" v-if="newItemMedia.length < 2">
-          <img v-bind:src="media.url" v-if="media.type === 'GraphImage'" alt />
-          <img v-bind:src="media.url" v-else-if="media.type === 'GraphVideo'" alt />
-          <div v-if="media.type === 'GraphVideo'">
-            <video
-              controls
-              playsinline
-              v-bind:src="media.video_url"
-              v-bind:poster="media.url"
-              type="video/mp4"
-            ></video>
-          </div>
-        </div>
-
-        <!-- <input type="text" v-model="newItemImage" /> -->
-      </div>
-
-      <!-- <div class="form-field">
+        </v-expand-transition>
+        <!-- <div class="form-field">
             <label for="a3">Ingredients</label>
             <textarea name id="a3" cols="30" rows="10" v-model="ingredientsTextarea"></textarea>
             <button v-on:click="addIngredient">+</button>
@@ -63,28 +82,31 @@
               :ingredient="ingredient"
               :key="ingredient.id"
             />
-      </div>-->
+        </div>-->
 
-      <div class="form-field">
-        <label for="a4">Content</label>
-        <textarea name id cols="30" rows="10" v-model="newItemContent"></textarea>
-      </div>
-      <input type="file" accept="application/json" @change="processFile($event)" ref="jsonFile" />
+        <input type="file" accept="application/json" @change="processFile($event)" ref="jsonFile" />
 
-      <button v-on:click="addItem" :disabled="itemAddProcessing">Add Item</button>
-    </div>
+        <button v-on:click="addItem" v-show="newItemContent" :disabled="itemAddProcessing">Add Item</button>
+        <button
+          v-on:click="resetAddForm"
+          v-show="newItemContent"
+          :disabled="itemAddProcessing"
+        >Cancel</button>
+      </fieldset>
+    </form>
+
+    <div class="add"></div>
     <div class="items" ref="items" id="items">
       <item
         v-for="(item, index) in items"
         :class="{ 'tease': index === 0 }"
         :item="item"
         :key="item._id"
-        v-on:remove-item="removeItem(item)"
       />
+      <div class="items-footer" ref="itemsFooter"></div>
     </div>
     <div class="lower-brow">
       <loading />
-      <!-- <div class="message">Edits successfully made</div> -->
     </div>
   </div>
 </template>
@@ -104,20 +126,20 @@ export default {
   },
   data: function() {
     return {
+      carouselScrollMarker: 0,
       ingredientIncrementer: 0,
       itemIncrementer: 0,
       ingredients: [],
       itemAddProcessing: false,
-      // ingredientsTextarea: null,
+      // itemsLimit: 20,
+      // itemsLoaded: 0,
       jsonData: null,
+      moarItemstoLoad: false,
       newItemMedia: [],
       newItemContent: null,
       newItemName: null,
       newItemSourceCategory: null,
       newItemSourceUrl: null,
-
-      carouselScrollMarker: 0,
-
       searchTerms: null
     };
   },
@@ -127,7 +149,13 @@ export default {
         let payload = {
           searchTerms: this.searchTerms
         };
-        await this.$store.dispatch("SEARCH_ITEMS", payload);
+        await this.$store.dispatch("EDIT_SEARCH_TERMS", payload);
+        // console.log(this.$store.state.searchTerms);
+
+        await this.$store.dispatch(
+          "SEARCH_ITEMS",
+          this.$store.state.searchTerms
+        );
       }
     },
     processFile(event) {
@@ -141,9 +169,7 @@ export default {
           this.newItemContent = null;
 
           this.jsonData = JSON.parse(evt.target.result);
-
           this.newItemId = this.jsonData.node.id;
-
           let instaNode = this.jsonData.node;
 
           if (instaNode.hasOwnProperty("edge_sidecar_to_children")) {
@@ -205,17 +231,12 @@ export default {
     */
     addItem() {
       // Add item through database
-      if (!this.newItemContent) {
+      if (!this.newItemContent || !this.$refs.newItemContent.innerText) {
         return;
       }
+
       this.saveItems();
     },
-    /*
-    removeIngredient(ingredient) {
-      const ingredientIndex = this.ingredients.indexOf(ingredient);
-      this.ingredients.splice(ingredientIndex, 1);
-    },
-    */
     async saveItems() {
       // Local Storage
       // const parsed = JSON.stringify(this.items);
@@ -224,15 +245,20 @@ export default {
       this.itemAddProcessing = true;
 
       let payload = {
-        name: this.newItemName,
+        name: this.$refs.newItemName.textContent,
         media: this.newItemMedia,
-        content: this.newItemContent,
+        content: this.$refs.newItemContent.innerText,
         sourceCategory: "Instagram",
         sourceIdentifier: this.newItemSourceIdentifier
       };
 
       await this.$store.dispatch("ADD_ITEM", payload);
 
+      this.resetAddForm();
+
+      this.itemAddProcessing = true;
+    },
+    resetAddForm() {
       // Resetting Addition Form Values
       this.newItemName = null;
       this.newItemMedia = [];
@@ -240,8 +266,6 @@ export default {
       this.$refs.jsonFile.value = "";
       this.newItemSourceCategory = null;
       this.newItemSourceIdentifier = null;
-
-      this.itemAddProcessing = true;
     },
     nextSlide() {
       this.carouselScrollMarker += this.$refs.carousel.clientWidth;
@@ -265,6 +289,41 @@ export default {
     }
   },
   mounted: function() {
+    this.observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.intersectionRatio > 0) {
+          if (this.$store.state.itemsRemaining === false) {
+            this.observer.unobserve(this.$refs.itemsFooter);
+          } else {
+            this.$store.dispatch(
+              "GET_ADDITIONAL_ITEMS",
+              this.$store.state.items.length
+            );
+          }
+        }
+      });
+    });
+
+    window.setTimeout(() => {
+      // this.observer.observe(this.$refs.itemsFooter);
+    }, 400);
+
+    // console.log(items.length);
+
+    // window.addEventListener("load", () => {
+    //   console.log("triggering observer");
+
+    // });
+
+    // itemImageObserver.observe(this.$el);
+    // console.log(this.$refs.mediaItem);
+
+    // this.observer.observe(this.$el);
+
+    // console.log(this);
+    // console.log(this.$el);
+    // console.log(this.$refs.mediaItem);
+
     /*
     let options = {
       // root: document.querySelector("#items"),
@@ -450,12 +509,64 @@ button {
   z-index: 2;
 }
 
+.communicator {
+  position: fixed;
+  top: 10%;
+  z-index: 2;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
 .message {
-  background-color: green;
-  color: white;
-  display: inline-block;
-  font-size: 70%;
+  align-items: center;
+  background-color: tan;
+  color: #111;
+  display: grid;
+  grid-column-gap: 1rem;
+  grid-template-columns: auto 32px;
+  // color: white;
+  // display: inline-block;
+  // font-size: 70%;
   line-height: 1;
-  padding: 0.25rem;
+  padding: 0.5rem;
+  // padding: 0.25rem;
+  &__body {
+  }
+  &__status {
+  }
+}
+
+.form {
+  fieldset {
+    border: 0;
+    padding: 0;
+  }
+  &--search {
+    .form-field {
+      display: flex;
+    }
+    input {
+      flex: 1 1 auto;
+      margin-right: 0.5rem;
+    }
+    button {
+      flex: 0;
+    }
+  }
+}
+
+.item-preview {
+  .item__header {
+    cursor: default;
+  }
+  .item__title {
+    z-index: 2;
+  }
+  .item-name {
+    min-height: 3rem;
+  }
+  .item__content {
+    margin-bottom: 0;
+  }
 }
 </style>

@@ -1,6 +1,8 @@
 export const state = () => ({
   items: [],
-  loading: false
+  itemsRemaining: true,
+  loading: false,
+  searchTerms: null
 });
 
 export const mutations = {
@@ -26,6 +28,12 @@ export const mutations = {
   },
   endBusyState(state) {
     state.loading = false;
+  },
+  adjustItemsRemaining(state, count) {
+    state.itemsRemaining = count;
+  },
+  setSearchTerms(state, payload) {
+    state.searchTerms = payload;
   }
 };
 
@@ -36,13 +44,47 @@ export const actions = {
   stopBusyState({ commit }) {
     commit("endBusyState");
   },
-  async GET_ITEMS({ commit, dispatch }) {
+  EDIT_SEARCH_TERMS({ commit }, payload) {
+    let searchTerms = payload.searchTerms;
+    commit("setSearchTerms", searchTerms);
+  },
+  async GET_ITEMS({ commit, dispatch }, payload) {
     dispatch("triggerBusyState");
+    let data = {
+      skip: payload
+    };
     try {
-      let items = await fetch("/.netlify/functions/all-items").then(res =>
-        res.json()
-      );
-      commit("SET_ITEMS", items);
+      let items = await fetch("/.netlify/functions/all-items", {
+        method: "POST",
+        body: JSON.stringify(data)
+      }).then(res => res.json());
+      if (items.length > 0) {
+        commit("SET_ITEMS", items);
+      } else {
+        commit("adjustItemsRemaining", false);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+    dispatch("stopBusyState");
+  },
+  async GET_ADDITIONAL_ITEMS({ commit, dispatch }, payload) {
+    dispatch("triggerBusyState");
+    let data = {
+      skip: payload
+    };
+    try {
+      let items = await fetch("/.netlify/functions/all-items", {
+        method: "POST",
+        body: JSON.stringify(data)
+      }).then(res => res.json());
+      if (items.length > 0) {
+        items.forEach(item => {
+          commit("addItem", item);
+        });
+      } else {
+        commit("adjustItemsRemaining", false);
+      }
     } catch (err) {
       console.log(err);
     }
@@ -52,7 +94,7 @@ export const actions = {
     dispatch("triggerBusyState");
     try {
       let data = {
-        searchTerms: payload.searchTerms
+        searchTerms: payload
       };
       let items = await fetch("/.netlify/functions/find-items", {
         method: "POST",
