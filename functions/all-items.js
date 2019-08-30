@@ -29,7 +29,7 @@ exports.handler = async (event, context, callback) => {
   let dataDirectory = '';
 
   if (Object.entries(context.clientContext).length != 0) {
-    dataDirectory = 'tmp';
+    dataDirectory = '/tmp';
   }
 
   const client = Stitch.initializeDefaultAppClient(
