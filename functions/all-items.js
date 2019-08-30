@@ -27,28 +27,29 @@ const headers = {
 
 exports.handler = async (event, context, callback) => {
   let client;
+  console.log(context);
 
-if (process.env.CONTEXT) {
-  client = Stitch.initializeDefaultAppClient(
-    "catalogue-fjarv",
-    new StitchAppClientConfiguration.Builder().withDataDirectory("/tmp").build()
+  if (Object.entries(context.clientContext).length != 0) {
+    client = Stitch.initializeDefaultAppClient(
+      "catalogue-fjarv",
+      new StitchAppClientConfiguration.Builder().withDataDirectory("/tmp").build()
+    );
+  }
+  else {
+    client = Stitch.initializeDefaultAppClient(
+      "catalogue-fjarv",
+      new StitchAppClientConfiguration.Builder().withDataDirectory("").build()
+    );
+  }
+
+  const mongoClient = client.getServiceClient(
+    RemoteMongoClient.factory,
+    "mongodb-atlas"
   );
-}
-else {
-  client = Stitch.initializeDefaultAppClient(
-    "catalogue-fjarv",
-    new StitchAppClientConfiguration.Builder().withDataDirectory("").build()
-  );
-}
 
-const mongoClient = client.getServiceClient(
-  RemoteMongoClient.factory,
-  "mongodb-atlas"
-);
-
-const credential = new UserApiKeyCredential(process.env.MONGODB_API_KEY);
-  console.log(process.env);
-  console.log(process.env.CONTEXT);
+  const credential = new UserApiKeyCredential(process.env.MONGODB_API_KEY);
+  // console.log(process.env);
+  // console.log(process.env.CONTEXT);
   try {
     const data = JSON.parse(event.body);
     // let skipAmount = 18;
