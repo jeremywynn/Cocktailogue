@@ -26,21 +26,16 @@ const headers = {
 };
 
 exports.handler = async (event, context, callback) => {
-  let client;
-  console.log(context);
+  let dataDirectory = '';
 
   if (Object.entries(context.clientContext).length != 0) {
-    client = Stitch.initializeDefaultAppClient(
-      "catalogue-fjarv",
-      new StitchAppClientConfiguration.Builder().withDataDirectory("/tmp").build()
-    );
+    dataDirectory = 'tmp';
   }
-  else {
-    client = Stitch.initializeDefaultAppClient(
-      "catalogue-fjarv",
-      new StitchAppClientConfiguration.Builder().withDataDirectory("").build()
-    );
-  }
+
+  const client = Stitch.initializeDefaultAppClient(
+    "catalogue-fjarv",
+    new StitchAppClientConfiguration.Builder().withDataDirectory(dataDirectory).build()
+  );
 
   const mongoClient = client.getServiceClient(
     RemoteMongoClient.factory,
@@ -48,8 +43,7 @@ exports.handler = async (event, context, callback) => {
   );
 
   const credential = new UserApiKeyCredential(process.env.MONGODB_API_KEY);
-  // console.log(process.env);
-  // console.log(process.env.CONTEXT);
+
   try {
     const data = JSON.parse(event.body);
     // let skipAmount = 18;
