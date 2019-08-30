@@ -9,8 +9,7 @@ import {
 
 // const environment = process.env.NODE_ENV || "development";
 
-console.log(process.env);
-console.log(process.env.CONTEXT);
+
 
 // console.log(environment);
 
@@ -19,7 +18,15 @@ console.log(process.env.CONTEXT);
 //   new StitchAppClientConfiguration.Builder().withDataDirectory("/tmp").build()
 // );
 
-let client;
+
+
+const headers = {
+  Accept: "application/json",
+  "Content-Type": "application/json"
+};
+
+exports.handler = async (event, context, callback) => {
+  let client;
 
 if (process.env.CONTEXT) {
   client = Stitch.initializeDefaultAppClient(
@@ -40,13 +47,8 @@ const mongoClient = client.getServiceClient(
 );
 
 const credential = new UserApiKeyCredential(process.env.MONGODB_API_KEY);
-
-const headers = {
-  Accept: "application/json",
-  "Content-Type": "application/json"
-};
-
-exports.handler = async (event, context, callback) => {
+  console.log(process.env);
+  console.log(process.env.CONTEXT);
   try {
     const data = JSON.parse(event.body);
     // let skipAmount = 18;
