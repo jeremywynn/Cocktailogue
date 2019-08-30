@@ -1,42 +1,45 @@
 <template>
   <div class="item" v-bind:class="{ 'editing': editingItem, 'reveal': revealed }" ref="item">
-    <div class="item__header" ref="itemHeader">
-      <div class="item__title">
-        <div class="title-interior">
-          <div class="item-name" ref="itemName">{{ itemName }}</div>
+    <div class="header-wrap">
+      <div class="item__header" ref="itemHeader">
+        <div class="item__title">
+          <div class="title-interior">
+            <div class="item-name" ref="itemName">{{ itemName }}</div>
+          </div>
         </div>
-      </div>
-      <div class="item__media">
-        <div class="carousel-wrapper" v-if="item.media.length > 1">
-          <!-- <div class="carousel snap" ref="carousel" v-on:resize="resize"> -->
-          <div class="carousel snap" ref="carousel">
-            <div class="media-item" v-for="media in item.media">
-              <img
-                v-bind:src="'https://ik.imagekit.io/94ka2dfnz' + media.path"
-                v-if="media.path"
-                alt
-              />
+        <div class="item__media">
+          <div class="carousel-wrapper" v-if="item.media.length > 1">
+            <!-- <div class="carousel snap" ref="carousel" v-on:resize="resize"> -->
+            <div class="carousel snap" ref="carousel">
+              <div class="media-item" v-for="media in item.media">
+                <img
+                  v-bind:src="'https://ik.imagekit.io/94ka2dfnz' + media.path"
+                  v-if="media.path"
+                  alt
+                />
+              </div>
             </div>
           </div>
-          <div class="carousel-controls">
-            <button v-on:click="prevSlide" ref="prev">Prev</button>
-            <button v-on:click="nextSlide" ref="next">Next</button>
+          <div
+            class="media-item"
+            v-if="item.media.length === 1"
+            v-for="media in item.media"
+            ref="mediaItem"
+          >
+            <img v-bind:src="'https://ik.imagekit.io/94ka2dfnz' + media.path" v-if="media.path" alt />
+            <img v-bind:src="media.url" v-else alt />
+          </div>
+          <div class="media-item" v-if="item.media.length === 0">
+            <img src="~/assets/drunk-uncle-720x720-recipe.jpg" alt />
           </div>
         </div>
-        <div
-          class="media-item"
-          v-if="item.media.length === 1"
-          v-for="media in item.media"
-          ref="mediaItem"
-        >
-          <img v-bind:src="'https://ik.imagekit.io/94ka2dfnz' + media.path" v-if="media.path" alt />
-          <img v-bind:src="media.url" v-else alt />
-        </div>
-        <div class="media-item" v-if="item.media.length === 0">
-          <img src="~/assets/drunk-uncle-720x720-recipe.jpg" alt />
-        </div>
+      </div>
+      <div class="carousel-controls" v-if="item.media.length > 1">
+        <button v-on:click="prevSlide" ref="prev" class="node node--prev">Prev</button>
+        <button v-on:click="nextSlide" ref="next" class="node node--next">Next</button>
       </div>
     </div>
+    
     <v-expand-transition>
       <div class="expander" v-show="revealed">
         <div class="item__contents">
@@ -70,10 +73,10 @@
                         v-on:click="confirmRemoval = true"
                         v-show="!editingItem"
                         :disabled="itemProcessing"
-                      >Remove Item</button>
+                      >Delete Item</button>
                     </div>
                     <div class="confirm-removal" v-if="confirmRemoval === true" key="showChoice">
-                      <span class="confirm-text">Remove?</span>
+                      <span class="confirm-text">Delete?</span>
                       <div class="choice">
                         <button v-on:click="removeItem">Yes</button>
                       </div>
@@ -148,14 +151,15 @@ export default {
       let payload = {
         ID: this.$vnode.key,
         name: this.$refs.itemName.textContent,
-        // content: this.$refs.itemContent.innerText
-        // media: this.newItemMedia,
         content: this.$refs.itemContent.innerText
       };
       this.editingItem = false;
       this.$refs.itemName.setAttribute("contenteditable", false);
       this.$refs.itemContent.setAttribute("contenteditable", false);
-      await this.$store.dispatch("EDIT_ITEM", payload);
+      const editedItem = await this.$store.dispatch("EDIT_ITEM", payload);
+      if (editedItem.matchedCount && editedItem.modifiedCount) {
+        this.$root.$emit("transmitMessage", "Item successfully edited.");
+      }
       this.itemProcessing = false;
     },
     async removeItem() {
@@ -165,7 +169,11 @@ export default {
         ID: this.$vnode.key,
         media: this.media
       };
-      await this.$store.dispatch("DELETE_ITEM", payload);
+      const deletedItem = await this.$store.dispatch("DELETE_ITEM", payload);
+      console.log(deletedItem);
+      if (deletedItem) { // Check _id here?
+        this.$root.$emit("transmitMessage", "Item successfully deleted.");
+      }
       this.itemProcessing = false;
     },
     // removeItem(item) {
@@ -312,7 +320,18 @@ export default {
 }
 .carousel-controls {
   position: absolute;
-  top: 50%;
+  top: 45%;
+  padding: 0 1rem;
+  width: 100%;
+}
+
+.node {
+  &--prev {
+    float: left;
+  }
+  &--next {
+    float: right;
+  }
 }
 
 .item__actions {
@@ -329,6 +348,10 @@ export default {
 .media-item {
 }
 
+.header-wrap {
+  position: relative;
+}
+
 .item__meta {
   padding: 0 1rem;
 }
@@ -336,15 +359,16 @@ export default {
   padding: 1rem;
 }
 .item {
-  border: 1px solid;
+  border: 2px solid;
   border-top: 0;
   overflow: hidden;
-  &__header {
+  .item__header {
     position: relative;
   }
 
   &__contents {
     // display: none;
+    font-size: 95%;
     padding: 0.5rem;
     position: relative;
   }
@@ -393,7 +417,7 @@ export default {
     }
   }
   &:first-child {
-    border-top: 1px solid;
+    border-top: 2px solid;
   }
   &.tease {
     .item__header {
@@ -535,7 +559,7 @@ export default {
 
 .item__content {
   // font-size: calc(0.825rem + 0.375vw);
-  line-height: 1.4;
+  // line-height: 1.4;
   margin-bottom: 1rem;
   position: relative;
   &:after,
@@ -567,7 +591,7 @@ export default {
 
 .item-content {
   // font-size: 90%;
-  line-height: 1.5;
+  line-height: 1.6;
   position: relative;
   transition: box-shadow 200ms;
   &:after,

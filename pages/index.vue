@@ -1,101 +1,122 @@
 <template>
   <div class="container">
-    <!-- <div class="communicator">
-      <div class="message">
-        <div class="message__body">Item has been successfully edited.</div>
-        <div class="message__status">
-          <canvas height="32" width="32" ref="lifespan"></canvas>
-        </div>
-      </div>
-    </div>-->
+    <div class="communicator">
+      <message />
+    </div>
 
-    <form @submit.prevent="searchItems" class="form form--search">
-      <fieldset>
-        <div class="form-field">
-          <input type="text" v-model="searchTerms" id="search-field" />
-          <button type="submit">Search</button>
-        </div>
-      </fieldset>
-    </form>
-
-    <form @submit.prevent class="form form--add">
-      <fieldset>
-        <v-expand-transition>
-          <div class="item-preview" v-show="newItemContent">
-            <div class="item editing">
-              <div class="item__header">
-                <div class="item__title">
-                  <div class="title-interior">
-                    <div
-                      class="item-name"
-                      contenteditable="true"
-                      v-html="newItemName"
-                      ref="newItemName"
-                    ></div>
-                  </div>
+    <header class="app-header">
+      <form @submit.prevent="searchItems" class="form form--search">
+        <fieldset>
+          <div class="form-field">
+            <input type="text" v-model="searchTerms" id="search-field" />
+            <button type="submit">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30.239 30.239">
+                <path d="M20.194 3.46c-4.613-4.613-12.121-4.613-16.734 0-4.612 4.614-4.612 12.121 0 16.735 4.108 4.107 10.506 4.547 15.116 1.34.097.459.319.897.676 1.254l6.718 6.718a2.498 2.498 0 0 0 3.535 0 2.496 2.496 0 0 0 0-3.535l-6.718-6.72a2.5 2.5 0 0 0-1.253-.674c3.209-4.611 2.769-11.008-1.34-15.118zm-2.121 14.614c-3.444 3.444-9.049 3.444-12.492 0-3.442-3.444-3.442-9.048 0-12.492 3.443-3.443 9.048-3.443 12.492 0 3.444 3.444 3.444 9.048 0 12.492z"/>
+              </svg>
+            </button>
+          </div>
+        </fieldset>
+      </form>
+      <!-- <div class="header-action"> -->
+        <button class="app-action" v-on:click="addingItem = !addingItem">
+          <span v-if="!addingItem">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 491.86 491.86">
+              <path d="M465.167 211.614H280.245V26.691c0-8.424-11.439-26.69-34.316-26.69s-34.316 18.267-34.316 26.69v184.924H26.69C18.267 211.614 0 223.053 0 245.929s18.267 34.316 26.69 34.316h184.924v184.924c0 8.422 11.438 26.69 34.316 26.69s34.316-18.268 34.316-26.69V280.245H465.17c8.422 0 26.69-11.438 26.69-34.316s-18.27-34.315-26.693-34.315z"/>
+            </svg>
+          </span>
+          <span v-if="addingItem">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 47.971 47.971">
+              <path d="M28.228 23.986L47.092 5.122a2.998 2.998 0 0 0 0-4.242 2.998 2.998 0 0 0-4.242 0L23.986 19.744 5.121.88a2.998 2.998 0 0 0-4.242 0 2.998 2.998 0 0 0 0 4.242l18.865 18.864L.879 42.85a2.998 2.998 0 1 0 4.242 4.241l18.865-18.864L42.85 47.091c.586.586 1.354.879 2.121.879s1.535-.293 2.121-.879a2.998 2.998 0 0 0 0-4.242L28.228 23.986z"/>
+            </svg>
+          </span>
+        </button>
+      <!-- </div> -->
+    </header>
+    <v-expand-transition>
+      <div class="add" v-show="addingItem">
+        <div class="add-interior">
+          <form @submit.prevent class="form form--add">
+            <fieldset>
+              <div class="instructions">
+                <div class="instructions__content">
+                  <p>To add an item, use the file input below to select a JSON file generated from <a href="https://instaloader.github.io/" rel="noreferrer" target="_blank">Instaloader</a>.</p>
                 </div>
-                <div class="item__media">
-                  <div class="carousel-wrapper" v-if="newItemMedia.length > 1">
-                    <div class="carousel snap" ref="carousel">
-                      <div class="carousel-item" v-for="media in newItemMedia">
-                        <img v-bind:src="media.url" v-if="media.type === 'GraphImage'" alt />
-                        <img v-bind:src="media.url" v-else-if="media.type === 'GraphVideo'" alt />
+              </div>
+              <v-expand-transition>
+                <div class="item-preview" v-show="newItemContent">
+                  <div class="item editing">
+                    <div class="header-wrap">
+                      <div class="item__header">
+                        <div class="item__title">
+                          <div class="title-interior">
+                            <div
+                              class="item-name"
+                              contenteditable="true"
+                              v-html="newItemName"
+                              ref="newItemName"
+                            ></div>
+                          </div>
+                        </div>
+                        <div class="item__media">
+                          <div class="carousel-wrapper" v-if="newItemMedia.length > 1">
+                            <div class="carousel snap" ref="carousel">
+                              <div class="carousel-item" v-for="media in newItemMedia">
+                                <img v-bind:src="media.url" v-if="media.type === 'GraphImage'" alt />
+                                <img v-bind:src="media.url" v-else-if="media.type === 'GraphVideo'" alt />
+                              </div>
+                            </div>
+                            <div class="carousel-controls">
+                              <button v-on:click="prevSlide" ref="prev" class="node node--prev">Prev</button>
+                              <button v-on:click="nextSlide" ref="next" class="node node--next">Next</button>
+                            </div>
+                          </div>
+                          <div v-for="media in newItemMedia" v-if="newItemMedia.length < 2">
+                            <img v-bind:src="media.url" v-if="media.type === 'GraphImage'" alt />
+                            <img v-bind:src="media.url" v-else-if="media.type === 'GraphVideo'" alt />
+                          </div>
+                          <div class="media-item" v-if="newItemMedia.length === 0">
+                            <img src="~/assets/drunk-uncle-720x720-recipe.jpg" alt />
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <div class="carousel-controls">
-                      <button v-on:click="prevSlide" ref="prev">Prev</button>
-                      <button v-on:click="nextSlide" ref="next">Next</button>
+                    <div class="item__contents">
+                      <div class="item__content">
+                        <div
+                          class="item-content"
+                          contenteditable="true"
+                          v-html="newItemContent"
+                          ref="newItemContent"
+                        ></div>
+                      </div>
                     </div>
                   </div>
-                  <div v-for="media in newItemMedia" v-if="newItemMedia.length < 2">
-                    <img v-bind:src="media.url" v-if="media.type === 'GraphImage'" alt />
-                    <img v-bind:src="media.url" v-else-if="media.type === 'GraphVideo'" alt />
+                </div>
+              </v-expand-transition>
+              <footer class="add-footer">
+                <input type="file" accept="application/json" @change="processFile($event)" ref="jsonFile" />
+                <div class="add-actions">
+                  <div class="add-action">
+                    <button v-on:click="addItem" v-show="newItemContent" :disabled="itemAddProcessing">Add Item</button>
                   </div>
-                  <div class="media-item" v-if="newItemMedia.length === 0">
-                    <img src="~/assets/drunk-uncle-720x720-recipe.jpg" alt />
+                  <div class="add-action">
+                    <button
+                    v-on:click="resetAddForm"
+                    v-show="newItemContent"
+                    :disabled="itemAddProcessing"
+                  >
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 47.971 47.971">
+                        <path d="M28.228 23.986L47.092 5.122a2.998 2.998 0 0 0 0-4.242 2.998 2.998 0 0 0-4.242 0L23.986 19.744 5.121.88a2.998 2.998 0 0 0-4.242 0 2.998 2.998 0 0 0 0 4.242l18.865 18.864L.879 42.85a2.998 2.998 0 1 0 4.242 4.241l18.865-18.864L42.85 47.091c.586.586 1.354.879 2.121.879s1.535-.293 2.121-.879a2.998 2.998 0 0 0 0-4.242L28.228 23.986z"/>
+                      </svg>
+                    </button>
                   </div>
                 </div>
-              </div>
-              <div class="item__contents">
-                <div class="item__content">
-                  <div
-                    class="item-content"
-                    contenteditable="true"
-                    v-html="newItemContent"
-                    ref="newItemContent"
-                  ></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </v-expand-transition>
-        <!-- <div class="form-field">
-            <label for="a3">Ingredients</label>
-            <textarea name id="a3" cols="30" rows="10" v-model="ingredientsTextarea"></textarea>
-            <button v-on:click="addIngredient">+</button>
-            <ingredient
-              v-for="(ingredient) in ingredients"
-              v-on:remove-ingredient="removeIngredient"
-              v-on:add-ingredient-here="addIngredientHere"
-              v-on:update:content="ingredient.content = $event"
-              v-bind:content.sync="ingredient.content"
-              :ingredient="ingredient"
-              :key="ingredient.id"
-            />
-        </div>-->
-
-        <input type="file" accept="application/json" @change="processFile($event)" ref="jsonFile" />
-
-        <button v-on:click="addItem" v-show="newItemContent" :disabled="itemAddProcessing">Add Item</button>
-        <button
-          v-on:click="resetAddForm"
-          v-show="newItemContent"
-          :disabled="itemAddProcessing"
-        >Cancel</button>
-      </fieldset>
-    </form>
-
-    <div class="add"></div>
+              </footer>
+            </fieldset>
+          </form>
+        </div>
+      </div>
+    </v-expand-transition>
     <div class="items" ref="items" id="items">
       <item
         v-for="(item, index) in items"
@@ -112,9 +133,9 @@
 </template>
 
 <script>
-import ingredient from "@@/components/ingredient.vue";
 import item from "@@/components/item.vue";
 import loading from "@@/components/loading.vue";
+import message from "@@/components/message.vue";
 
 export default {
   async fetch({ store }) {
@@ -126,13 +147,12 @@ export default {
   },
   data: function() {
     return {
+      addingItem: false,
       carouselScrollMarker: 0,
       ingredientIncrementer: 0,
       itemIncrementer: 0,
       ingredients: [],
       itemAddProcessing: false,
-      // itemsLimit: 20,
-      // itemsLoaded: 0,
       jsonData: null,
       moarItemstoLoad: false,
       newItemMedia: [],
@@ -150,8 +170,6 @@ export default {
           searchTerms: this.searchTerms
         };
         await this.$store.dispatch("EDIT_SEARCH_TERMS", payload);
-        // console.log(this.$store.state.searchTerms);
-
         await this.$store.dispatch(
           "SEARCH_ITEMS",
           this.$store.state.searchTerms
@@ -198,37 +216,6 @@ export default {
         false
       );
     },
-    /*
-    updateIngredient(ingredient) {
-      // console.log(ingredient);
-      // console.log(JSON.stringify(ingredient));
-      // const ingredientIndex = this.ingredients.indexOf(ingredient);
-      // this.ingredients[ingredientIndex].content = ingredientContent;
-      // this.ingredient.content = ingredient;
-    },
-    addIngredient() {
-      this.ingredients.push({
-        // content: "test"
-        id: this.ingredientIncrementer,
-        content: null
-      });
-      this.ingredientIncrementer++;
-    },
-    addIngredientHere(ingredient) {
-      // console.log("why is this not this working?");
-      const ingredientIndex = this.ingredients.indexOf(ingredient);
-      // console.log(ingredientIndex);
-      const newIngredient = {
-        id: this.ingredientIncrementer,
-        content: null
-        // content: "new"
-      };
-      this.ingredients.splice(ingredientIndex + 1, 0, newIngredient);
-      // console.log(this.ingredients.length);
-      // const ingredientIndex = this.ingredients.indexOf(ingredient);
-      this.ingredientIncrementer++;
-    },
-    */
     addItem() {
       // Add item through database
       if (!this.newItemContent || !this.$refs.newItemContent.innerText) {
@@ -252,11 +239,15 @@ export default {
         sourceIdentifier: this.newItemSourceIdentifier
       };
 
-      await this.$store.dispatch("ADD_ITEM", payload);
+      const newItem = await this.$store.dispatch("ADD_ITEM", payload);
+      if (newItem) {
+        this.resetAddForm();
+        this.addingItem = false;
+        this.$root.$emit("transmitMessage", "Item successfully added.");
+      }
+      
+      this.itemAddProcessing = false;
 
-      this.resetAddForm();
-
-      this.itemAddProcessing = true;
     },
     resetAddForm() {
       // Resetting Addition Form Values
@@ -281,6 +272,7 @@ export default {
         behavior: "smooth"
       });
     },
+    
     itemScroll() {}
   },
   computed: {
@@ -289,6 +281,7 @@ export default {
     }
   },
   mounted: function() {
+
     this.observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (entry.intersectionRatio > 0) {
@@ -303,98 +296,6 @@ export default {
         }
       });
     });
-
-    window.setTimeout(() => {
-      // this.observer.observe(this.$refs.itemsFooter);
-    }, 400);
-
-    // console.log(items.length);
-
-    // window.addEventListener("load", () => {
-    //   console.log("triggering observer");
-
-    // });
-
-    // itemImageObserver.observe(this.$el);
-    // console.log(this.$refs.mediaItem);
-
-    // this.observer.observe(this.$el);
-
-    // console.log(this);
-    // console.log(this.$el);
-    // console.log(this.$refs.mediaItem);
-
-    /*
-    let options = {
-      // root: document.querySelector("#items"),
-      rootMargin: "0px 0px 0px 0px",
-      threshold: 1.0
-      // threshold: buildThresholdList()
-    };
-
-    let callback = (entries, observer) => {
-      entries.forEach(entry => {
-        if (entry.intersectionRatio > 0) {
-          // entry.target.classList.add("intersected");
-          console.log(entry);
-        } else {
-          // console.log(entry);
-        }
-      });
-    };
-
-    let itemObserver = new IntersectionObserver(callback, options);
-
-    // Set height of first teased item
-    let teasedItem = document.querySelector(".tease");
-    // Get height of teased item image
-    let itemMedia = teasedItem.querySelector(".media-item");
-    let measuredMedia = itemMedia.querySelector("img");
-
-    measuredMedia.onload = function() {
-      let teasedHeader = teasedItem.querySelector(".item__header");
-      teasedHeader.style.height = getComputedStyle(measuredMedia).height;
-
-      // Set rootMargin of options object
-      options.rootMargin =
-        "0px 0px -" + getComputedStyle(measuredMedia).height + " 0px";
-
-      // console.log(options.rootMargin);
-
-      let nextElement = teasedItem.nextSibling;
-      // let nextElementImageHeight =
-      // const itemObserver = new IntersectionObserver(callback, options);
-      // // itemObserver.observe(nextElement);
-
-      // document.querySelectorAll(".item").forEach(item => {
-      //   itemObserver.observe(item);
-      // });
-
-      itemObserver.observe(teasedItem);
-
-      // document.querySelectorAll(".item").forEach(item => {
-      //   itemObserver.observe(item);
-      // });
-    };
-
-    // Get next element
-    // console.log(teasedItem.nextSibling);
-
-    // Get height of viewport
-    // console.log(window.innerHeight);
-
-    // Get height of first element
-
-    */
-    /*
-    // IntersectionObserver
-    let options = {
-      // root: document.querySelector("#items"),
-      rootMargin: "0px 0px 0px 0px",
-      threshold: 1.0
-      // threshold: buildThresholdList()
-    };
-    */
   },
   watch: {
     carouselScrollMarker: function() {
@@ -417,7 +318,8 @@ export default {
   },
   components: {
     item,
-    loading
+    loading,
+    message
   }
 };
 </script>
@@ -487,12 +389,15 @@ button {
 }
 
 .add {
-  max-width: 30rem;
+  // max-width: 30rem;
   textarea {
     width: 100%;
   }
   img {
-    max-width: 10rem;
+    // max-width: 10rem;
+  }
+  .item__media {
+    opacity: 1;
   }
 }
 
@@ -517,25 +422,6 @@ button {
   transform: translateX(-50%);
 }
 
-.message {
-  align-items: center;
-  background-color: tan;
-  color: #111;
-  display: grid;
-  grid-column-gap: 1rem;
-  grid-template-columns: auto 32px;
-  // color: white;
-  // display: inline-block;
-  // font-size: 70%;
-  line-height: 1;
-  padding: 0.5rem;
-  // padding: 0.25rem;
-  &__body {
-  }
-  &__status {
-  }
-}
-
 .form {
   fieldset {
     border: 0;
@@ -548,9 +434,17 @@ button {
     input {
       flex: 1 1 auto;
       margin-right: 0.5rem;
+      padding: 0.5rem;
     }
     button {
       flex: 0;
+      svg {
+        display: block;
+        fill: #fff;
+        height: 20px;
+        margin: 0 auto;
+        width: 20px;
+      }
     }
   }
 }
@@ -569,4 +463,88 @@ button {
     margin-bottom: 0;
   }
 }
+
+.app-header {
+  display: flex;
+  margin-bottom: 0.5rem;
+  .form--search {
+    flex: 1 1 auto;
+    .form-field {
+      display: grid;
+      grid-template-columns: auto 2.5rem;
+      grid-column-gap: 0.5rem;
+      input[type="text"] {
+        width: 100%;
+      }
+    }
+  }
+  .app-action {
+    flex: 0;
+    margin-left: 0.5rem;
+    span {
+      display: block;
+    }
+    svg {
+      display: block;
+      fill: #fff;
+      height: 20px;
+      margin: 0 auto;
+      width: 20px;
+    }
+  }
+}
+
+
+.instructions {
+  padding: 0 0 0.5rem;
+  &__content {
+    background-color: gray;
+    padding: 0.5rem;
+  }
+}
+
+.add {
+  // padding: 0.5rem 0;
+  width: 100%;
+}
+
+.add-interior {
+  padding: 0 0 0.5rem;
+}
+
+.item-preview {
+  margin-bottom: 0.5rem;
+}
+
+.add-footer {
+  display: flex;
+  input[type="file"] {
+    flex: 1;
+    width: 100%;
+  }
+}
+
+.add-actions {
+  display: flex;
+  flex: 0;
+  flex-wrap: nowrap;
+}
+
+.add-action {
+  margin-left: 0.5rem;
+  button {
+    white-space: nowrap;
+    svg {
+      display: block;
+      fill: #fff;
+      height: 19px;
+      margin: 0 auto;
+      width: 19px;
+    }
+  }
+}
+
+// .form--add {
+//   width: 100%;
+// }
 </style>

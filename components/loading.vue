@@ -1,18 +1,21 @@
 <template>
-  <div>
+  <div class="loading-indicator">
     <canvas height="100" width="100" ref="loading"></canvas>
   </div>
 </template>
 
 <style lang="scss">
-canvas {
-  display: block;
-  opacity: 0;
-  transition: opacity 400ms;
-  &.active {
-    opacity: 1;
+.loading-indicator {
+  canvas {
+    display: block;
+    opacity: 0;
+    transition: opacity 400ms;
+    &.active {
+      opacity: 1;
+    }
   }
 }
+
 </style>
 
 <script>
@@ -62,7 +65,7 @@ export default {
       var remainder = (timestamp - this.start) % duration;
       var startAngle = Math.PI * (remainder / duration) * 2;
       var endAngle = startAngle + Math.PI;
-      var degrees = (360 * remainder) / duration;
+      // var degrees = (360 * remainder) / duration;
 
       // Drawing the main arc
 

@@ -121,6 +121,8 @@ export const actions = {
         body: JSON.stringify(data)
       }).then(res => res.json());
       commit("addItem", newItem);
+      dispatch("stopBusyState");
+      return newItem;
     } catch (err) {
       console.log(err);
     }
@@ -138,6 +140,8 @@ export const actions = {
         body: JSON.stringify(data)
       }).then(res => res.json());
       commit("deleteItem", deletedItem);
+      dispatch("stopBusyState");
+      return deletedItem;
     } catch (err) {
       console.log(err);
     }
@@ -155,13 +159,13 @@ export const actions = {
         method: "POST",
         body: JSON.stringify(data)
       }).then(res => res.json());
-      // console.log(editedItem);
-      // commit("editItem", editedItem);
       if (editedItem.matchedCount && editedItem.modifiedCount) {
         dispatch("REFRESH_ITEM", payload.ID);
       } else {
         // Compose error message
       }
+      commit("endBusyState");
+      return editedItem;
     } catch (err) {
       console.log(err);
     }

@@ -9,16 +9,30 @@ import {
 
 // const environment = process.env.NODE_ENV || "development";
 
+// console.log(process.env);
+
 // console.log(environment);
 
 // const client = Stitch.initializeDefaultAppClient(
 //   "catalogue-fjarv",
 //   new StitchAppClientConfiguration.Builder().withDataDirectory("/tmp").build()
 // );
-const client = Stitch.initializeDefaultAppClient(
-  "catalogue-fjarv",
-  new StitchAppClientConfiguration.Builder().withDataDirectory("").build()
-);
+
+let client;
+
+if (process.env.CONTEXT) {
+  client = Stitch.initializeDefaultAppClient(
+    "catalogue-fjarv",
+    new StitchAppClientConfiguration.Builder().withDataDirectory("/tmp").build()
+  );
+}
+else {
+  client = Stitch.initializeDefaultAppClient(
+    "catalogue-fjarv",
+    new StitchAppClientConfiguration.Builder().withDataDirectory("").build()
+  );
+}
+
 const mongoClient = client.getServiceClient(
   RemoteMongoClient.factory,
   "mongodb-atlas"
@@ -34,6 +48,7 @@ const headers = {
 exports.handler = async (event, context, callback) => {
   try {
     const data = JSON.parse(event.body);
+    // let skipAmount = 18;
     let skipAmount = 0;
     if (data.skip) {
       skipAmount = data.skip;
@@ -46,7 +61,7 @@ exports.handler = async (event, context, callback) => {
 
     // skipAmount 1040
 
-    const pipeline = [{ $skip: skipAmount }, { $limit: 100 }];
+    const pipeline = [{$sort: {"_id": -1} }, { $skip: skipAmount }, { $limit: 10 }];
     const items = await itemsCollection.aggregate(pipeline).toArray();
 
     return {
