@@ -7,21 +7,6 @@ import {
   UserApiKeyCredential
 } from "mongodb-stitch-server-sdk";
 
-// const client = Stitch.initializeDefaultAppClient(
-//   "catalogue-fjarv",
-//   new StitchAppClientConfiguration.Builder().withDataDirectory("/tmp").build()
-// );
-const client = Stitch.initializeDefaultAppClient(
-  "catalogue-fjarv",
-  new StitchAppClientConfiguration.Builder().withDataDirectory("").build()
-);
-const mongoClient = client.getServiceClient(
-  RemoteMongoClient.factory,
-  "mongodb-atlas"
-);
-
-const credential = new UserApiKeyCredential(process.env.MONGODB_API_KEY);
-
 const headers = {
   Accept: "application/json",
   "Content-Type": "application/json"
@@ -32,6 +17,23 @@ RegExp.escape = function(s) {
 };
 
 exports.handler = async (event, context, callback) => {
+  let dataDirectory = '';
+
+  if (Object.entries(context.clientContext).length != 0) {
+    dataDirectory = '/tmp';
+  }
+
+  const client = Stitch.initializeDefaultAppClient(
+    "catalogue-fjarv",
+    new StitchAppClientConfiguration.Builder().withDataDirectory(dataDirectory).build()
+  );
+
+  const mongoClient = client.getServiceClient(
+    RemoteMongoClient.factory,
+    "mongodb-atlas"
+  );
+
+  const credential = new UserApiKeyCredential(process.env.MONGODB_API_KEY);
   try {
     const data = JSON.parse(event.body);
     const searchTerms = data.searchTerms;

@@ -7,19 +7,6 @@ import {
   UserApiKeyCredential
 } from "mongodb-stitch-server-sdk";
 
-// const environment = process.env.NODE_ENV || "development";
-
-
-
-// console.log(environment);
-
-// const client = Stitch.initializeDefaultAppClient(
-//   "catalogue-fjarv",
-//   new StitchAppClientConfiguration.Builder().withDataDirectory("/tmp").build()
-// );
-
-
-
 const headers = {
   Accept: "application/json",
   "Content-Type": "application/json"
