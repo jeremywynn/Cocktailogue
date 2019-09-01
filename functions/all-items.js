@@ -59,6 +59,7 @@ async function connectToDatabase(uri) {
   try {
     //Performance optimization Step 3: test that database connection exists and is valid
     //before re-using it
+    console.log(cachedDb);
     if (cachedDb && cachedDb.serverConfig.isConnected()) {
       console.log('=> using cached database instance');
       return Promise.resolve(cachedDb);
