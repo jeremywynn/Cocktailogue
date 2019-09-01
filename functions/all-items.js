@@ -9,11 +9,11 @@ import {
 
 //Performance optimization Step 1: declare the database connection object outside the handler method
 let cachedDb = null;
-let dataDirectory = '';
+let dataDirectory = '/tmp';
 
-if (process.env.NETLIFY === 'true') {
-  dataDirectory = dataDirectory = '/tmp';
-}
+// if (process.env.NETLIFY === 'true') {
+//   dataDirectory = dataDirectory = '/tmp';
+// }
 
 const client = Stitch.initializeDefaultAppClient(
   "catalogue-fjarv",
