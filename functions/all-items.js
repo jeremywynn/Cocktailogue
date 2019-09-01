@@ -59,10 +59,11 @@ async function connectToDatabase(uri) {
   try {
     //Performance optimization Step 3: test that database connection exists and is valid
     //before re-using it
-    console.log(cachedDb.serverConfig);
-    if (cachedDb && cachedDb.serverConfig) {
-      console.log('=> using cached database instance');
-      return Promise.resolve(cachedDb);
+    if (cachedDb && (typeof cachedDb.serverConfig != 'undefined')) {
+      if (cachedDb.serverConfig.isConnected()) {
+        console.log('=> using cached database instance');
+        return Promise.resolve(cachedDb);
+      }
     }
     await client.auth.loginWithCredential(credential);
     const db = mongoClient.db("catalogue");
