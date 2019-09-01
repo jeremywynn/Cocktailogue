@@ -4,19 +4,19 @@ import {
   Stitch,
   StitchAppClientConfiguration,
   RemoteMongoClient,
+  BSON,
   UserApiKeyCredential
 } from "mongodb-stitch-server-sdk";
 
 //Performance optimization Step 1: declare the database connection object outside the handler method
 let cachedDb = null;
-let dataDirectory = '/tmp';
+let dataDirectory = '';
 
-if (process.env.CONTEXT) {
-  dataDirectory = dataDirectory = '/tmp';
+const isLambda = !!(process.env.LAMBDA_TASK_ROOT || false);
+
+if (isLambda) {
+  dataDirectory = '/tmp';
 }
-
-console.log(process.env.CONTEXT);
-console.log(process.env.NETLIFY);
 
 const client = Stitch.initializeDefaultAppClient(
   "catalogue-fjarv",
@@ -100,17 +100,16 @@ async function queryDatabase(db, event) {
   // console.log('query parameters: ', jsonContents);
 
   let skipAmount = 0;
-  if (jsonContents.skip) {
-    skipAmount = jsonContents.skip;
-  }
 
   try {
+    let pipeline = [{$sort: {"_id": -1} }, { $skip: skipAmount }, { $limit: 20 }];
+    if (jsonContents.skip) {
+      let oid = new BSON.ObjectId(jsonContents.skip);
+      pipeline = [{$match: {_id: {$lt: oid}}}, {$sort: {"_id": -1} }, { $limit: 20 }];
+    }
     const itemsCollection = db.collection("items");
-    const pipeline = [{$sort: {"_id": -1} }, { $skip: skipAmount }, { $limit: 10 }];
     const items = await itemsCollection.aggregate(pipeline).toArray();
-
     return items;
-
   } catch (error) {
     return error;
   }

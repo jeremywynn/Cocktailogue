@@ -9,7 +9,7 @@ import {
 
 //Performance optimization Step 1: declare the database connection object outside the handler method
 let cachedDb = null;
-let dataDirectory = '/tmp';
+let dataDirectory = '';
 
 if (process.env.CONTEXT) {
   dataDirectory = dataDirectory = '/tmp';
@@ -40,6 +40,7 @@ exports.handler = async (event, context, callback) => {
     context.callbackWaitsForEmptyEventLoop = false;
 
     const items = await processEvent(event, context, callback);
+    // console.log(items);
     return {
       statusCode: 200,
       headers,
@@ -90,6 +91,7 @@ async function processEvent(event, context, callback) {
 
 async function queryDatabase(db, event) {   
   var jsonContents = JSON.parse(JSON.stringify(event));
+  // console.log(jsonContents);
   // const data = JSON.parse(event.body);
   
   //handling API Gateway input where the event is embedded into the 'body' element
@@ -98,9 +100,14 @@ async function queryDatabase(db, event) {
       jsonContents = JSON.parse(event.body);
   }
 
+  // console.log(jsonContents);
+
   const searchTerms = jsonContents.searchTerms;
   const sanitizedSearchQuery = RegExp.escape(searchTerms);
   const searchRegex = new RegExp(sanitizedSearchQuery, "i");
+  // const searchRegex = new RegExp(sanitizedSearchQuery);
+
+  // console.log(searchRegex);
 
   // console.log('query parameters: ', jsonContents);
 
@@ -111,11 +118,21 @@ async function queryDatabase(db, event) {
 
   try {
     const itemsCollection = db.collection("items");
-    const pipeline = [{$sort: {"_id": -1} }, { $skip: skipAmount }, { $limit: 10 }];
+    
     const items = await itemsCollection
       .find({ content: searchRegex }, { score: { $meta: "textScore" } })
       // .sort({ score: { $meta: "textScore" } })
       .toArray();
+    
+
+    /*
+    const pipeline = [{ $match: { content: { $regex: searchTerms, $options: 'i' } } }, { $sort: { $score: { $meta: "textScore" } } }, { $limit: 10 }];
+    const items = await itemsCollection.aggregate(pipeline).toArray();
+    */
+
+    // console.log(items);
+
+    // console.log(items);
 
     return items;
 

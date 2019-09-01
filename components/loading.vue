@@ -70,7 +70,7 @@ export default {
       // Drawing the main arc
 
       ctx.lineWidth = 5;
-      ctx.strokeStyle = "rgba(199, 38, 31, 1)";
+      ctx.strokeStyle = "rgba(226, 166, 16, 1)";
       ctx.beginPath();
       ctx.arc(0, 0, radius, startAngle, endAngle);
       ctx.stroke();
@@ -121,7 +121,7 @@ export default {
         var arcAlpha = secondArcTriggerPoint - deltaProgress;
 
         ctx.lineWidth = arcWidth;
-        ctx.strokeStyle = "rgba(199, 38, 31, " + arcAlpha + ")";
+        ctx.strokeStyle = "rgba(226, 166, 16, " + arcAlpha + ")";
         ctx.beginPath();
         ctx.arc(0, 0, arcRadius, 0, Math.PI * 2);
         ctx.stroke();
@@ -136,7 +136,7 @@ export default {
         var arcAlpha = 1 - deltaProgress;
 
         ctx.lineWidth = arcWidth;
-        ctx.strokeStyle = "rgba(199, 38, 31, " + arcAlpha + ")";
+        ctx.strokeStyle = "rgba(226, 166, 16, " + arcAlpha + ")";
         ctx.beginPath();
         ctx.arc(0, 0, arcRadius, 0, Math.PI * 2);
         ctx.stroke();

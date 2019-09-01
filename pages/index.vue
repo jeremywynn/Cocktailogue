@@ -285,6 +285,19 @@ export default {
     this.observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (entry.intersectionRatio > 0) {
+          // Get id of last element in state
+          let lastItemId = this.$store.state.items[this.$store.state.items.length - 1]._id;
+          // console.log();
+          if (this.$store.state.itemsRemaining === false) {
+            this.observer.unobserve(this.$refs.itemsFooter);
+            console.log('now unobserving!')
+          } else {
+            this.$store.dispatch(
+              "GET_ADDITIONAL_ITEMS",
+              lastItemId
+            );
+          }
+          /*
           if (this.$store.state.itemsRemaining === false) {
             this.observer.unobserve(this.$refs.itemsFooter);
           } else {
@@ -293,9 +306,14 @@ export default {
               this.$store.state.items.length
             );
           }
+          */
         }
       });
     });
+
+    window.setTimeout(() => {
+      this.observer.observe(this.$refs.itemsFooter);
+    }, 400);
   },
   watch: {
     carouselScrollMarker: function() {
