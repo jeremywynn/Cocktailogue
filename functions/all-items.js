@@ -19,14 +19,11 @@ const client = Stitch.initializeDefaultAppClient(
   "catalogue-fjarv",
   new StitchAppClientConfiguration.Builder().withDataDirectory(dataDirectory).build()
 );
-
 const mongoClient = client.getServiceClient(
   RemoteMongoClient.factory,
   "mongodb-atlas"
 );
-
 const credential = new UserApiKeyCredential(process.env.MONGODB_API_KEY);
-
 const headers = {
   Accept: "application/json",
   "Content-Type": "application/json"
