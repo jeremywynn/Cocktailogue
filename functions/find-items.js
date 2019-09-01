@@ -9,7 +9,7 @@ import {
 
 //Performance optimization Step 1: declare the database connection object outside the handler method
 let cachedDb = null;
-let dataDirectory = '';
+let dataDirectory = '/tmp';
 
 if (process.env.CONTEXT) {
   dataDirectory = dataDirectory = '/tmp';
