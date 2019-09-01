@@ -9,11 +9,11 @@ import {
 
 //Performance optimization Step 1: declare the database connection object outside the handler method
 let cachedDb = null;
-let dataDirectory = '/tmp';
+let dataDirectory = '';
 
-// if (process.env.NETLIFY === 'true') {
-//   dataDirectory = dataDirectory = '/tmp';
-// }
+if (process.env.CONTEXT) {
+  dataDirectory = dataDirectory = '/tmp';
+}
 
 const client = Stitch.initializeDefaultAppClient(
   "catalogue-fjarv",
@@ -61,7 +61,7 @@ async function connectToDatabase(uri) {
     //before re-using it
     if (cachedDb && (typeof cachedDb.serverConfig != 'undefined')) {
       if (cachedDb.serverConfig.isConnected()) {
-        console.log('=> using cached database instance');
+        // console.log('=> using cached database instance');
         return Promise.resolve(cachedDb);
       }
     }
@@ -97,7 +97,7 @@ async function queryDatabase(db, event) {
       jsonContents = JSON.parse(event.body);
   }
 
-  console.log('query parameters: ', jsonContents);
+  // console.log('query parameters: ', jsonContents);
 
   let skipAmount = 0;
   if (jsonContents.skip) {
