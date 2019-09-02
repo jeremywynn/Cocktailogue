@@ -503,8 +503,14 @@ button {
 .instructions {
   padding: 0 0 0.5rem;
   &__content {
-    background-color: gray;
+    // background-color: gray;
     padding: 0.5rem;
+    a {
+      color: rgba(255, 250, 14, 1);
+      &:hover {
+        text-decoration: none;
+      }
+    }
   }
 }
 
