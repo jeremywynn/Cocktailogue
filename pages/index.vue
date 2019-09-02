@@ -471,6 +471,7 @@ button {
 .app-header {
   display: flex;
   margin-bottom: 0.5rem;
+  padding-top: 0.5rem;
   .form--search {
     flex: 1 1 auto;
     .form-field {
