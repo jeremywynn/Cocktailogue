@@ -70,6 +70,7 @@
                   <transition name="fade" mode="out-in">
                     <div class="original-removal" v-if="confirmRemoval === false" key="hideChoice">
                       <button
+                        class="negative"
                         v-on:click="confirmRemoval = true"
                         v-show="!editingItem"
                         :disabled="itemProcessing"
@@ -81,7 +82,7 @@
                         <button v-on:click="removeItem">Yes</button>
                       </div>
                       <div class="choice">
-                        <button v-on:click="confirmRemoval = false">No</button>
+                        <button class="subtle" v-on:click="confirmRemoval = false">No</button>
                       </div>
                     </div>
                   </transition>
@@ -128,16 +129,6 @@ export default {
       this.editingItem = true;
       this.$refs.itemName.setAttribute("contenteditable", true);
       this.$refs.itemContent.setAttribute("contenteditable", true);
-      /*
-      document.addEventListener("keydown", function(e) {
-        console.log(e);
-        if (e.key == "Escape") {
-          console.log("escape");
-          this.disableEditMode();
-          document.removeEventListener("keypress");
-        }
-      });
-      */
     },
     triggerEditItem() {
       if (this.editingItem === false) {
@@ -171,14 +162,11 @@ export default {
       };
       const deletedItem = await this.$store.dispatch("DELETE_ITEM", payload);
       console.log(deletedItem);
-      if (deletedItem) { // Check _id here?
+      if (deletedItem) {
         this.$root.$emit("transmitMessage", "Item successfully deleted.");
       }
       this.itemProcessing = false;
     },
-    // removeItem(item) {
-    //   this.$emit("remove-item", item);
-    // },
     nextSlide() {
       this.carouselScrollMarker += this.$refs.carousel.clientWidth;
       this.$refs.carousel.scrollTo({
@@ -204,43 +192,22 @@ export default {
     //   });
     // }
   },
-  computed: {},
-  created: function() {
-    // console.log("true"); // Does this each time
-  },
   mounted: function() {
-    // if (this.$refs.carousel) {
-    //   window.addEventListener("resize", this.resize); // Eventually use resizeObserver here
-    // }
 
     this.observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (entry.intersectionRatio > 0) {
-          // console.log("in the view");
           entry.target.classList.add("unveil");
           this.observer.unobserve(entry.target);
-        } else {
-          // console.log("out of view");
         }
       });
     });
 
-    // itemImageObserver.observe(this.$el);
-    // console.log(this.$refs.mediaItem);
-
     this.observer.observe(this.$el);
-
-    // console.log(this);
-    // console.log(this.$el);
-    // console.log(this.$refs.mediaItem);
 
     this.$el.querySelectorAll(".item__media").forEach(item => {
       this.observer.observe(item);
     });
-
-    // this.$refs.mediaItem.forEach(mediaItem => {
-    //   itemMediaObserver.observe(mediaItem);
-    // });
 
     this.$refs.itemContent.spellcheck = false;
     this.$refs.itemName.spellcheck = false;
@@ -288,14 +255,16 @@ export default {
 }
 
 .confirm-removal {
+  align-items: center;
   display: flex;
   margin-left: 0.5rem;
 }
 .confirm-text {
   font-size: 80%;
-  margin-right: 0.5rem;
 }
-
+.choice {
+  margin-left: 0.5rem;
+}
 .original-removal {
   button {
     display: block;
@@ -345,8 +314,6 @@ export default {
     white-space: nowrap;
   }
 }
-.media-item {
-}
 
 .header-wrap {
   position: relative;
@@ -359,7 +326,7 @@ export default {
   padding: 1rem;
 }
 .item {
-  border: 2px solid;
+  border: 1px solid rgba(255, 255, 255, 1);
   border-top: 0;
   overflow: hidden;
   .item__header {
@@ -367,7 +334,6 @@ export default {
   }
 
   &__contents {
-    // display: none;
     font-size: 95%;
     padding: 0.5rem;
     position: relative;
@@ -384,15 +350,9 @@ export default {
       font-size: inherit;
       line-height: inherit;
       min-height: 20vh;
-      // overflow: hidden;
       padding: 1rem;
       resize: none;
-      // resize: vertical;
       width: 100%;
-
-      // min-height: 100%;
-      // position: absolute;
-      // top: 0;
     }
   }
   &__media {
@@ -417,14 +377,14 @@ export default {
     }
   }
   &:first-child {
-    border-top: 2px solid;
+    // border-top: 2px solid;
+    border-top: 1px solid rgba(255, 255, 255, 1);
   }
   &.tease {
     .item__header {
     }
     .item__title {
       bottom: 0;
-      // position: absolute;
       text-shadow: 0 0 3px black;
     }
     .item__media {
@@ -443,15 +403,6 @@ export default {
     .item__media {
       display: block;
     }
-    .item__contents {
-      // display: block;
-    }
-  }
-  &.intersected {
-    color: red;
-  }
-  &.detected {
-    color: yellow !important;
   }
 }
 
@@ -463,13 +414,11 @@ export default {
   background-color: rgba(0, 0, 0, 0.667);
   bottom: 0;
   font-size: 1.5rem;
-  // font-weight: 700;
   padding: 0.5rem;
   position: absolute;
   text-shadow: 0 0 3px black;
   width: 100%;
   .item-name {
-    // font: inherit;
     padding: 0.5rem 1rem;
     width: 100%;
   }
@@ -484,7 +433,6 @@ export default {
     padding: 0.5rem 1rem;
     pointer-events: none;
     position: absolute;
-    // text-shadow: inherit;
     width: 100%;
     z-index: -1;
   }
@@ -495,7 +443,8 @@ export default {
   transition: box-shadow 200ms;
   &:after,
   &:before {
-    background-color: white;
+    // background-color: white;
+    background-color: rgba(255, 250, 14, 1);
     content: "";
     display: block;
     opacity: 0;
@@ -522,7 +471,8 @@ export default {
   position: relative;
   &:after,
   &:before {
-    background-color: white;
+    // background-color: white;
+    background-color: rgba(255, 250, 14, 1);
     content: "";
     display: block;
     opacity: 0;
@@ -530,7 +480,6 @@ export default {
     transition: opacity 400ms;
   }
   &:after {
-    // animation: editIndicatorTopLtR 150ms linear reverse;
     height: 2px;
     top: 0;
     transform-origin: left;
@@ -543,28 +492,24 @@ export default {
     transform-origin: top;
     width: 2px;
   }
-  // &:focus {
-  //   &:after,
-  //   &:before {
-  //     background-color: yellow;
-  //   }
-  // }
 }
 
 .item__source-url {
   a {
-    color: yellow;
+    color: rgba(255, 250, 14, 1);
+    &:hover {
+      text-decoration: none;
+    }
   }
 }
 
 .item__content {
-  // font-size: calc(0.825rem + 0.375vw);
-  // line-height: 1.4;
   margin-bottom: 1rem;
   position: relative;
   &:after,
   &:before {
-    background-color: white;
+    // background-color: white;
+    background-color: rgba(255, 250, 14, 1);
     content: "";
     display: block;
     opacity: 0;
@@ -584,19 +529,16 @@ export default {
     transform-origin: top;
     width: 2px;
   }
-  @media only all and (min-width: 40em) {
-    // font-size: 1.05rem;
-  }
 }
 
 .item-content {
-  // font-size: 90%;
   line-height: 1.6;
   position: relative;
   transition: box-shadow 200ms;
   &:after,
   &:before {
-    background-color: white;
+    // background-color: white;
+    background-color: rgba(255, 250, 14, 1);
     content: "";
     display: block;
     opacity: 0;
@@ -638,16 +580,8 @@ export default {
   .item__title {
     z-index: 2;
   }
-  .item__title {
-    // position: relative;
-    // z-index: 2;
-  }
   .item-name {
     cursor: text;
-    // outline: 1px solid;
-    // opacity: 0;
-    // position: absolute;
-    // z-index: -1;
     &:after {
       animation: editIndicatorTopLtR 150ms linear forwards 150ms;
       opacity: 1;
@@ -663,7 +597,7 @@ export default {
     &:focus,
     &:active,
     &:hover {
-      box-shadow: 0 0 1rem yellow inset;
+      box-shadow: 0 0 1rem rgba(255, 250, 14, 1) inset;
     }
   }
   .item__content {
@@ -694,23 +628,8 @@ export default {
     &:focus,
     &:active,
     &:hover {
-      box-shadow: 0 0 1rem yellow inset;
+      box-shadow: 0 0 1rem rgba(255, 250, 14, 1) inset;
     }
-  }
-  /*
-  input[type="text"] {
-    opacity: 1;
-    pointer-events: auto;
-    position: static;
-    z-index: 1;
-  }
-  */
-  .item-content {
-    // border: 1px solid;
-    // outline: 1px solid;
-    // opacity: 0;
-    // pointer-events: none;
-    // z-index: -1;
   }
 }
 

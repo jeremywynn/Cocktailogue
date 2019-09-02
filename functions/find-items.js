@@ -4,6 +4,7 @@ import {
   Stitch,
   StitchAppClientConfiguration,
   RemoteMongoClient,
+  BSON,
   UserApiKeyCredential
 } from "mongodb-stitch-server-sdk";
 
@@ -11,8 +12,10 @@ import {
 let cachedDb = null;
 let dataDirectory = '';
 
-if (process.env.CONTEXT) {
-  dataDirectory = dataDirectory = '/tmp';
+const isLambda = !!(process.env.LAMBDA_TASK_ROOT || false);
+
+if (isLambda) {
+  dataDirectory = '/tmp';
 }
 
 const client = Stitch.initializeDefaultAppClient(
@@ -91,12 +94,10 @@ async function processEvent(event, context, callback) {
 
 async function queryDatabase(db, event) {   
   var jsonContents = JSON.parse(JSON.stringify(event));
-  // console.log(jsonContents);
-  // const data = JSON.parse(event.body);
   
   //handling API Gateway input where the event is embedded into the 'body' element
   if (event.body !== null && event.body !== undefined) {
-      console.log('retrieving payload from event.body');
+      console.log('retrieving search payload from event.body');
       jsonContents = JSON.parse(event.body);
   }
 
@@ -124,6 +125,7 @@ async function queryDatabase(db, event) {
       // .sort({ score: { $meta: "textScore" } })
       .toArray();
     
+    console.log(items);
 
     /*
     const pipeline = [{ $match: { content: { $regex: searchTerms, $options: 'i' } } }, { $sort: { $score: { $meta: "textScore" } } }, { $limit: 10 }];

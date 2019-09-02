@@ -4,7 +4,7 @@
   </div>
 </template>
 
-<style>
+<style lang="scss">
 html {
   font-family: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
     "Helvetica Neue", Arial, sans-serif;
@@ -32,17 +32,34 @@ h5,
 h6,
 .item-name {
   font-family: "Roboto", sans-serif;
+  font-weight: 500;
 }
 
 textarea,
 input[type="text"] {
   /* background-color: white; */
-  border: 2px solid white;
+  /* border: 2px solid white; */
+  /* border: 1px solid rgba(226, 166, 16, 1); */
+  border: 1px solid rgba(255, 255, 255, 1);
+  outline-color: rgba(255, 250, 14, 1);
+  &:focus, &:active {
+    // box-shadow: 0 0 1rem #fffa0e inset;
+  }
 }
 
 button {
-  border: 1px solid yellow;
+  /* border: 1px solid rgba(226, 166, 16, 1); */
+  background-color: rgba(255, 250, 14, 1);
+  color: #000;
+  font-family: "Roboto", sans-serif;
+  font-weight: 500;
   padding: 0.25rem 0.5rem;
+  &.negative {
+    background-color: rgba(216, 33, 55, 1);
+  }
+  &.subtle {
+    background-color: rgba(149, 150, 145, 1);
+  }
   &:hover,
   &:focus,
   &:active {

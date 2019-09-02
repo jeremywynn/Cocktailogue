@@ -40,6 +40,15 @@ export default {
     })
   },
   methods: {
+    start() {
+      this.timeoutID = null;
+      this.canvas.classList.add("active");
+      this.animationRequest = window.requestAnimationFrame(this.drawEvolve);
+    },
+    finish() {
+      this.canvas.classList.remove("active");
+      this.timeoutID = window.setTimeout(this.stopEvolve, 400);
+    },
     stopEvolve() {
       window.cancelAnimationFrame(this.animationRequest);
       this.ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -70,7 +79,7 @@ export default {
       // Drawing the main arc
 
       ctx.lineWidth = 5;
-      ctx.strokeStyle = "rgba(226, 166, 16, 1)";
+      ctx.strokeStyle = "rgba(255, 250, 14, 1)";
       ctx.beginPath();
       ctx.arc(0, 0, radius, startAngle, endAngle);
       ctx.stroke();
@@ -121,7 +130,7 @@ export default {
         var arcAlpha = secondArcTriggerPoint - deltaProgress;
 
         ctx.lineWidth = arcWidth;
-        ctx.strokeStyle = "rgba(226, 166, 16, " + arcAlpha + ")";
+        ctx.strokeStyle = "rgba(255, 250, 14, " + arcAlpha + ")";
         ctx.beginPath();
         ctx.arc(0, 0, arcRadius, 0, Math.PI * 2);
         ctx.stroke();
@@ -136,7 +145,7 @@ export default {
         var arcAlpha = 1 - deltaProgress;
 
         ctx.lineWidth = arcWidth;
-        ctx.strokeStyle = "rgba(226, 166, 16, " + arcAlpha + ")";
+        ctx.strokeStyle = "rgba(255, 250, 14, " + arcAlpha + ")";
         ctx.beginPath();
         ctx.arc(0, 0, arcRadius, 0, Math.PI * 2);
         ctx.stroke();
