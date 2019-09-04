@@ -25,12 +25,13 @@ export default {
     return {
       // loadingState: this.$store.state.loading
       animationRequest: null,
+      animationStart: null,
       canvas: null,
       ctx: null,
       duration: 666.667,
       durationRadiance: 2000,
       radius: 18,
-      start: null,
+      
       timeoutID: null
     };
   },
@@ -56,8 +57,8 @@ export default {
     },
     drawEvolve(timestamp) {
       // Timing Setup
-      if (!this.start) {
-        this.start = timestamp;
+      if (!this.animationStart) {
+        this.animationStart = timestamp;
       }
 
       let canvas = this.canvas;
@@ -71,10 +72,9 @@ export default {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.translate(canvas.width / 2, canvas.height / 2);
 
-      var remainder = (timestamp - this.start) % duration;
+      var remainder = (timestamp - this.animationStart) % duration;
       var startAngle = Math.PI * (remainder / duration) * 2;
       var endAngle = startAngle + Math.PI;
-      // var degrees = (360 * remainder) / duration;
 
       // Drawing the main arc
 
@@ -116,7 +116,7 @@ export default {
       ctx.globalCompositeOperation = "source-over";
 
       var arcWidth = 2;
-      var oRemainder = (timestamp - this.start) % durationRadiance;
+      var oRemainder = (timestamp - this.animationStart) % durationRadiance;
       var oRemainderPercentage = oRemainder / durationRadiance;
       var firstArcTriggerPoint = 0.66;
       var secondArcTriggerPoint = 0.83;

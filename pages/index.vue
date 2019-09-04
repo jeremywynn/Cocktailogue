@@ -5,20 +5,23 @@
     </div>
 
     <header class="app-header">
-      <form @submit.prevent="searchItems" class="form form--search">
+      <div class="backlink" v-if="searchQuery">
+        <nuxt-link to="/">&#8592;</nuxt-link>
+      </div>
+      <form @submit.prevent="searchItems" class="form form--search" role="search" aria-label="Search">
         <fieldset>
           <div class="form-field">
-            <input type="text" v-model="searchTerms" id="search-field" placeholder="Search" />
-            <button type="submit">
+            <input type="text" id="search-field" v-model="searchTerms" placeholder="Search" />
+            <!-- <button type="submit">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30.239 30.239">
                 <path d="M20.194 3.46c-4.613-4.613-12.121-4.613-16.734 0-4.612 4.614-4.612 12.121 0 16.735 4.108 4.107 10.506 4.547 15.116 1.34.097.459.319.897.676 1.254l6.718 6.718a2.498 2.498 0 0 0 3.535 0 2.496 2.496 0 0 0 0-3.535l-6.718-6.72a2.5 2.5 0 0 0-1.253-.674c3.209-4.611 2.769-11.008-1.34-15.118zm-2.121 14.614c-3.444 3.444-9.049 3.444-12.492 0-3.442-3.444-3.442-9.048 0-12.492 3.443-3.443 9.048-3.443 12.492 0 3.444 3.444 3.444 9.048 0 12.492z"/>
               </svg>
-            </button>
+            </button> -->
           </div>
         </fieldset>
       </form>
       <!-- <div class="header-action"> -->
-        <button class="app-action" v-on:click="addingItem = !addingItem">
+        <button class="app-action" v-on:click="addingItem = !addingItem" v-bind:class="{ 'subtle': addingItem }">
           <span v-if="!addingItem">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 491.86 491.86">
               <path d="M465.167 211.614H280.245V26.691c0-8.424-11.439-26.69-34.316-26.69s-34.316 18.267-34.316 26.69v184.924H26.69C18.267 211.614 0 223.053 0 245.929s18.267 34.316 26.69 34.316h184.924v184.924c0 8.422 11.438 26.69 34.316 26.69s34.316-18.268 34.316-26.69V280.245H465.17c8.422 0 26.69-11.438 26.69-34.316s-18.27-34.315-26.693-34.315z"/>
@@ -66,8 +69,16 @@
                               </div>
                             </div>
                             <div class="carousel-controls">
-                              <button v-on:click="prevSlide" ref="prev" class="node node--prev">Prev</button>
-                              <button v-on:click="nextSlide" ref="next" class="node node--next">Next</button>
+                              <button v-on:click="prevSlide" ref="prev" class="node node--prev" disabled>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 492 492">
+                                  <path d="M198.608 246.104L382.664 62.04c5.068-5.056 7.856-11.816 7.856-19.024 0-7.212-2.788-13.968-7.856-19.032l-16.128-16.12C361.476 2.792 354.712 0 347.504 0s-13.964 2.792-19.028 7.864L109.328 227.008c-5.084 5.08-7.868 11.868-7.848 19.084-.02 7.248 2.76 14.028 7.848 19.112l218.944 218.932c5.064 5.072 11.82 7.864 19.032 7.864 7.208 0 13.964-2.792 19.032-7.864l16.124-16.12c10.492-10.492 10.492-27.572 0-38.06L198.608 246.104z"/>
+                                </svg>
+                              </button>
+                              <button v-on:click="nextSlide" ref="next" class="node node--next">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 492 492">
+                                  <path d="M198.608 246.104L382.664 62.04c5.068-5.056 7.856-11.816 7.856-19.024 0-7.212-2.788-13.968-7.856-19.032l-16.128-16.12C361.476 2.792 354.712 0 347.504 0s-13.964 2.792-19.028 7.864L109.328 227.008c-5.084 5.08-7.868 11.868-7.848 19.084-.02 7.248 2.76 14.028 7.848 19.112l218.944 218.932c5.064 5.072 11.82 7.864 19.032 7.864 7.208 0 13.964-2.792 19.032-7.864l16.124-16.12c10.492-10.492 10.492-27.572 0-38.06L198.608 246.104z"/>
+                                </svg>
+                              </button>
                             </div>
                           </div>
                           <div v-for="media in newItemMedia" v-if="newItemMedia.length < 2">
@@ -100,7 +111,7 @@
                     <button v-on:click="addItem" v-show="newItemContent" :disabled="itemAddProcessing">Add Item</button>
                   </div>
                   <div class="add-action">
-                    <button
+                    <button class="subtle"
                     v-on:click="resetAddForm"
                     v-show="newItemContent"
                     :disabled="itemAddProcessing"
@@ -117,7 +128,7 @@
         </div>
       </div>
     </v-expand-transition>
-    <div class="items" ref="items" id="items">
+    <div class="items" ref="items" id="items" v-if="items.length">
       <item
         v-for="(item, index) in items"
         :class="{ 'tease': index === 0 }"
@@ -125,6 +136,9 @@
         :key="item._id"
       />
       <div class="items-footer" ref="itemsFooter"></div>
+    </div>
+    <div v-else class="disclaimer">
+      <p>No items were found.</p>
     </div>
     <div class="lower-brow">
       <loading />
@@ -138,9 +152,15 @@ import loading from "@@/components/loading.vue";
 import message from "@@/components/message.vue";
 
 export default {
-  async fetch({ store }) {
+  watchQuery: ['search'],
+  async fetch({ store, query }) {
     try {
-      await store.dispatch("GET_ITEMS");
+      if (query.search) {
+        await store.dispatch("SEARCH_ITEMS", query.search);
+      }
+      else {
+        await store.dispatch("GET_ITEMS");
+      }
     } catch (err) {
       console.log(err);
     }
@@ -160,20 +180,25 @@ export default {
       newItemName: null,
       newItemSourceCategory: null,
       newItemSourceUrl: null,
+      searchQuery: this.$route.query.search,
       searchTerms: null
     };
+  },
+  created: function() {
+    // this.$store.dispatch("startBusyState");
+    // console.log('start getting busy!')
+
+    // console.log(this.$route.query.search);
   },
   methods: {
     async searchItems() {
       if (this.searchTerms) {
-        let payload = {
-          searchTerms: this.searchTerms
-        };
-        await this.$store.dispatch("EDIT_SEARCH_TERMS", payload);
-        await this.$store.dispatch(
-          "SEARCH_ITEMS",
-          this.$store.state.searchTerms
-        );
+        this.$router.push({
+          name: 'index',
+          query: {
+            search: this.searchTerms
+          }
+        });
       }
     },
     processFile(event) {
@@ -225,9 +250,6 @@ export default {
       this.saveItems();
     },
     async saveItems() {
-      // Local Storage
-      // const parsed = JSON.stringify(this.items);
-      // localStorage.setItem("items", parsed);
 
       this.itemAddProcessing = true;
 
@@ -272,38 +294,39 @@ export default {
         behavior: "smooth"
       });
     },
-    
-    itemScroll() {}
   },
   computed: {
     items() {
       return this.$store.state.items;
-    }
+    },
   },
   mounted: function() {
-
+    console.log(this.items);
     this.observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (entry.intersectionRatio > 0) {
-          // Get id of last element in state
-          let lastItemId = this.$store.state.items[this.$store.state.items.length - 1]._id;
-          // console.log();
           if (this.$store.state.itemsRemaining === false) {
             this.observer.unobserve(this.$refs.itemsFooter);
-            console.log('now unobserving!')
           } else {
-            this.$store.dispatch(
-              "GET_ADDITIONAL_ITEMS",
-              lastItemId
-            );
+            // Get id of last element in state
+            let lastItemId = this.$store.state.items[this.$store.state.items.length - 1]._id;
+            if (this.$store.state.loading === false) {
+              this.$store.dispatch(
+                "GET_ADDITIONAL_ITEMS",
+                lastItemId
+              );
+            }
           }
         }
       });
     });
 
-    window.setTimeout(() => {
-      this.observer.observe(this.$refs.itemsFooter);
-    }, 400);
+    if (!this.$route.query.search) {
+      // Find a better way to do this
+      window.setTimeout(() => {
+        this.observer.observe(this.$refs.itemsFooter);
+      }, 400);
+    }
   },
   watch: {
     carouselScrollMarker: function() {
@@ -322,7 +345,7 @@ export default {
           this.$refs.next.setAttribute("disabled", "");
         }
       }
-    }
+    },
   },
   components: {
     item,
@@ -372,12 +395,23 @@ button {
   scroll-snap-align: start;
 }
 
-/* 2015 spec - For Firefox, Edge, IE */
 .carousel.snap {
   scroll-snap-type: mandatory;
   -ms-scroll-snap-type: mandatory;
   scroll-snap-points-x: repeat(100%);
   -ms-scroll-snap-points-x: repeat(100%);
+}
+
+.backlink {
+  align-items: center;
+  display: flex;
+  margin-right: 0.5rem;
+  a {
+    color: rgba(255, 250, 14, 1);
+    font-size: 2rem;
+    line-height: 0;
+    text-decoration: none;
+  }
 }
 
 .carousel {
@@ -435,8 +469,10 @@ button {
       display: flex;
     }
     input {
+      background-color: transparent;
+      border-radius: 0;
       flex: 1 1 auto;
-      margin-right: 0.5rem;
+      // margin-right: 0.5rem;
       padding: 0.5rem;
     }
     button {
@@ -475,9 +511,9 @@ button {
   .form--search {
     flex: 1 1 auto;
     .form-field {
-      display: grid;
-      grid-template-columns: auto 2.5rem;
-      grid-column-gap: 0.5rem;
+      // display: grid;
+      // grid-template-columns: auto 2.5rem;
+      // grid-column-gap: 0.5rem;
       input[type="text"] {
         width: 100%;
       }
@@ -500,8 +536,16 @@ button {
   }
 }
 
+.disclaimer {
+  // border-top: 2px solid rgba(255, 250, 14, 1);
+  padding: 1rem 0;
+  text-align: center;
+}
+
 
 .instructions {
+  border-top: 2px solid rgba(255, 250, 14, 1);
+  line-height: 1.5;
   padding: 0 0 0.5rem;
   &__content {
     // background-color: gray;
@@ -551,6 +595,14 @@ button {
       height: 19px;
       margin: 0 auto;
       width: 19px;
+    }
+  }
+}
+
+.add-action {
+  .subtle {
+    svg {
+      fill: #000;
     }
   }
 }

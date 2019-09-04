@@ -9,7 +9,6 @@
         </div>
         <div class="item__media">
           <div class="carousel-wrapper" v-if="item.media.length > 1">
-            <!-- <div class="carousel snap" ref="carousel" v-on:resize="resize"> -->
             <div class="carousel snap" ref="carousel">
               <div class="media-item" v-for="media in item.media">
                 <img
@@ -62,7 +61,7 @@
           </div>
           <div class="item__actions">
             <div class="action-group action-group--editing">
-              <button v-on:click="triggerEditItem" :disabled="itemProcessing">
+              <button v-on:click="triggerEditItem" :disabled="itemProcessing" v-bind:class="{ 'subtle': editingItem }">
                 <span v-if="editingItem">Cancel Edits</span>
                 <span v-else>Edit Item</span>
               </button>
@@ -105,7 +104,6 @@
 </template>
 
 <script>
-// import Vuetify from 'vuetify/lib'
 
 export default {
   data: function() {
@@ -211,10 +209,13 @@ export default {
       });
     });
 
-    this.observer.observe(this.$el);
-
     this.$el.querySelectorAll(".item__media").forEach(item => {
-      this.observer.observe(item);
+      let imageElement = item.querySelector('img');
+      if (imageElement) {
+        imageElement.addEventListener("load", () => {
+          this.observer.observe(item);
+        });
+      }
     });
 
     this.$refs.itemContent.spellcheck = false;
@@ -297,7 +298,6 @@ export default {
 }
 .carousel-controls {
   position: absolute;
-  // top: 43%;
   top: 50%;
   padding: 0 1rem;
   transform: translateY(-100%);
@@ -309,6 +309,7 @@ export default {
   border: 0;
   border-radius: 0;
   outline: none;
+  transition: opacity 400ms;
   &--prev {
     float: left;
   }
@@ -327,14 +328,24 @@ export default {
       fill: rgba(0, 0, 0, 1);
       stroke: rgba(255, 250, 14, 1);
       stroke-width: 8px;
+      transition: fill 400ms;
     }
   }
   &:disabled {
+    opacity: 0.25;
     svg {
       path {
-        fill: transparent;
-        stroke: #fff;
-        stroke-width: 8px;
+        fill: transparent !important;
+        stroke: #fff !important;
+        stroke-width: 8px !important;
+      }
+    }
+  }
+  &:hover {
+    box-shadow: none !important;
+    svg {
+      path {
+        fill: rgba(255, 250, 14, 1);
       }
     }
   }
@@ -355,7 +366,6 @@ export default {
 .header-wrap {
   position: relative;
 }
-
 .item__meta {
   padding: 0 1rem;
 }
@@ -414,19 +424,7 @@ export default {
     }
   }
   &:first-child {
-    // border-top: 2px solid;
     border-top: 1px solid rgba(255, 255, 255, 1);
-  }
-  &.tease {
-    .item__header {
-    }
-    .item__title {
-      bottom: 0;
-      text-shadow: 0 0 3px black;
-    }
-    .item__media {
-      opacity: 1;
-    }
   }
   &.reveal {
     .item__header {
@@ -450,11 +448,14 @@ export default {
 .item__title {
   background-color: rgba(0, 0, 0, 0.667);
   bottom: 0;
-  font-size: 1.5rem;
+  font-size: calc(1rem + 1vw);
   padding: 0.5rem;
   position: absolute;
   text-shadow: 0 0 3px black;
   width: 100%;
+  @media only all and (min-width: 56em) {
+    font-size: 1.5rem;
+  }
   .item-name {
     padding: 0.5rem 1rem;
     width: 100%;
@@ -480,7 +481,6 @@ export default {
   transition: box-shadow 200ms;
   &:after,
   &:before {
-    // background-color: white;
     background-color: rgba(255, 250, 14, 1);
     content: "";
     display: block;
@@ -490,17 +490,17 @@ export default {
   }
   &:after {
     bottom: 0;
-    height: 2px;
-    left: 2px;
+    height: 1px;
+    left: 1px;
     transform-origin: left;
-    width: calc(100% - 4px);
+    width: calc(100% - 2px);
   }
   &:before {
     height: calc(100% - 1px);
     right: 0;
     top: 1px;
     transform-origin: top;
-    width: 2px;
+    width: 1px;
   }
 }
 
@@ -508,7 +508,6 @@ export default {
   position: relative;
   &:after,
   &:before {
-    // background-color: white;
     background-color: rgba(255, 250, 14, 1);
     content: "";
     display: block;
@@ -517,17 +516,17 @@ export default {
     transition: opacity 400ms;
   }
   &:after {
-    height: 2px;
+    height: 1px;
     top: 0;
     transform-origin: left;
     width: 100%;
   }
   &:before {
-    height: calc(100% - 2px);
+    height: calc(100% - 1px);
     left: 0;
-    top: 2px;
+    top: 1px;
     transform-origin: top;
-    width: 2px;
+    width: 1px;
   }
 }
 
@@ -545,7 +544,6 @@ export default {
   position: relative;
   &:after,
   &:before {
-    // background-color: white;
     background-color: rgba(255, 250, 14, 1);
     content: "";
     display: block;
@@ -554,17 +552,17 @@ export default {
     transition: opacity 400ms;
   }
   &:after {
-    height: 2px;
+    height: 1px;
     top: 0;
     transform-origin: left;
     width: 100%;
   }
   &:before {
-    height: calc(100% - 2px);
+    height: calc(100% - 1px);
     left: 0;
-    top: 2px;
+    top: 1px;
     transform-origin: top;
-    width: 2px;
+    width: 1px;
   }
 }
 
@@ -574,7 +572,6 @@ export default {
   transition: box-shadow 200ms;
   &:after,
   &:before {
-    // background-color: white;
     background-color: rgba(255, 250, 14, 1);
     content: "";
     display: block;
@@ -584,17 +581,17 @@ export default {
   }
   &:after {
     bottom: 0;
-    height: 2px;
-    left: 2px;
+    height: 1px;
+    left: 1px;
     transform-origin: left;
-    width: calc(100% - 4px);
+    width: calc(100% - 2px);
   }
   &:before {
-    height: calc(100% - 2px);
+    height: calc(100% - 1px);
     right: 0;
-    top: 2px;
+    top: 1px;
     transform-origin: top;
-    width: 2px;
+    width: 1px;
   }
 }
 

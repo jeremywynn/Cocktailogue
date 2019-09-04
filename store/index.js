@@ -1,8 +1,7 @@
 export const state = () => ({
   items: [],
   itemsRemaining: true,
-  loading: false,
-  searchTerms: null
+  loading: false
 });
 
 export const mutations = {
@@ -32,9 +31,6 @@ export const mutations = {
   adjustItemsRemaining(state, count) {
     state.itemsRemaining = count;
   },
-  setSearchTerms(state, payload) {
-    state.searchTerms = payload;
-  }
 };
 
 export const actions = {
@@ -43,10 +39,6 @@ export const actions = {
   },
   stopBusyState({ commit }) {
     commit("endBusyState");
-  },
-  EDIT_SEARCH_TERMS({ commit }, payload) {
-    let searchTerms = payload.searchTerms;
-    commit("setSearchTerms", searchTerms);
   },
   async GET_ITEMS({ commit, dispatch }, payload) {
     dispatch("triggerBusyState");
@@ -58,9 +50,8 @@ export const actions = {
         method: "POST",
         body: JSON.stringify(data)
       }).then(res => res.json());
-      if (items.length > 0) {
-        commit("SET_ITEMS", items);
-      } else {
+      commit("SET_ITEMS", items);
+      if (items.length < 1) {
         commit("adjustItemsRemaining", false);
       }
     } catch (err) {

@@ -37,9 +37,6 @@ h6,
 
 textarea,
 input[type="text"] {
-  /* background-color: white; */
-  /* border: 2px solid white; */
-  /* border: 1px solid rgba(226, 166, 16, 1); */
   border: 1px solid rgba(255, 255, 255, 1);
   outline-color: rgba(255, 250, 14, 1);
   &:focus, &:active {
@@ -54,15 +51,27 @@ button {
   font-family: "Roboto", sans-serif;
   font-weight: 500;
   padding: 0.25rem 0.5rem;
+  transition: box-shadow 400ms;
   &.negative {
     background-color: rgba(216, 33, 55, 1);
+    &:hover,
+    &:focus,
+    &:active {
+      box-shadow: 0 0 8px rgba(216, 33, 55, 1);
+    }
   }
   &.subtle {
     background-color: rgba(149, 150, 145, 1);
+    &:hover,
+    &:focus,
+    &:active {
+      box-shadow: 0 0 8px rgba(149, 150, 145, 1);
+  }
   }
   &:hover,
   &:focus,
   &:active {
+    box-shadow: 0 0 8px rgba(255, 250, 14, 1);
   }
 }
 </style>

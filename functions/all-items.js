@@ -8,7 +8,6 @@ import {
   UserApiKeyCredential
 } from "mongodb-stitch-server-sdk";
 
-//Performance optimization Step 1: declare the database connection object outside the handler method
 let cachedDb = null;
 let dataDirectory = '';
 
@@ -35,7 +34,6 @@ const headers = {
 exports.handler = async (event, context, callback) => {
 
   try {
-    //Performance optimization Step 2: set context.callbackWaitsForEmptyEventLoop to false to prevent the Lambda function from waiting for all resources (such as the database connection) to be released before returning it
     context.callbackWaitsForEmptyEventLoop = false;
 
     const items = await processEvent(event, context, callback);
@@ -91,13 +89,10 @@ async function queryDatabase(db, event) {
   var jsonContents = JSON.parse(JSON.stringify(event));
   // const data = JSON.parse(event.body);
   
-  //handling API Gateway input where the event is embedded into the 'body' element
   if (event.body !== null && event.body !== undefined) {
       console.log('retrieving payload from event.body');
       jsonContents = JSON.parse(event.body);
   }
-
-  // console.log('query parameters: ', jsonContents);
 
   let skipAmount = 0;
 

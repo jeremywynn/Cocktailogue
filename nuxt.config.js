@@ -70,5 +70,10 @@ export default {
      ** You can extend webpack config here
      */
     extend(config, ctx) {}
+  },
+  loadingIndicator: {
+    name: 'pulse',
+    color: 'rgb(255, 250, 14)',
+    background: '#000000'
   }
 };

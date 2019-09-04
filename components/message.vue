@@ -30,7 +30,7 @@ export default {
       this.canvas = this.$refs.lifespan;
       this.ctx = this.canvas.getContext("2d");
       this.ctx.lineWidth = 5;
-      this.ctx.strokeStyle = "rgba(199, 38, 31, 1)";
+      this.ctx.strokeStyle = "rgba(255, 250, 14, 1)";
       this.ctx.beginPath();
       this.ctx.arc(this.canvas.width / 2, this.canvas.height / 2, this.radius, -(this.startAngle), endAngle, true);
       this.ctx.stroke();
@@ -90,8 +90,10 @@ export default {
 <style lang="scss">
   .message {
     align-items: center;
-    background-color: tan;
-    color: #111;
+    background-color: rgba(0, 0, 0, 1);
+    border-top: 2px solid rgba(255, 250, 14, 1);
+    box-shadow: 0px 1px 3px rgba(255, 250, 14, 1);
+    color: rgba(255, 255, 255, 1);
     display: grid;
     grid-column-gap: 1rem;
     grid-template-columns: auto 32px;

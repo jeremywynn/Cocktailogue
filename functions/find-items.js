@@ -125,7 +125,7 @@ async function queryDatabase(db, event) {
       // .sort({ score: { $meta: "textScore" } })
       .toArray();
     
-    console.log(items);
+    // console.log(items);
 
     /*
     const pipeline = [{ $match: { content: { $regex: searchTerms, $options: 'i' } } }, { $sort: { $score: { $meta: "textScore" } } }, { $limit: 10 }];
