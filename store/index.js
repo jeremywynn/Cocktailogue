@@ -23,7 +23,7 @@ export const mutations = {
     state.items = items;
   },
   addItem(state, item) {
-    state.items.push(item);
+    state.items.unshift(item);
   },
   deleteItem(state, payload) {
     const item = state.items.find(item => item._id === payload._id);

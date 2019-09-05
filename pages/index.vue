@@ -153,11 +153,10 @@ import item from "@@/components/item.vue";
 import loading from "@@/components/loading.vue";
 import message from "@@/components/message.vue";
 
-import { mapGetters, mapActions } from "vuex";
+// import { mapGetters, mapActions } from "vuex";
 import netlifyIdentity from "netlify-identity-widget";
 
 netlifyIdentity.init({
-  // APIUrl: "https://cocktailogue.netlify.com/.netlify/identity", // Get URL of Netlify site
   logo: false // you can try false and see what happens
 });
 
@@ -339,6 +338,7 @@ export default {
     }
   },
   mounted: function() {
+
     // Strengthen this logic
     this.observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {

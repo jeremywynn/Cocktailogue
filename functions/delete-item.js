@@ -29,7 +29,7 @@ const mongoClient = client.getServiceClient(
 const credential = new UserApiKeyCredential(process.env.MONGODB_API_KEY);
 
 var imagekit = new ImageKit({
-  imagekitId: "94ka2dfnz",
+  imagekitId: process.env.IMAGEKIT_ID,
   apiKey: process.env.IMAGEKIT_PUBLIC_API_KEY,
   apiSecret: process.env.IMAGEKIT_API_SECRET
 });

@@ -75,5 +75,8 @@ export default {
     name: 'pulse',
     color: 'rgb(255, 250, 14)',
     background: '#000000'
+  },
+  env: {
+    IMAGEKIT_ID: process.env.IMAGEKIT_ID
   }
 };

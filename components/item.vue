@@ -12,7 +12,7 @@
             <div class="carousel snap" ref="carousel">
               <div class="media-item" v-for="media in item.media">
                 <img
-                  v-bind:src="'https://ik.imagekit.io/94ka2dfnz' + media.path"
+                  v-bind:src="'https://ik.imagekit.io/' + imageKitID + media.path"
                   v-if="media.path"
                   alt
                 />
@@ -25,7 +25,7 @@
             v-for="media in item.media"
             ref="mediaItem"
           >
-            <img v-bind:src="'https://ik.imagekit.io/94ka2dfnz' + media.path" v-if="media.path" alt />
+            <img v-bind:src="'https://ik.imagekit.io/' + imageKitID + media.path" v-if="media.path" alt />
             <img v-bind:src="media.url" v-else alt />
           </div>
           <div class="media-item" v-if="item.media.length === 0">
@@ -124,11 +124,10 @@
 
 <script>
 
-import { mapGetters, mapActions } from "vuex";
+// import { mapGetters, mapActions } from "vuex";
 import netlifyIdentity from "netlify-identity-widget";
 
 netlifyIdentity.init({
-  // APIUrl: "https://cocktailogue.netlify.com/.netlify/identity", // Get URL of Netlify site
   logo: false // you can try false and see what happens
 });
 
@@ -138,6 +137,7 @@ export default {
       carouselScrollMarker: 0,
       confirmRemoval: false,
       editingItem: false,
+      imageKitID: process.env.IMAGEKIT_ID,
       itemContent: this.item.content,
       itemName: this.item.name,
       itemProcessing: false,
