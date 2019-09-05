@@ -3,7 +3,6 @@
     <div class="communicator">
       <message />
     </div>
-
     <header class="app-header">
       <div class="backlink" v-if="searchQuery">
         <nuxt-link to="/">&#8592;</nuxt-link>
@@ -107,8 +106,11 @@
               <footer class="add-footer">
                 <input type="file" accept="application/json" @change="processFile($event)" ref="jsonFile" />
                 <div class="add-actions">
-                  <div class="add-action">
+                  <div class="add-action" v-if="isLoggedIn">
                     <button v-on:click="addItem" v-show="newItemContent" :disabled="itemAddProcessing">Add Item</button>
+                  </div>
+                  <div class="add-action" v-else>
+                    <button v-on:click="triggerNetlifyIdentityAction('login')" v-show="newItemContent" :disabled="itemAddProcessing" class="unauthorized">Add Item</button>
                   </div>
                   <div class="add-action">
                     <button class="subtle"
@@ -151,6 +153,14 @@ import item from "@@/components/item.vue";
 import loading from "@@/components/loading.vue";
 import message from "@@/components/message.vue";
 
+import { mapGetters, mapActions } from "vuex";
+import netlifyIdentity from "netlify-identity-widget";
+
+netlifyIdentity.init({
+  APIUrl: "https://cocktailogue.netlify.com/.netlify/identity", // Get URL of Netlify site
+  logo: false // you can try false and see what happens
+});
+
 export default {
   watchQuery: ['search'],
   async fetch({ store, query }) {
@@ -168,6 +178,7 @@ export default {
   data: function() {
     return {
       addingItem: false,
+      currentUser: null,
       carouselScrollMarker: 0,
       ingredientIncrementer: 0,
       itemIncrementer: 0,
@@ -184,12 +195,6 @@ export default {
       searchTerms: null
     };
   },
-  created: function() {
-    // this.$store.dispatch("startBusyState");
-    // console.log('start getting busy!')
-
-    // console.log(this.$route.query.search);
-  },
   methods: {
     async searchItems() {
       if (this.searchTerms) {
@@ -199,6 +204,35 @@ export default {
             search: this.searchTerms
           }
         });
+      }
+    },
+    updateUser(payload) {
+      this.$store.dispatch("updateUser", payload);
+    },
+    triggerNetlifyIdentityAction(action) {
+      if (action == "login" || action == "signup") {
+        netlifyIdentity.open(action);
+        netlifyIdentity.on(action, user => {
+          this.currentUser = {
+            username: user.user_metadata.full_name,
+            email: user.email,
+            access_token: user.token.access_token,
+            expires_at: user.token.expires_at,
+            refresh_token: user.token.refresh_token,
+            token_type: user.token.token_type
+          };
+          this.updateUser({
+            currentUser: this.currentUser
+          });
+          netlifyIdentity.close();
+        });
+      } else if (action == "logout") {
+        this.currentUser = null;
+        this.updateUser({
+          currentUser: this.currentUser
+        });
+        netlifyIdentity.logout();
+        this.$router.push({ name: "Index" });
       }
     },
     processFile(event) {
@@ -296,12 +330,18 @@ export default {
     },
   },
   computed: {
+    isLoggedIn() {
+      return this.$store.state.user;
+    },
+    user() {
+      return JSON.parse(this.$store.state.user);
+    },
     items() {
       return this.$store.state.items;
-    },
+    }
   },
   mounted: function() {
-    console.log(this.items);
+    // console.log(this.items);
     this.observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (entry.intersectionRatio > 0) {

@@ -45,7 +45,6 @@ input[type="text"] {
 }
 
 button {
-  /* border: 1px solid rgba(226, 166, 16, 1); */
   background-color: rgba(255, 250, 14, 1);
   color: #000;
   font-family: "Roboto", sans-serif;
@@ -72,6 +71,15 @@ button {
   &:focus,
   &:active {
     box-shadow: 0 0 8px rgba(255, 250, 14, 1);
+  }
+  &:disabled, &.unauthorized {
+    background-color: transparent !important;
+    border: 1px solid rgba(149, 150, 145, 1) !important;
+    color: rgba(149, 150, 145, 1) !important;
+    opacity: 0.5 !important;
+    &:hover, &:focus, &:active {
+      box-shadow: none !important;
+    }
   }
 }
 </style>

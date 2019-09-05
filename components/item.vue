@@ -61,35 +61,54 @@
           </div>
           <div class="item__actions">
             <div class="action-group action-group--editing">
-              <button v-on:click="triggerEditItem" :disabled="itemProcessing" v-bind:class="{ 'subtle': editingItem }">
-                <span v-if="editingItem">Cancel Edits</span>
-                <span v-else>Edit Item</span>
-              </button>
-              <button
-                v-on:click="editItem"
-                v-show="editingItem"
-                :disabled="itemProcessing"
-              >Save Edits</button>
+              <div class="edit-option" v-if="isLoggedIn">
+                <button v-on:click="triggerEditItem" :disabled="itemProcessing" v-bind:class="{ 'subtle': editingItem }">
+                  <span v-if="editingItem">Cancel Edits</span>
+                  <span v-else>Edit Item</span>
+                </button>
+                <button
+                  v-on:click="editItem"
+                  v-show="editingItem"
+                  :disabled="itemProcessing"
+                >Save Edits</button>
+              </div>
+              <div class="edit-option" v-else>
+                <button v-on:click="triggerNetlifyIdentityAction('login')" :disabled="itemProcessing" class="unauthorized">
+                  <span>Edit Item</span>
+                </button>
+              </div>
             </div>
             <div class="action-group" v-if="!editingItem">
               <transition name="fade">
                 <div class="button-group">
                   <transition name="fade" mode="out-in">
-                    <div class="original-removal" v-if="confirmRemoval === false" key="hideChoice">
-                      <button
-                        class="negative"
-                        v-on:click="confirmRemoval = true"
-                        v-show="!editingItem"
-                        :disabled="itemProcessing"
-                      >Delete Item</button>
-                    </div>
-                    <div class="confirm-removal" v-if="confirmRemoval === true" key="showChoice">
-                      <span class="confirm-text">Delete?</span>
-                      <div class="choice">
-                        <button v-on:click="removeItem">Yes</button>
+                    <div class="removal-option" v-if="isLoggedIn">
+                      <div class="original-removal" v-if="confirmRemoval === false" key="hideChoice">
+                        <button
+                          class="negative"
+                          v-on:click="confirmRemoval = true"
+                          v-show="!editingItem"
+                          :disabled="itemProcessing"
+                        >Delete Item</button>
                       </div>
-                      <div class="choice">
-                        <button class="subtle" v-on:click="confirmRemoval = false">No</button>
+                      <div class="confirm-removal" v-if="confirmRemoval === true" key="showChoice">
+                        <span class="confirm-text">Delete?</span>
+                        <div class="choice">
+                          <button v-on:click="removeItem">Yes</button>
+                        </div>
+                        <div class="choice">
+                          <button class="subtle" v-on:click="confirmRemoval = false">No</button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="removal-option" v-else>
+                      <div class="original-removal" v-if="confirmRemoval === false" key="hideChoice">
+                        <button
+                          class="negative unauthorized"
+                          v-on:click="triggerNetlifyIdentityAction('login')"
+                          v-show="!editingItem"
+                          :disabled="itemProcessing"
+                        >Delete Item</button>
                       </div>
                     </div>
                   </transition>
@@ -104,6 +123,14 @@
 </template>
 
 <script>
+
+import { mapGetters, mapActions } from "vuex";
+import netlifyIdentity from "netlify-identity-widget";
+
+netlifyIdentity.init({
+  APIUrl: "https://cocktailogue.netlify.com/.netlify/identity", // Get URL of Netlify site
+  logo: false // you can try false and see what happens
+});
 
 export default {
   data: function() {
@@ -123,7 +150,44 @@ export default {
       sourceIdentifier: this.item.sourceIdentifier
     };
   },
+  computed: {
+    isLoggedIn() {
+      return this.$store.state.user;
+    },
+    user() {
+      return JSON.parse(this.$store.state.user);
+    },
+  },
   methods: {
+    updateUser(payload) {
+      this.$store.dispatch("updateUser", payload);
+    },
+    triggerNetlifyIdentityAction(action) {
+      if (action == "login" || action == "signup") {
+        netlifyIdentity.open(action);
+        netlifyIdentity.on(action, user => {
+          this.currentUser = {
+            username: user.user_metadata.full_name,
+            email: user.email,
+            access_token: user.token.access_token,
+            expires_at: user.token.expires_at,
+            refresh_token: user.token.refresh_token,
+            token_type: user.token.token_type
+          };
+          this.updateUser({
+            currentUser: this.currentUser
+          });
+          netlifyIdentity.close();
+        });
+      } else if (action == "logout") {
+        this.currentUser = null;
+        this.updateUser({
+          currentUser: this.currentUser
+        });
+        netlifyIdentity.logout();
+        this.$router.push({ name: "Index" });
+      }
+    },
     disableEditMode() {
       this.$refs.itemContent.setAttribute("contenteditable", false);
       this.$refs.itemName.setAttribute("contenteditable", false);
