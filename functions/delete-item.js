@@ -9,19 +9,23 @@ import {
   UserApiKeyCredential
 } from "mongodb-stitch-server-sdk";
 
-// const client = Stitch.initializeDefaultAppClient(
-//   "catalogue-fjarv",
-//   new StitchAppClientConfiguration.Builder().withDataDirectory("/tmp").build()
-// );
+let cachedDb = null;
+let dataDirectory = '';
+
+const isLambda = !!(process.env.LAMBDA_TASK_ROOT || false);
+
+if (isLambda) {
+  dataDirectory = '/tmp';
+}
+
 const client = Stitch.initializeDefaultAppClient(
   "catalogue-fjarv",
-  new StitchAppClientConfiguration.Builder().withDataDirectory("").build()
+  new StitchAppClientConfiguration.Builder().withDataDirectory(dataDirectory).build()
 );
 const mongoClient = client.getServiceClient(
   RemoteMongoClient.factory,
   "mongodb-atlas"
 );
-
 const credential = new UserApiKeyCredential(process.env.MONGODB_API_KEY);
 
 var imagekit = new ImageKit({
@@ -36,19 +40,76 @@ const headers = {
 };
 
 exports.handler = async (event, context, callback) => {
+
   try {
-    const data = JSON.parse(event.body);
-    const media = data.media;
-    let mediaToDelete = [];
+    context.callbackWaitsForEmptyEventLoop = false;
 
-    if (media) {
-      media.forEach(function(singleMedia) {
-        if (singleMedia.path) {
-          mediaToDelete.push(singleMedia.path);
-        }
-      });
+    const response = await processEvent(event, context, callback);
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify(response)
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify(error)
+    };
+  }
+};
+
+async function connectToDatabase(uri) {
+
+  try {
+    if (cachedDb && (typeof cachedDb.serverConfig != 'undefined')) {
+      if (cachedDb.serverConfig.isConnected()) {
+        return Promise.resolve(cachedDb);
+      }
     }
+    await client.auth.loginWithCredential(credential);
+    const db = mongoClient.db("catalogue");
+    cachedDb = db;
+    return cachedDb;
+  }
+  catch (error) {
+    console.log(error);
+    return error;
+  }
+}
 
+async function processEvent(event, context, callback) {
+  try {
+    const db = await connectToDatabase();
+    const result = await queryDatabase(db, event);
+    return result;
+  } catch (error) {
+    console.log(error); // output to netlify function log
+    return error;
+  }
+}
+
+async function queryDatabase(db, event) {   
+  var jsonContents = JSON.parse(JSON.stringify(event));
+  
+  if (event.body !== null && event.body !== undefined) {
+    jsonContents = JSON.parse(event.body);
+  }
+
+  const media = jsonContents.media;
+  let mediaToDelete = [];
+
+  if (media) {
+    media.forEach(function(singleMedia) {
+      if (singleMedia.path) {
+        mediaToDelete.push(singleMedia.path);
+      }
+    });
+  }
+
+  try {
+    
     if (mediaToDelete) {
       let deletePromises = mediaToDelete.map(async function(mediaItemPath) {
         try {
@@ -61,40 +122,20 @@ exports.handler = async (event, context, callback) => {
       await Promise.all(deletePromises);
     }
 
-    await client.auth.loginWithCredential(credential);
-    const db = mongoClient.db("catalogue");
     const itemsCollection = db.collection("items");
-
     const response = await itemsCollection.deleteOne({
-      _id: new BSON.ObjectId(data.ID)
+      _id: new BSON.ObjectId(jsonContents.ID)
     });
 
     if (response.deletedCount) {
       // Should we query for the deleted document to make doubly sure it was deleted?
       let payload = {
-        _id: data.ID
+        _id: jsonContents.ID
       };
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify(payload)
-      };
+      return payload;
     }
-
-    // console.log(response);
-    // { deletedCount: 1 }
-
-    // return {
-    //   statusCode: 200,
-    //   headers,
-    //   body: JSON.stringify(response)
-    // };
   } catch (error) {
-    console.log(error); // output to netlify function log
-    return {
-      statusCode: 400,
-      headers,
-      body: JSON.stringify(error)
-    };
+    return error;
   }
-};
+
+}

@@ -276,11 +276,9 @@ export default {
       );
     },
     addItem() {
-      // Add item through database
       if (!this.newItemContent || !this.$refs.newItemContent.innerText) {
         return;
       }
-
       this.saveItems();
     },
     async saveItems() {
@@ -341,7 +339,7 @@ export default {
     }
   },
   mounted: function() {
-    // console.log(this.items);
+    // Strengthen this logic
     this.observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (entry.intersectionRatio > 0) {
@@ -350,7 +348,7 @@ export default {
           } else {
             // Get id of last element in state
             let lastItemId = this.$store.state.items[this.$store.state.items.length - 1]._id;
-            if (this.$store.state.loading === false) {
+            if (this.$store.state.loading === false && !this.$route.query.search) {
               this.$store.dispatch(
                 "GET_ADDITIONAL_ITEMS",
                 lastItemId
@@ -367,6 +365,13 @@ export default {
         this.observer.observe(this.$refs.itemsFooter);
       }, 400);
     }
+    // Is this tick function needed?
+    this.$nextTick(function () {
+      if (this.$route.query.search) {
+        // console.log('triggered');
+        this.observer.unobserve(this.$refs.itemsFooter);
+      }
+    });
   },
   watch: {
     carouselScrollMarker: function() {

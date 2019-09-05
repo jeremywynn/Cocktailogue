@@ -228,10 +228,10 @@ export default {
       this.confirmRemoval = false;
       let payload = {
         ID: this.$vnode.key,
-        media: this.media
+        media: this.item.media
       };
       const deletedItem = await this.$store.dispatch("DELETE_ITEM", payload);
-      console.log(deletedItem);
+      // console.log(deletedItem);
       if (deletedItem) {
         this.$root.$emit("transmitMessage", "Item successfully deleted.");
       }
@@ -749,4 +749,11 @@ export default {
     transform: scaleY(1);
   }
 }
+
+.edit-option, .removal-option {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
 </style>

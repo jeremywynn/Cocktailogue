@@ -9,15 +9,23 @@ import {
   UserApiKeyCredential
 } from "mongodb-stitch-server-sdk";
 
+let cachedDb = null;
+let dataDirectory = '';
+
+const isLambda = !!(process.env.LAMBDA_TASK_ROOT || false);
+
+if (isLambda) {
+  dataDirectory = '/tmp';
+}
+
 const client = Stitch.initializeDefaultAppClient(
   "catalogue-fjarv",
-  new StitchAppClientConfiguration.Builder().withDataDirectory("").build()
+  new StitchAppClientConfiguration.Builder().withDataDirectory(dataDirectory).build()
 );
 const mongoClient = client.getServiceClient(
   RemoteMongoClient.factory,
   "mongodb-atlas"
 );
-
 const credential = new UserApiKeyCredential(process.env.MONGODB_API_KEY);
 
 // var imagekit = new ImageKit({
@@ -32,47 +40,78 @@ const headers = {
 };
 
 exports.handler = async (event, context, callback) => {
+
   try {
-    const data = JSON.parse(event.body);
-    const query = {
-      _id: new BSON.ObjectId(data.ID)
-    };
-    const update = {
-      $set: {
-        name: data.name,
-        content: data.content
-      }
-    };
-    const options = { upsert: false };
+    context.callbackWaitsForEmptyEventLoop = false;
 
-    await client.auth.loginWithCredential(credential);
-    const db = mongoClient.db("catalogue");
-    const itemsCollection = db.collection("items");
-
-    const response = await itemsCollection.updateOne(query, update, options);
-    // const { matchedCount, modifiedCount } = response;
-    // if (matchedCount && modifiedCount) {
-    //   const editedItem = await itemsCollection.findOne({
-    //     _id: new BSON.ObjectId(data.ID)
-    //   });
-    //   return {
-    //     statusCode: 200,
-    //     headers,
-    //     body: JSON.stringify(editedItem)
-    //   };
-    // }
+    const response = await processEvent(event, context, callback);
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify(response)
     };
-    // Throw error here?
   } catch (error) {
-    console.log(error); // output to netlify function log
+    console.log(error);
     return {
-      statusCode: 400,
+      statusCode: 500,
       headers,
       body: JSON.stringify(error)
     };
   }
 };
+
+async function connectToDatabase(uri) {
+  try {
+    if (cachedDb && (typeof cachedDb.serverConfig != 'undefined')) {
+      if (cachedDb.serverConfig.isConnected()) {
+        return Promise.resolve(cachedDb);
+      }
+    }
+    await client.auth.loginWithCredential(credential);
+    const db = mongoClient.db("catalogue");
+    cachedDb = db;
+    return cachedDb;
+  }
+  catch (error) {
+    console.log(error);
+    return error;
+  }
+}
+
+async function processEvent(event, context, callback) {
+  try {
+    const db = await connectToDatabase();
+    const result = await queryDatabase(db, event);
+    return result;
+  } catch (error) {
+    console.log(error); // output to netlify function log
+    return error;
+  }
+}
+
+async function queryDatabase(db, event) {   
+  var jsonContents = JSON.parse(JSON.stringify(event));
+  
+  if (event.body !== null && event.body !== undefined) {
+      jsonContents = JSON.parse(event.body);
+  }
+
+  const query = {
+    _id: new BSON.ObjectId(jsonContents.ID)
+  };
+  const update = {
+    $set: {
+      name: jsonContents.name,
+      content: jsonContents.content
+    }
+  };
+  const options = { upsert: false };
+
+  try {
+    const itemsCollection = db.collection("items");
+    const response = await itemsCollection.updateOne(query, update, options);
+    return response;
+  } catch (error) {
+    return error;
+  }
+}

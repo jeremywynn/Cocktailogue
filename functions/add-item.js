@@ -9,19 +9,23 @@ import {
   UserApiKeyCredential
 } from "mongodb-stitch-server-sdk";
 
-// const client = Stitch.initializeDefaultAppClient(
-//   "catalogue-fjarv",
-//   new StitchAppClientConfiguration.Builder().withDataDirectory("/tmp").build()
-// );
+let cachedDb = null;
+let dataDirectory = '';
+
+const isLambda = !!(process.env.LAMBDA_TASK_ROOT || false);
+
+if (isLambda) {
+  dataDirectory = '/tmp';
+}
+
 const client = Stitch.initializeDefaultAppClient(
   "catalogue-fjarv",
-  new StitchAppClientConfiguration.Builder().withDataDirectory("").build()
+  new StitchAppClientConfiguration.Builder().withDataDirectory(dataDirectory).build()
 );
 const mongoClient = client.getServiceClient(
   RemoteMongoClient.factory,
   "mongodb-atlas"
 );
-
 const credential = new UserApiKeyCredential(process.env.MONGODB_API_KEY);
 
 var imagekit = new ImageKit({
@@ -36,10 +40,67 @@ const headers = {
 };
 
 exports.handler = async (event, context, callback) => {
-  try {
-    const data = JSON.parse(event.body);
-    let media = data.media;
 
+  try {
+    context.callbackWaitsForEmptyEventLoop = false;
+
+    const response = await processEvent(event, context, callback);
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify(response)
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify(error)
+    };
+  }
+};
+
+async function connectToDatabase(uri) {
+
+  try {
+    if (cachedDb && (typeof cachedDb.serverConfig != 'undefined')) {
+      if (cachedDb.serverConfig.isConnected()) {
+        return Promise.resolve(cachedDb);
+      }
+    }
+    await client.auth.loginWithCredential(credential);
+    const db = mongoClient.db("catalogue");
+    cachedDb = db;
+    return cachedDb;
+  }
+  catch (error) {
+    console.log(error);
+    return error;
+  }
+}
+
+async function processEvent(event, context, callback) {
+  try {
+    const db = await connectToDatabase();
+    const result = await queryDatabase(db, event);
+    return result;
+  } catch (error) {
+    console.log(error); // output to netlify function log
+    return error;
+  }
+}
+
+async function queryDatabase(db, event) {   
+  var jsonContents = JSON.parse(JSON.stringify(event));
+  
+  if (event.body !== null && event.body !== undefined) {
+    jsonContents = JSON.parse(event.body);
+  }
+
+  let data = jsonContents;
+  let media = data.media;
+
+  try {
     if (media) {
       let uploadPromises = media.map(async function(mediaItem) {
         try {
@@ -61,8 +122,6 @@ exports.handler = async (event, context, callback) => {
         }
       }, media);
 
-      await client.auth.loginWithCredential(credential);
-      const db = mongoClient.db("catalogue");
       const itemsCollection = db.collection("items");
 
       let newItem = {
@@ -79,14 +138,10 @@ exports.handler = async (event, context, callback) => {
         _id: new BSON.ObjectId(response.insertedId)
       });
 
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify(newlyCreatedItem)
-      };
+      return newlyCreatedItem;
+
     } else {
-      await client.auth.loginWithCredential(credential);
-      const db = mongoClient.db("catalogue");
+
       const itemsCollection = db.collection("items");
 
       let newItem = {
@@ -99,18 +154,9 @@ exports.handler = async (event, context, callback) => {
       };
 
       const response = await itemsCollection.insertOne(newItem);
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify(response)
-      };
+      return response;
     }
   } catch (error) {
-    console.log(error); // output to netlify function log
-    return {
-      statusCode: 400,
-      headers,
-      body: JSON.stringify(error)
-    };
+    return error;
   }
-};
+}

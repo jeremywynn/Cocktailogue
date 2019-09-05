@@ -26,6 +26,7 @@ const mongoClient = client.getServiceClient(
   "mongodb-atlas"
 );
 const credential = new UserApiKeyCredential(process.env.MONGODB_API_KEY);
+
 const headers = {
   Accept: "application/json",
   "Content-Type": "application/json"
@@ -90,8 +91,7 @@ async function queryDatabase(db, event) {
   // const data = JSON.parse(event.body);
   
   if (event.body !== null && event.body !== undefined) {
-      console.log('retrieving payload from event.body');
-      jsonContents = JSON.parse(event.body);
+    jsonContents = JSON.parse(event.body);
   }
 
   let skipAmount = 0;
