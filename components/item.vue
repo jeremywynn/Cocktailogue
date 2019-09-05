@@ -396,6 +396,7 @@ export default {
     }
   }
   &:disabled {
+    border: 0 !important;
     opacity: 0.25;
     svg {
       path {
