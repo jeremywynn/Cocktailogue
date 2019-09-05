@@ -348,6 +348,7 @@ export default {
           } else {
             // Get id of last element in state
             let lastItemId = this.$store.state.items[this.$store.state.items.length - 1]._id;
+            console.log(lastItemId);
             if (this.$store.state.loading === false && !this.$route.query.search) {
               this.$store.dispatch(
                 "GET_ADDITIONAL_ITEMS",
@@ -517,8 +518,10 @@ button {
       background-color: transparent;
       border-radius: 0;
       flex: 1 1 auto;
-      // margin-right: 0.5rem;
       padding: 0.5rem;
+      &:hover, &:focus, &:active {
+        border-color: rgba(255, 250, 14, 1);
+      }
     }
     button {
       flex: 0;
@@ -556,9 +559,6 @@ button {
   .form--search {
     flex: 1 1 auto;
     .form-field {
-      // display: grid;
-      // grid-template-columns: auto 2.5rem;
-      // grid-column-gap: 0.5rem;
       input[type="text"] {
         width: 100%;
       }

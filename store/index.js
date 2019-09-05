@@ -22,8 +22,11 @@ export const mutations = {
   SEARCH_ITEMS(state, items) {
     state.items = items;
   },
-  addItem(state, item) {
+  addNewItem(state, item) {
     state.items.unshift(item);
+  },
+  addItem(state, item) {
+    state.items.push(item);
   },
   deleteItem(state, payload) {
     const item = state.items.find(item => item._id === payload._id);
@@ -125,7 +128,7 @@ export const actions = {
         method: "POST",
         body: JSON.stringify(data)
       }).then(res => res.json());
-      commit("addItem", newItem);
+      commit("addNewItem", newItem);
       dispatch("stopBusyState");
       return newItem;
     } catch (err) {
