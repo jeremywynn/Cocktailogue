@@ -8,7 +8,6 @@ import {
   UserApiKeyCredential
 } from "mongodb-stitch-server-sdk";
 
-//Performance optimization Step 1: declare the database connection object outside the handler method
 let cachedDb = null;
 let dataDirectory = '';
 
@@ -39,7 +38,6 @@ RegExp.escape = function(s) {
 exports.handler = async (event, context, callback) => {
 
   try {
-    //Performance optimization Step 2: set context.callbackWaitsForEmptyEventLoop to false to prevent the Lambda function from waiting for all resources (such as the database connection) to be released before returning it
     context.callbackWaitsForEmptyEventLoop = false;
 
     const items = await processEvent(event, context, callback);
@@ -62,11 +60,8 @@ exports.handler = async (event, context, callback) => {
 async function connectToDatabase(uri) {
 
   try {
-    //Performance optimization Step 3: test that database connection exists and is valid
-    //before re-using it
     if (cachedDb && (typeof cachedDb.serverConfig != 'undefined')) {
       if (cachedDb.serverConfig.isConnected()) {
-        // console.log('=> using cached database instance');
         return Promise.resolve(cachedDb);
       }
     }
@@ -95,22 +90,13 @@ async function processEvent(event, context, callback) {
 async function queryDatabase(db, event) {   
   var jsonContents = JSON.parse(JSON.stringify(event));
   
-  //handling API Gateway input where the event is embedded into the 'body' element
   if (event.body !== null && event.body !== undefined) {
-      console.log('retrieving search payload from event.body');
       jsonContents = JSON.parse(event.body);
   }
-
-  // console.log(jsonContents);
 
   const searchTerms = jsonContents.searchTerms;
   const sanitizedSearchQuery = RegExp.escape(searchTerms);
   const searchRegex = new RegExp(sanitizedSearchQuery, "i");
-  // const searchRegex = new RegExp(sanitizedSearchQuery);
-
-  // console.log(searchRegex);
-
-  // console.log('query parameters: ', jsonContents);
 
   let skipAmount = 0;
   if (jsonContents.skip) {
@@ -125,16 +111,10 @@ async function queryDatabase(db, event) {
       // .sort({ score: { $meta: "textScore" } })
       .toArray();
     
-    // console.log(items);
-
     /*
     const pipeline = [{ $match: { content: { $regex: searchTerms, $options: 'i' } } }, { $sort: { $score: { $meta: "textScore" } } }, { $limit: 10 }];
     const items = await itemsCollection.aggregate(pipeline).toArray();
     */
-
-    // console.log(items);
-
-    // console.log(items);
 
     return items;
 
