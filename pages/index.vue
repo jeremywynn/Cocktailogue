@@ -11,28 +11,21 @@
         <fieldset>
           <div class="form-field">
             <input type="text" id="search-field" v-model="searchTerms" placeholder="Search" />
-            <!-- <button type="submit">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30.239 30.239">
-                <path d="M20.194 3.46c-4.613-4.613-12.121-4.613-16.734 0-4.612 4.614-4.612 12.121 0 16.735 4.108 4.107 10.506 4.547 15.116 1.34.097.459.319.897.676 1.254l6.718 6.718a2.498 2.498 0 0 0 3.535 0 2.496 2.496 0 0 0 0-3.535l-6.718-6.72a2.5 2.5 0 0 0-1.253-.674c3.209-4.611 2.769-11.008-1.34-15.118zm-2.121 14.614c-3.444 3.444-9.049 3.444-12.492 0-3.442-3.444-3.442-9.048 0-12.492 3.443-3.443 9.048-3.443 12.492 0 3.444 3.444 3.444 9.048 0 12.492z"/>
-              </svg>
-            </button> -->
           </div>
         </fieldset>
       </form>
-      <!-- <div class="header-action"> -->
-        <button class="app-action" v-on:click="addingItem = !addingItem" v-bind:class="{ 'subtle': addingItem }">
-          <span v-if="!addingItem">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 491.86 491.86">
-              <path d="M465.167 211.614H280.245V26.691c0-8.424-11.439-26.69-34.316-26.69s-34.316 18.267-34.316 26.69v184.924H26.69C18.267 211.614 0 223.053 0 245.929s18.267 34.316 26.69 34.316h184.924v184.924c0 8.422 11.438 26.69 34.316 26.69s34.316-18.268 34.316-26.69V280.245H465.17c8.422 0 26.69-11.438 26.69-34.316s-18.27-34.315-26.693-34.315z"/>
-            </svg>
-          </span>
-          <span v-if="addingItem">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 47.971 47.971">
-              <path d="M28.228 23.986L47.092 5.122a2.998 2.998 0 0 0 0-4.242 2.998 2.998 0 0 0-4.242 0L23.986 19.744 5.121.88a2.998 2.998 0 0 0-4.242 0 2.998 2.998 0 0 0 0 4.242l18.865 18.864L.879 42.85a2.998 2.998 0 1 0 4.242 4.241l18.865-18.864L42.85 47.091c.586.586 1.354.879 2.121.879s1.535-.293 2.121-.879a2.998 2.998 0 0 0 0-4.242L28.228 23.986z"/>
-            </svg>
-          </span>
-        </button>
-      <!-- </div> -->
+      <button class="app-action" v-on:click="addingItem = !addingItem" v-bind:class="{ 'subtle': addingItem }">
+        <span v-if="!addingItem">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 491.86 491.86">
+            <path d="M465.167 211.614H280.245V26.691c0-8.424-11.439-26.69-34.316-26.69s-34.316 18.267-34.316 26.69v184.924H26.69C18.267 211.614 0 223.053 0 245.929s18.267 34.316 26.69 34.316h184.924v184.924c0 8.422 11.438 26.69 34.316 26.69s34.316-18.268 34.316-26.69V280.245H465.17c8.422 0 26.69-11.438 26.69-34.316s-18.27-34.315-26.693-34.315z"/>
+          </svg>
+        </span>
+        <span v-if="addingItem">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 47.971 47.971">
+            <path d="M28.228 23.986L47.092 5.122a2.998 2.998 0 0 0 0-4.242 2.998 2.998 0 0 0-4.242 0L23.986 19.744 5.121.88a2.998 2.998 0 0 0-4.242 0 2.998 2.998 0 0 0 0 4.242l18.865 18.864L.879 42.85a2.998 2.998 0 1 0 4.242 4.241l18.865-18.864L42.85 47.091c.586.586 1.354.879 2.121.879s1.535-.293 2.121-.879a2.998 2.998 0 0 0 0-4.242L28.228 23.986z"/>
+          </svg>
+        </span>
+      </button>
     </header>
     <v-expand-transition>
       <div class="add" v-show="addingItem">
@@ -190,7 +183,7 @@ export default {
       newItemName: null,
       newItemSourceCategory: null,
       newItemSourceUrl: null,
-      searchQuery: this.$route.query.search,
+      // searchQuery: null,
       searchTerms: null
     };
   },
@@ -325,6 +318,37 @@ export default {
         behavior: "smooth"
       });
     },
+    configureInfiniteFooter() {
+      if (this.observer) {
+        this.observer.unobserve(this.$refs.itemsFooter);
+      }
+      // Strengthen this logic
+      this.observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.intersectionRatio > 0) {
+            if (this.$store.state.itemsRemaining === false) {
+              this.observer.unobserve(this.$refs.itemsFooter);
+            } else {
+              // Get id of last element in state
+              let lastItemId = this.$store.state.items[this.$store.state.items.length - 1]._id;
+              if (this.$store.state.loading === false && !this.$route.query.search) {
+                this.$store.dispatch(
+                  "GET_ADDITIONAL_ITEMS",
+                  lastItemId
+                );
+              }
+            }
+          }
+        });
+      });
+
+      if (!this.$route.query.search) {
+        // Find a better way to do this
+        window.setTimeout(() => {
+          this.observer.observe(this.$refs.itemsFooter);
+        }, 400);
+      }
+    }
   },
   computed: {
     isLoggedIn() {
@@ -335,46 +359,16 @@ export default {
     },
     items() {
       return this.$store.state.items;
+    },
+    searchQuery() {
+      return this.$route.query.search;
     }
   },
   mounted: function() {
-
-    // Strengthen this logic
-    this.observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.intersectionRatio > 0) {
-          if (this.$store.state.itemsRemaining === false) {
-            this.observer.unobserve(this.$refs.itemsFooter);
-          } else {
-            // Get id of last element in state
-            let lastItemId = this.$store.state.items[this.$store.state.items.length - 1]._id;
-            console.log(lastItemId);
-            if (this.$store.state.loading === false && !this.$route.query.search) {
-              this.$store.dispatch(
-                "GET_ADDITIONAL_ITEMS",
-                lastItemId
-              );
-            }
-          }
-        }
-      });
-    });
-
-    if (!this.$route.query.search) {
-      // Find a better way to do this
-      window.setTimeout(() => {
-        this.observer.observe(this.$refs.itemsFooter);
-      }, 400);
-    }
-    // Is this tick function needed?
-    this.$nextTick(function () {
-      if (this.$route.query.search) {
-        // console.log('triggered');
-        this.observer.unobserve(this.$refs.itemsFooter);
-      }
-    });
+    this.configureInfiniteFooter();
   },
   watch: {
+    '$route': 'configureInfiniteFooter',
     carouselScrollMarker: function() {
       if (this.$refs.carousel) {
         if (this.carouselScrollMarker < this.$refs.carousel.clientWidth) {

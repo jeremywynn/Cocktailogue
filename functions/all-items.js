@@ -56,11 +56,8 @@ exports.handler = async (event, context, callback) => {
 async function connectToDatabase(uri) {
 
   try {
-    //Performance optimization Step 3: test that database connection exists and is valid
-    //before re-using it
     if (cachedDb && (typeof cachedDb.serverConfig != 'undefined')) {
       if (cachedDb.serverConfig.isConnected()) {
-        // console.log('=> using cached database instance');
         return Promise.resolve(cachedDb);
       }
     }
