@@ -18,7 +18,7 @@ if (isLambda) {
 }
 
 const client = Stitch.initializeDefaultAppClient(
-  "catalogue-fjarv",
+  process.env.MONGODB_STITCH_APP_ID,
   new StitchAppClientConfiguration.Builder().withDataDirectory(dataDirectory).build()
 );
 const mongoClient = client.getServiceClient(

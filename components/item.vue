@@ -323,7 +323,7 @@ export default {
 .fade-leave-active {
   transition: opacity 0.5s;
 }
-.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+.fade-enter, .fade-leave-to {
   opacity: 0;
 }
 
@@ -441,10 +441,6 @@ export default {
   border: 1px solid rgba(255, 255, 255, 1);
   border-top: 0;
   overflow: hidden;
-  .item__header {
-    position: relative;
-  }
-
   &__contents {
     font-size: 95%;
     padding: 0.5rem;
@@ -508,6 +504,7 @@ export default {
 
 .item__header {
   cursor: pointer;
+  position: relative;
 }
 
 .item__title {
