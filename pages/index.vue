@@ -157,7 +157,7 @@ import { mapGetters, mapActions } from "vuex";
 import netlifyIdentity from "netlify-identity-widget";
 
 netlifyIdentity.init({
-  APIUrl: "https://cocktailogue.netlify.com/.netlify/identity", // Get URL of Netlify site
+  // APIUrl: "https://cocktailogue.netlify.com/.netlify/identity", // Get URL of Netlify site
   logo: false // you can try false and see what happens
 });
 
