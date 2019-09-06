@@ -495,6 +495,7 @@ button {
   left: 50%;
   max-width: 80%;
   position: fixed;
+  text-align: center;
   top: 10%;
   transform: translateX(-50%);
   width: 100%;

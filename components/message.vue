@@ -94,11 +94,12 @@ export default {
     border-top: 2px solid rgba(255, 250, 14, 1);
     // box-shadow: 0px 1px 3px rgba(255, 250, 14, 1);
     color: rgba(255, 255, 255, 1);
-    display: grid;
+    display: inline-grid;
     grid-column-gap: 1rem;
     grid-template-columns: auto 32px;
     line-height: 1.2;
     padding: 0.5rem 1rem;
+    text-align: left;
     canvas {
       display: block;
       margin: 0 auto;
