@@ -72,7 +72,7 @@ export const actions = {
         commit("adjustItemsRemaining", false);
       }
     } catch (err) {
-      console.log(err);
+      console.log(err); // SyntaxError: Unexpected token F in JSON at position 0
     }
     dispatch("stopBusyState");
   },

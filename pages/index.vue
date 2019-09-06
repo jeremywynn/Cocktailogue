@@ -357,7 +357,7 @@ export default {
         });
       });
 
-      if (!this.$route.query.search) {
+      if (!this.$route.query.search && this.$refs.itemsFooter) {
         // Find a better way to do this
         window.setTimeout(() => {
           this.observer.observe(this.$refs.itemsFooter);
@@ -384,7 +384,9 @@ export default {
     }
   },
   mounted: function() {
-    this.configureInfiniteFooter();
+    if (this.$refs.itemsFooter) {
+      this.configureInfiniteFooter();
+    }
 
     let appHeader = document.getElementById('app-header');
     let topLink = document.getElementById('top-link');
