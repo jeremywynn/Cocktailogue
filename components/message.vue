@@ -97,7 +97,7 @@ export default {
     display: grid;
     grid-column-gap: 1rem;
     grid-template-columns: auto 32px;
-    line-height: 1;
+    line-height: 1.2;
     padding: 0.5rem 1rem;
     canvas {
       display: block;

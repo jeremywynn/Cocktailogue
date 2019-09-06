@@ -492,11 +492,13 @@ button {
 }
 
 .communicator {
+  left: 50%;
+  max-width: 80%;
   position: fixed;
   top: 10%;
-  z-index: 2;
-  left: 50%;
   transform: translateX(-50%);
+  width: 100%;
+  z-index: 2;
 }
 
 .form {
