@@ -39,13 +39,11 @@ textarea,
 input[type="text"] {
   border: 1px solid rgba(255, 255, 255, 1);
   outline-color: rgba(255, 250, 14, 1);
-  &:focus, &:active {
-    // box-shadow: 0 0 1rem #fffa0e inset;
-  }
 }
 
 button {
   background-color: rgba(255, 250, 14, 1);
+  border: 1px solid rgba(255, 250, 14, 1);
   color: #000;
   font-family: "Roboto", sans-serif;
   font-weight: 500;
@@ -53,6 +51,7 @@ button {
   transition: box-shadow 400ms;
   &.negative {
     background-color: rgba(216, 33, 55, 1);
+    border-color: rgba(216, 33, 55, 1);
     &:hover,
     &:focus,
     &:active {
@@ -61,11 +60,17 @@ button {
   }
   &.subtle {
     background-color: rgba(149, 150, 145, 1);
+    border-color: rgba(149, 150, 145, 1);
     &:hover,
     &:focus,
     &:active {
       box-shadow: 0 0 8px rgba(149, 150, 145, 1);
-  }
+    }
+    &:disabled {
+      svg {
+        fill: rgba(149, 150, 145, 1) !important;
+      }
+    }
   }
   &:hover,
   &:focus,
@@ -75,6 +80,7 @@ button {
   &:disabled, &.unauthorized {
     background-color: transparent !important;
     border: 1px solid rgba(149, 150, 145, 1) !important;
+    border-color: rgba(149, 150, 145, 1) !important;
     color: rgba(149, 150, 145, 1) !important;
     opacity: 0.5 !important;
     &:hover, &:focus, &:active {

@@ -57,12 +57,14 @@
                         <div class="header-wrap">
                           <div class="item__header">
                             <div class="item__title">
+                              <label>Title</label>
                               <div class="title-interior">
                                 <div
                                   class="item-name"
                                   contenteditable="true"
                                   v-html="newItemName"
                                   ref="newItemName"
+                                  @paste="stripMarkup"
                                 ></div>
                               </div>
                             </div>
@@ -304,6 +306,7 @@ export default {
       if (newItem) {
         this.resetAddForm();
         this.addingItem = false;
+        this.scrollToTop();
         this.$root.$emit("transmitMessage", "Item successfully added.");
       }
       
@@ -313,6 +316,7 @@ export default {
     resetAddForm() {
       // Resetting Addition Form Values
       this.newItemName = null;
+      this.$refs.newItemName.textContent = '';
       this.newItemMedia = [];
       this.newItemContent = null;
       this.$refs.jsonFile.value = "";
@@ -370,8 +374,15 @@ export default {
       }
     },
     scrollToTop() {
-      event.preventDefault();
+      if (event) {
+        event.preventDefault();
+      }
       window.scrollTo(0, 0);
+    },
+    stripMarkup(event) {
+      event.preventDefault();
+      let paste = (event.clipboardData || window.clipboardData).getData('text');
+      event.target.textContent = paste;
     }
   },
   computed: {
@@ -605,6 +616,9 @@ button {
   }
   .item__title {
     z-index: 2;
+    label {
+      font-size: 80%;
+    }
   }
   .item-name {
     min-height: 3rem;
@@ -704,14 +718,11 @@ button {
     svg {
       display: block;
       fill: #fff;
-      height: 19px;
+      height: 18px;
       margin: 0 auto;
-      width: 19px;
+      width: 18px;
     }
   }
-}
-
-.add-action {
   .subtle {
     svg {
       fill: #000;
