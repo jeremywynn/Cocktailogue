@@ -1,140 +1,150 @@
 <template>
-  <div class="container">
+  <div class="container" id="top">
+    <a href="#top" class="top-link" id="top-link" v-on:click="scrollToTop">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 492 492">
+        <path d="M198.608 246.104L382.664 62.04c5.068-5.056 7.856-11.816 7.856-19.024 0-7.212-2.788-13.968-7.856-19.032l-16.128-16.12C361.476 2.792 354.712 0 347.504 0s-13.964 2.792-19.028 7.864L109.328 227.008c-5.084 5.08-7.868 11.868-7.848 19.084-.02 7.248 2.76 14.028 7.848 19.112l218.944 218.932c5.064 5.072 11.82 7.864 19.032 7.864 7.208 0 13.964-2.792 19.032-7.864l16.124-16.12c10.492-10.492 10.492-27.572 0-38.06L198.608 246.104z"/>
+      </svg>
+    </a>
     <div class="communicator">
       <message />
     </div>
-    <header class="app-header">
-      <div class="backlink" v-if="searchQuery">
-        <nuxt-link to="/">&#8592;</nuxt-link>
-      </div>
-      <form @submit.prevent="searchItems" class="form form--search" role="search" aria-label="Search">
-        <fieldset>
-          <div class="form-field">
-            <input type="text" id="search-field" v-model="searchTerms" placeholder="Search" />
-          </div>
-        </fieldset>
-      </form>
-      <button class="app-action" v-on:click="addingItem = !addingItem" v-bind:class="{ 'subtle': addingItem }">
-        <span v-if="!addingItem">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 491.86 491.86">
-            <path d="M465.167 211.614H280.245V26.691c0-8.424-11.439-26.69-34.316-26.69s-34.316 18.267-34.316 26.69v184.924H26.69C18.267 211.614 0 223.053 0 245.929s18.267 34.316 26.69 34.316h184.924v184.924c0 8.422 11.438 26.69 34.316 26.69s34.316-18.268 34.316-26.69V280.245H465.17c8.422 0 26.69-11.438 26.69-34.316s-18.27-34.315-26.693-34.315z"/>
+    <main class="main">
+      <header class="app-header" id="app-header">
+        <nuxt-link to="/" v-if="searchQuery" class="backlink">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+            <path d="M491.318 235.318H20.682C9.26 235.318 0 244.578 0 256c0 11.423 9.26 20.682 20.682 20.682h470.636c11.423 0 20.682-9.259 20.682-20.682 0-11.422-9.259-20.682-20.682-20.682z"/>
+            <path d="M49.932 256L211.795 94.136c8.077-8.077 8.077-21.172 0-29.249-8.077-8.076-21.172-8.076-29.249 0L6.058 241.375c-8.077 8.077-8.077 21.172 0 29.249l176.488 176.488a20.616 20.616 0 0 0 14.625 6.058 20.616 20.616 0 0 0 14.625-6.058c8.077-8.077 8.077-21.172 0-29.249L49.932 256z"/>
           </svg>
-        </span>
-        <span v-if="addingItem">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 47.971 47.971">
-            <path d="M28.228 23.986L47.092 5.122a2.998 2.998 0 0 0 0-4.242 2.998 2.998 0 0 0-4.242 0L23.986 19.744 5.121.88a2.998 2.998 0 0 0-4.242 0 2.998 2.998 0 0 0 0 4.242l18.865 18.864L.879 42.85a2.998 2.998 0 1 0 4.242 4.241l18.865-18.864L42.85 47.091c.586.586 1.354.879 2.121.879s1.535-.293 2.121-.879a2.998 2.998 0 0 0 0-4.242L28.228 23.986z"/>
-          </svg>
-        </span>
-      </button>
-    </header>
-    <v-expand-transition>
-      <div class="add" v-show="addingItem">
-        <div class="add-interior">
-          <form @submit.prevent class="form form--add">
-            <fieldset>
-              <div class="instructions">
-                <div class="instructions__content">
-                  <p>To add an item, use the file input below to select a JSON file generated from <a href="https://instaloader.github.io/" rel="noreferrer" target="_blank">Instaloader</a>.</p>
+        </nuxt-link>
+        <form @submit.prevent="searchItems" class="form form--search" role="search" aria-label="Search">
+          <fieldset>
+            <div class="form-field">
+              <input type="text" id="search-field" v-model="searchTerms" placeholder="Search" />
+            </div>
+          </fieldset>
+        </form>
+        <button class="app-action" v-on:click="addingItem = !addingItem" v-bind:class="{ 'subtle': addingItem }">
+          <span v-if="!addingItem">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 491.86 491.86">
+              <path d="M465.167 211.614H280.245V26.691c0-8.424-11.439-26.69-34.316-26.69s-34.316 18.267-34.316 26.69v184.924H26.69C18.267 211.614 0 223.053 0 245.929s18.267 34.316 26.69 34.316h184.924v184.924c0 8.422 11.438 26.69 34.316 26.69s34.316-18.268 34.316-26.69V280.245H465.17c8.422 0 26.69-11.438 26.69-34.316s-18.27-34.315-26.693-34.315z"/>
+            </svg>
+          </span>
+          <span v-if="addingItem">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 47.971 47.971">
+              <path d="M28.228 23.986L47.092 5.122a2.998 2.998 0 0 0 0-4.242 2.998 2.998 0 0 0-4.242 0L23.986 19.744 5.121.88a2.998 2.998 0 0 0-4.242 0 2.998 2.998 0 0 0 0 4.242l18.865 18.864L.879 42.85a2.998 2.998 0 1 0 4.242 4.241l18.865-18.864L42.85 47.091c.586.586 1.354.879 2.121.879s1.535-.293 2.121-.879a2.998 2.998 0 0 0 0-4.242L28.228 23.986z"/>
+            </svg>
+          </span>
+        </button>
+      </header>
+      <v-expand-transition>
+        <div class="add" v-show="addingItem">
+          <div class="add-interior">
+            <form @submit.prevent class="form form--add">
+              <fieldset>
+                <div class="instructions">
+                  <div class="instructions__content">
+                    <p>To add an item, use the file input below to select a JSON file generated from <a href="https://instaloader.github.io/" rel="noreferrer" target="_blank">Instaloader</a>.</p>
+                  </div>
                 </div>
-              </div>
-              <v-expand-transition>
-                <div class="item-preview" v-show="newItemContent">
-                  <div class="item editing">
-                    <div class="header-wrap">
-                      <div class="item__header">
-                        <div class="item__title">
-                          <div class="title-interior">
-                            <div
-                              class="item-name"
-                              contenteditable="true"
-                              v-html="newItemName"
-                              ref="newItemName"
-                            ></div>
+                <v-expand-transition>
+                  <div class="item-preview" v-show="newItemContent">
+                    <div class="item editing">
+                      <div class="header-wrap">
+                        <div class="item__header">
+                          <div class="item__title">
+                            <div class="title-interior">
+                              <div
+                                class="item-name"
+                                contenteditable="true"
+                                v-html="newItemName"
+                                ref="newItemName"
+                              ></div>
+                            </div>
                           </div>
-                        </div>
-                        <div class="item__media">
-                          <div class="carousel-wrapper" v-if="newItemMedia.length > 1">
-                            <div class="carousel snap" ref="carousel">
-                              <div class="carousel-item" v-for="media in newItemMedia">
-                                <img v-bind:src="media.url" v-if="media.type === 'GraphImage'" alt />
-                                <img v-bind:src="media.url" v-else-if="media.type === 'GraphVideo'" alt />
+                          <div class="item__media">
+                            <div class="carousel-wrapper" v-if="newItemMedia.length > 1">
+                              <div class="carousel snap" ref="carousel">
+                                <div class="carousel-item" v-for="media in newItemMedia">
+                                  <img v-bind:src="media.url" v-if="media.type === 'GraphImage'" alt />
+                                  <img v-bind:src="media.url" v-else-if="media.type === 'GraphVideo'" alt />
+                                </div>
+                              </div>
+                              <div class="carousel-controls">
+                                <button v-on:click="prevSlide" ref="prev" class="node node--prev" disabled>
+                                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 492 492">
+                                    <path d="M198.608 246.104L382.664 62.04c5.068-5.056 7.856-11.816 7.856-19.024 0-7.212-2.788-13.968-7.856-19.032l-16.128-16.12C361.476 2.792 354.712 0 347.504 0s-13.964 2.792-19.028 7.864L109.328 227.008c-5.084 5.08-7.868 11.868-7.848 19.084-.02 7.248 2.76 14.028 7.848 19.112l218.944 218.932c5.064 5.072 11.82 7.864 19.032 7.864 7.208 0 13.964-2.792 19.032-7.864l16.124-16.12c10.492-10.492 10.492-27.572 0-38.06L198.608 246.104z"/>
+                                  </svg>
+                                </button>
+                                <button v-on:click="nextSlide" ref="next" class="node node--next">
+                                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 492 492">
+                                    <path d="M198.608 246.104L382.664 62.04c5.068-5.056 7.856-11.816 7.856-19.024 0-7.212-2.788-13.968-7.856-19.032l-16.128-16.12C361.476 2.792 354.712 0 347.504 0s-13.964 2.792-19.028 7.864L109.328 227.008c-5.084 5.08-7.868 11.868-7.848 19.084-.02 7.248 2.76 14.028 7.848 19.112l218.944 218.932c5.064 5.072 11.82 7.864 19.032 7.864 7.208 0 13.964-2.792 19.032-7.864l16.124-16.12c10.492-10.492 10.492-27.572 0-38.06L198.608 246.104z"/>
+                                  </svg>
+                                </button>
                               </div>
                             </div>
-                            <div class="carousel-controls">
-                              <button v-on:click="prevSlide" ref="prev" class="node node--prev" disabled>
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 492 492">
-                                  <path d="M198.608 246.104L382.664 62.04c5.068-5.056 7.856-11.816 7.856-19.024 0-7.212-2.788-13.968-7.856-19.032l-16.128-16.12C361.476 2.792 354.712 0 347.504 0s-13.964 2.792-19.028 7.864L109.328 227.008c-5.084 5.08-7.868 11.868-7.848 19.084-.02 7.248 2.76 14.028 7.848 19.112l218.944 218.932c5.064 5.072 11.82 7.864 19.032 7.864 7.208 0 13.964-2.792 19.032-7.864l16.124-16.12c10.492-10.492 10.492-27.572 0-38.06L198.608 246.104z"/>
-                                </svg>
-                              </button>
-                              <button v-on:click="nextSlide" ref="next" class="node node--next">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 492 492">
-                                  <path d="M198.608 246.104L382.664 62.04c5.068-5.056 7.856-11.816 7.856-19.024 0-7.212-2.788-13.968-7.856-19.032l-16.128-16.12C361.476 2.792 354.712 0 347.504 0s-13.964 2.792-19.028 7.864L109.328 227.008c-5.084 5.08-7.868 11.868-7.848 19.084-.02 7.248 2.76 14.028 7.848 19.112l218.944 218.932c5.064 5.072 11.82 7.864 19.032 7.864 7.208 0 13.964-2.792 19.032-7.864l16.124-16.12c10.492-10.492 10.492-27.572 0-38.06L198.608 246.104z"/>
-                                </svg>
-                              </button>
+                            <div v-for="media in newItemMedia" v-if="newItemMedia.length < 2">
+                              <img v-bind:src="media.url" v-if="media.type === 'GraphImage'" alt />
+                              <img v-bind:src="media.url" v-else-if="media.type === 'GraphVideo'" alt />
                             </div>
-                          </div>
-                          <div v-for="media in newItemMedia" v-if="newItemMedia.length < 2">
-                            <img v-bind:src="media.url" v-if="media.type === 'GraphImage'" alt />
-                            <img v-bind:src="media.url" v-else-if="media.type === 'GraphVideo'" alt />
-                          </div>
-                          <div class="media-item" v-if="newItemMedia.length === 0">
-                            <img src="~/assets/drunk-uncle-720x720-recipe.jpg" alt />
+                            <div class="media-item" v-if="newItemMedia.length === 0">
+                              <img src="~/assets/drunk-uncle-720x720-recipe.jpg" alt />
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                    <div class="item__contents">
-                      <div class="item__content">
-                        <div
-                          class="item-content"
-                          contenteditable="true"
-                          v-html="newItemContent"
-                          ref="newItemContent"
-                        ></div>
+                      <div class="item__contents">
+                        <div class="item__content">
+                          <div
+                            class="item-content"
+                            contenteditable="true"
+                            v-html="newItemContent"
+                            ref="newItemContent"
+                          ></div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </v-expand-transition>
-              <footer class="add-footer">
-                <input type="file" accept="application/json" @change="processFile($event)" ref="jsonFile" />
-                <div class="add-actions">
-                  <div class="add-action" v-if="isLoggedIn">
-                    <button v-on:click="addItem" v-show="newItemContent" :disabled="itemAddProcessing">Add Item</button>
+                </v-expand-transition>
+                <footer class="add-footer">
+                  <input type="file" accept="application/json" @change="processFile($event)" ref="jsonFile" />
+                  <div class="add-actions">
+                    <div class="add-action" v-if="isLoggedIn">
+                      <button v-on:click="addItem" v-show="newItemContent" :disabled="itemAddProcessing">Add Item</button>
+                    </div>
+                    <div class="add-action" v-else>
+                      <button v-on:click="triggerNetlifyIdentityAction('login')" v-show="newItemContent" :disabled="itemAddProcessing" class="unauthorized">Add Item</button>
+                    </div>
+                    <div class="add-action">
+                      <button class="subtle"
+                      v-on:click="resetAddForm"
+                      v-show="newItemContent"
+                      :disabled="itemAddProcessing"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 47.971 47.971">
+                          <path d="M28.228 23.986L47.092 5.122a2.998 2.998 0 0 0 0-4.242 2.998 2.998 0 0 0-4.242 0L23.986 19.744 5.121.88a2.998 2.998 0 0 0-4.242 0 2.998 2.998 0 0 0 0 4.242l18.865 18.864L.879 42.85a2.998 2.998 0 1 0 4.242 4.241l18.865-18.864L42.85 47.091c.586.586 1.354.879 2.121.879s1.535-.293 2.121-.879a2.998 2.998 0 0 0 0-4.242L28.228 23.986z"/>
+                        </svg>
+                      </button>
+                    </div>
                   </div>
-                  <div class="add-action" v-else>
-                    <button v-on:click="triggerNetlifyIdentityAction('login')" v-show="newItemContent" :disabled="itemAddProcessing" class="unauthorized">Add Item</button>
-                  </div>
-                  <div class="add-action">
-                    <button class="subtle"
-                    v-on:click="resetAddForm"
-                    v-show="newItemContent"
-                    :disabled="itemAddProcessing"
-                  >
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 47.971 47.971">
-                        <path d="M28.228 23.986L47.092 5.122a2.998 2.998 0 0 0 0-4.242 2.998 2.998 0 0 0-4.242 0L23.986 19.744 5.121.88a2.998 2.998 0 0 0-4.242 0 2.998 2.998 0 0 0 0 4.242l18.865 18.864L.879 42.85a2.998 2.998 0 1 0 4.242 4.241l18.865-18.864L42.85 47.091c.586.586 1.354.879 2.121.879s1.535-.293 2.121-.879a2.998 2.998 0 0 0 0-4.242L28.228 23.986z"/>
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              </footer>
-            </fieldset>
-          </form>
+                </footer>
+              </fieldset>
+            </form>
+          </div>
         </div>
+      </v-expand-transition>
+      <div class="items" ref="items" id="items" v-if="items.length">
+        <item
+          v-for="(item, index) in items"
+          :class="{ 'tease': index === 0 }"
+          :item="item"
+          :key="item._id"
+        />
+        <div class="items-footer" ref="itemsFooter"></div>
       </div>
-    </v-expand-transition>
-    <div class="items" ref="items" id="items" v-if="items.length">
-      <item
-        v-for="(item, index) in items"
-        :class="{ 'tease': index === 0 }"
-        :item="item"
-        :key="item._id"
-      />
-      <div class="items-footer" ref="itemsFooter"></div>
-    </div>
-    <div v-else class="disclaimer">
-      <p>No items were found.</p>
-    </div>
+      <div v-else class="disclaimer">
+        <p>No items were found.</p>
+      </div>
+    </main>
     <div class="lower-brow">
       <loading />
     </div>
@@ -150,7 +160,7 @@ import message from "@@/components/message.vue";
 import netlifyIdentity from "netlify-identity-widget";
 
 netlifyIdentity.init({
-  logo: false // you can try false and see what happens
+  logo: false
 });
 
 export default {
@@ -177,19 +187,19 @@ export default {
       ingredients: [],
       itemAddProcessing: false,
       jsonData: null,
-      moarItemstoLoad: false,
       newItemMedia: [],
       newItemContent: null,
       newItemName: null,
       newItemSourceCategory: null,
       newItemSourceUrl: null,
-      // searchQuery: null,
       searchTerms: null
     };
   },
   methods: {
     async searchItems() {
       if (this.searchTerms) {
+        this.addingItem = false;
+        this.resetAddForm();
         this.$router.push({
           name: 'index',
           query: {
@@ -318,6 +328,11 @@ export default {
         behavior: "smooth"
       });
     },
+    prepareForRouteChange() {
+      this.addingItem = false;
+      this.resetAddForm();
+      this.configureInfiniteFooter();
+    },
     configureInfiniteFooter() {
       if (this.observer) {
         this.observer.unobserve(this.$refs.itemsFooter);
@@ -348,6 +363,10 @@ export default {
           this.observer.observe(this.$refs.itemsFooter);
         }, 400);
       }
+    },
+    scrollToTop() {
+      event.preventDefault();
+      window.scrollTo(0, 0);
     }
   },
   computed: {
@@ -366,9 +385,33 @@ export default {
   },
   mounted: function() {
     this.configureInfiniteFooter();
+
+    let appHeader = document.getElementById('app-header');
+    let topLink = document.getElementById('top-link');
+    
+    let options = {
+      root: null,
+      rootMargin: '0px',
+      threshold: 1.0
+    }
+
+    let callback = (entries, observer) => { 
+      entries.forEach(entry => {
+        if (entry.intersectionRatio != 1) {
+          topLink.classList.add('active');
+        }
+        else {
+          topLink.classList.remove('active');
+        }
+      });
+    };
+
+    let observer = new IntersectionObserver(callback, options);
+    observer.observe(appHeader);
+    
   },
   watch: {
-    '$route': 'configureInfiniteFooter',
+    '$route': 'prepareForRouteChange',
     carouselScrollMarker: function() {
       if (this.$refs.carousel) {
         if (this.carouselScrollMarker < this.$refs.carousel.clientWidth) {
@@ -414,7 +457,8 @@ button {
 .container {
   margin: 0 auto;
   max-width: 40rem;
-  padding-bottom: 2rem;
+  padding: 0.5rem 0 2rem;
+  // padding-bottom: 2rem;
 }
 
 .carousel {
@@ -444,13 +488,27 @@ button {
 
 .backlink {
   align-items: center;
+  background-color: rgba(255, 250, 14, 1);
+  // color: rgba(255, 250, 14, 1);
   display: flex;
+  flex: 0;
+  font-size: 2rem;
+  line-height: 0;
   margin-right: 0.5rem;
-  a {
-    color: rgba(255, 250, 14, 1);
-    font-size: 2rem;
-    line-height: 0;
-    text-decoration: none;
+  padding: 0.25rem 0.5rem;
+  text-decoration: none;
+  transition: box-shadow 400ms;
+  svg {
+    display: block;
+    height: 20px;
+    margin: 0 auto;
+    width: 20px;
+    fill {
+      color: #fff;
+    }
+  }
+  &:hover, &:focus, &:active {
+    box-shadow: 0 0 8px rgba(255, 250, 14, 1);
   }
 }
 
@@ -550,9 +608,10 @@ button {
 }
 
 .app-header {
+  background-color: #000;
   display: flex;
   margin-bottom: 0.5rem;
-  padding-top: 0.5rem;
+  z-index: 2;
   .form--search {
     flex: 1 1 auto;
     .form-field {
@@ -561,20 +620,21 @@ button {
       }
     }
   }
-  .app-action {
-    flex: 0;
-    margin-left: 0.5rem;
-    span {
-      display: block;
-    }
-    svg {
-      display: block;
-      // fill: #fff;
-      fill: #000;
-      height: 20px;
-      margin: 0 auto;
-      width: 20px;
-    }
+}
+
+.app-action {
+  flex: 0;
+  margin-left: 0.5rem;
+  span {
+    display: block;
+  }
+  svg {
+    display: block;
+    // fill: #fff;
+    fill: #000;
+    height: 20px;
+    margin: 0 auto;
+    width: 20px;
   }
 }
 
@@ -584,14 +644,16 @@ button {
   text-align: center;
 }
 
+.main {
+  padding: 0 0.5rem;
+}
 
 .instructions {
   border-top: 2px solid rgba(255, 250, 14, 1);
   line-height: 1.5;
   padding: 0 0 0.5rem;
   &__content {
-    // background-color: gray;
-    padding: 0.5rem;
+    padding: 0.75rem 0.5rem;
     a {
       color: rgba(255, 250, 14, 1);
       &:hover {
@@ -646,6 +708,38 @@ button {
     svg {
       fill: #000;
     }
+  }
+}
+
+.top-link {
+  background-color:rgba(255, 250, 14, 1);
+  display: inline-block;
+  opacity: 0;
+  padding: 0.5rem;
+  pointer-events: none;
+  position: fixed;
+  right: 0.5rem;
+  text-decoration: none;
+  transition: opacity 400ms;
+  top: 0.5rem;
+  z-index: -1;
+  svg {
+    display: block;
+    height: 20px;
+    margin: 0 auto;
+    transform: rotate(90deg);
+    width: 20px;
+    path {
+      fill: rgba(0, 0, 0, 1);
+      stroke: rgba(255, 250, 14, 1);
+      stroke-width: 8px;
+      transition: fill 400ms;
+    }
+  }
+  &.active {
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 2;
   }
 }
 

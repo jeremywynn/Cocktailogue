@@ -128,7 +128,7 @@
 import netlifyIdentity from "netlify-identity-widget";
 
 netlifyIdentity.init({
-  logo: false // you can try false and see what happens
+  logo: false
 });
 
 export default {
