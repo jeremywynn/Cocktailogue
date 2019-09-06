@@ -92,7 +92,6 @@ export default {
     align-items: center;
     background-color: rgba(0, 0, 0, 1);
     border-top: 2px solid rgba(255, 250, 14, 1);
-    // box-shadow: 0px 1px 3px rgba(255, 250, 14, 1);
     color: rgba(255, 255, 255, 1);
     display: inline-grid;
     grid-column-gap: 1rem;
