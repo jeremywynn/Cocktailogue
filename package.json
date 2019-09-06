@@ -1,7 +1,7 @@
 {
-  "name": "Cocktails",
+  "name": "Cocktailogue",
   "version": "1.0.0",
-  "description": "My premium Nuxt.js project",
+  "description": "My online saved Instagram posts of cocktails.",
   "author": "Jeremy Wynn",
   "private": true,
   "scripts": {
