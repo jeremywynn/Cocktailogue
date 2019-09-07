@@ -282,8 +282,8 @@ export default {
       }
     });
 
-    this.$refs.itemContent.spellcheck = false;
-    this.$refs.itemName.spellcheck = false;
+    // this.$refs.itemContent.spellcheck = false;
+    // this.$refs.itemName.spellcheck = false;
 
     if (this.$refs.prev && this.$refs.carousel.scrollLeft === 0) {
       this.$refs.prev.setAttribute("disabled", "");

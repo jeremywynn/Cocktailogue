@@ -426,6 +426,8 @@ export default {
 
     let observer = new IntersectionObserver(callback, options);
     observer.observe(appHeader);
+
+    document.body.setAttribute('spellcheck', false); 
     
   },
   watch: {
