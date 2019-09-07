@@ -660,7 +660,6 @@ button {
 }
 
 .disclaimer {
-  // border-top: 2px solid rgba(255, 250, 14, 1);
   border-top: 2px solid rgba(255, 250, 14, 1);
   padding: 1rem 0;
   text-align: center;
@@ -763,7 +762,6 @@ button {
 }
 
 .login-brow {
-  // background: red;
   color: rgba(255, 250, 14, 1);
   margin-bottom: 0.5rem;
   padding: 0.5rem 0.5rem 0;

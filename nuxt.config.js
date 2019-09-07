@@ -12,7 +12,8 @@ export default {
         hid: "description",
         name: "description",
         content: process.env.npm_package_description || ""
-      }
+      },
+      { name: 'og:image', content: '/assets/drunk-uncle-720x720-recipe.jpg' },
     ],
     link: [
       { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
