@@ -190,9 +190,7 @@ export default {
       addingItem: false,
       currentUser: null,
       carouselScrollMarker: 0,
-      ingredientIncrementer: 0,
       itemIncrementer: 0,
-      ingredients: [],
       itemAddProcessing: false,
       jsonData: null,
       newItemMedia: [],
@@ -200,7 +198,7 @@ export default {
       newItemName: null,
       newItemSourceCategory: null,
       newItemSourceUrl: null,
-      searchTerms: null
+      searchTerms: this.$route.query.search
     };
   },
   methods: {
@@ -426,8 +424,6 @@ export default {
 
     let observer = new IntersectionObserver(callback, options);
     observer.observe(appHeader);
-
-    document.body.setAttribute('spellcheck', false); 
     
   },
   watch: {

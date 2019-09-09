@@ -54,7 +54,7 @@ export default {
     // css: false,
     defaultAssets: false,
     // materialIcons: true,
-    treeShake: true
+    // treeShake: true
   },
   modules: ["@nuxtjs/proxy", "@nuxtjs/dotenv"],
   proxy: {
@@ -70,6 +70,7 @@ export default {
     /*
      ** You can extend webpack config here
      */
+    // analyze: true,
     extend(config, ctx) {}
   },
   loadingIndicator: {

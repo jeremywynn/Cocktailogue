@@ -2,20 +2,20 @@ export const state = () => ({
   items: [],
   itemsRemaining: true,
   loading: false,
-  user: window.localStorage.getItem('user')
+  // user: window.localStorage.getItem('user')
 });
 
 export const mutations = {
-  setUser: (state, currentUser) => {
-    if (!currentUser) {
-        state.user = null;
-        window.localStorage.removeItem('user');
-        return;
-    }
-    let theUser = JSON.stringify(currentUser);
-    state.user = theUser;
-    window.localStorage.setItem('user', theUser);
-  },
+  // setUser: (state, currentUser) => {
+  //   if (!currentUser) {
+  //       state.user = null;
+  //       window.localStorage.removeItem('user');
+  //       return;
+  //   }
+  //   let theUser = JSON.stringify(currentUser);
+  //   state.user = theUser;
+  //   window.localStorage.setItem('user', theUser);
+  // },
   SET_ITEMS(state, items) {
     state.items = items;
   },
@@ -48,9 +48,9 @@ export const mutations = {
 };
 
 export const actions = {
-  updateUser: ({ commit }, payload) => {
-    commit('setUser', payload.currentUser)
-  },
+  // updateUser: ({ commit }, payload) => {
+  //   commit('setUser', payload.currentUser)
+  // },
   triggerBusyState({ commit }) {
     commit("startBusyState");
   },
