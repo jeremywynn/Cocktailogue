@@ -1,6 +1,6 @@
 export const state = () => ({
   items: [],
-  itemsCount: null,
+  itemCount: null,
   itemsRemaining: true,
   loading: false,
   user: window.localStorage.getItem('user')
@@ -9,18 +9,21 @@ export const state = () => ({
 export const mutations = {
   setUser: (state, currentUser) => {
     if (!currentUser) {
-        state.user = null;
-        window.localStorage.removeItem('user');
-        return;
+      state.user = null;
+      window.localStorage.removeItem('user');
+      return;
     }
     let theUser = JSON.stringify(currentUser);
     state.user = theUser;
     window.localStorage.setItem('user', theUser);
   },
-  SET_ITEMS(state, items) {
+  setItems(state, items) {
     state.items = items;
   },
-  SEARCH_ITEMS(state, items) {
+  setItemsCount(state, itemCount) {
+    state.itemCount = itemCount;
+  },
+  searchItems(state, items) {
     state.items = items;
   },
   addNewItem(state, item) {
@@ -64,12 +67,13 @@ export const actions = {
       skip: payload
     };
     try {
-      let items = await fetch("/.netlify/functions/all-items", {
+      const response = await fetch("/.netlify/functions/all-items", {
         method: "POST",
         body: JSON.stringify(data)
       }).then(res => res.json());
-      commit("SET_ITEMS", items);
-      if (items.length < 1) {
+      commit("setItems", response[0]);
+      commit("setItemsCount", response[1]);
+      if (response[0].length < 1) {
         commit("adjustItemsRemaining", false);
       }
     } catch (err) {
@@ -109,7 +113,7 @@ export const actions = {
         method: "POST",
         body: JSON.stringify(data)
       }).then(res => res.json());
-      commit("SEARCH_ITEMS", items);
+      commit("searchItems", items);
     } catch (err) {
       console.log(err);
     }

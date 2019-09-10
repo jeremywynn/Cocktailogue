@@ -89,18 +89,16 @@ async function queryDatabase(db, event) {
     data = JSON.parse(event.body);
   }
 
-  let skipAmount = 0;
-
   try {
-    let pipeline = [{ $sort: {"_id": -1} }, { $skip: skipAmount }, { $limit: 20 }];
+    let pipeline = [{ $sort: {"_id": -1} }, { $limit: 20 }];
     if (data.skip) {
       let oid = new BSON.ObjectId(jsonContents.skip);
       pipeline = [{ $match: { _id: { $lt: oid }}}, { $sort: { "_id": -1 } }, { $limit: 20 }];
     }
     const itemsCollection = db.collection("items");
     const items = await itemsCollection.aggregate(pipeline).toArray();
-    // const itemsCount = await itemsCollection.count();
-    return items;
+    const itemCount = await itemsCollection.count();
+    return [items, itemCount];
   } catch (error) {
     return error;
   }

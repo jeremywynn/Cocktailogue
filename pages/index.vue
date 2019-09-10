@@ -4,6 +4,9 @@
       <div class="apex">
         <div class="item-count">
           <div class="search-count" v-if="searchQuery">{{ items.length }} <span v-if="items.length > 1">items</span><span v-else>item</span> found</div>
+          <div class="grand-count" v-else>
+            {{ grandTotal }} <span v-if="grandTotal > 1">items</span><span v-else>item</span> found
+          </div>
         </div>
         <div class="login-area">
           <div v-if="isLoggedIn" v-on:click="triggerNetlifyIdentityAction('logout')">Logout</div>
@@ -403,6 +406,9 @@ export default {
     },
     searchQuery() {
       return this.$route.query.search;
+    },
+    grandTotal() {
+      return this.$store.state.itemCount;
     }
   },
   mounted: function() {
