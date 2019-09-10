@@ -54,7 +54,6 @@ exports.handler = async (event, context, callback) => {
 };
 
 async function connectToDatabase(uri) {
-
   try {
     if (cachedDb && (typeof cachedDb.serverConfig != 'undefined')) {
       if (cachedDb.serverConfig.isConnected()) {
@@ -84,23 +83,23 @@ async function processEvent(event, context, callback) {
 }
 
 async function queryDatabase(db, event) {   
-  var jsonContents = JSON.parse(JSON.stringify(event));
-  // const data = JSON.parse(event.body);
+  var data = JSON.parse(JSON.stringify(event));
   
   if (event.body !== null && event.body !== undefined) {
-    jsonContents = JSON.parse(event.body);
+    data = JSON.parse(event.body);
   }
 
   let skipAmount = 0;
 
   try {
-    let pipeline = [{$sort: {"_id": -1} }, { $skip: skipAmount }, { $limit: 20 }];
-    if (jsonContents.skip) {
+    let pipeline = [{ $sort: {"_id": -1} }, { $skip: skipAmount }, { $limit: 20 }];
+    if (data.skip) {
       let oid = new BSON.ObjectId(jsonContents.skip);
-      pipeline = [{$match: {_id: {$lt: oid}}}, {$sort: {"_id": -1} }, { $limit: 20 }];
+      pipeline = [{ $match: { _id: { $lt: oid }}}, { $sort: { "_id": -1 } }, { $limit: 20 }];
     }
     const itemsCollection = db.collection("items");
     const items = await itemsCollection.aggregate(pipeline).toArray();
+    // const itemsCount = await itemsCollection.count();
     return items;
   } catch (error) {
     return error;
