@@ -109,7 +109,6 @@ export const actions = {
         method: "POST",
         body: JSON.stringify(data)
       }).then(res => res.json());
-      console.log(items.length)
       commit("SEARCH_ITEMS", items);
     } catch (err) {
       console.log(err);

@@ -51,7 +51,7 @@
       <div class="expander" v-show="revealed">
         <div class="item__contents">
           <div class="item__content">
-            <div class="item-content" ref="itemContent">{{ itemContent }}</div>
+            <div class="item-content" ref="itemContent" v-html="highlight()"></div>
           </div>
           <div class="item__meta">
             <div class="item__source-category" v-if="sourceCategory">{{ sourceCategory }}</div>
@@ -157,6 +157,9 @@ export default {
     user() {
       return JSON.parse(this.$store.state.user);
     },
+    searchQuery() {
+      return this.$route.query.search;
+    }
   },
   methods: {
     updateUser(payload) {
@@ -250,6 +253,14 @@ export default {
         left: this.carouselScrollMarker,
         behavior: "smooth"
       });
+    },
+    highlight() {
+      if(!this.searchQuery) {
+        return this.itemContent;
+      }
+      return this.itemContent.replace(new RegExp(this.searchQuery, "gi"), match => {
+        return '<span class="highlighted">' + match + '</span>';
+      });
     }
     /*
       Uncaught TypeError: Cannot read property 'scrollTo' of undefined
@@ -272,7 +283,6 @@ export default {
         }
       });
     });
-
     this.$el.querySelectorAll(".item__media").forEach(item => {
       let imageElement = item.querySelector('img');
       if (imageElement) {
@@ -281,10 +291,6 @@ export default {
         });
       }
     });
-
-    // this.$refs.itemContent.spellcheck = false;
-    // this.$refs.itemName.spellcheck = false;
-
     if (this.$refs.prev && this.$refs.carousel.scrollLeft === 0) {
       this.$refs.prev.setAttribute("disabled", "");
     }
@@ -751,6 +757,11 @@ export default {
   display: flex;
   justify-content: space-between;
   width: 100%;
+}
+
+.highlighted {
+  background-color: rgba(255, 250, 14, 1);
+  color: #000;
 }
 
 </style>
