@@ -87,10 +87,11 @@ export const actions = {
       skip: payload
     };
     try {
-      let items = await fetch("/.netlify/functions/all-items", {
+      const response = await fetch("/.netlify/functions/all-items", {
         method: "POST",
         body: JSON.stringify(data)
       }).then(res => res.json());
+      const items = response[0];
       if (items.length > 0) {
         items.forEach(item => {
           commit("addItem", item);
