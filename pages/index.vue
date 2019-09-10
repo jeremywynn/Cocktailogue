@@ -798,6 +798,12 @@ button {
 
 .login-area {
   color: rgba(255, 250, 14, 1);
+  div {
+    cursor: pointer;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }
 
 </style>
