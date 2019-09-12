@@ -1,21 +1,32 @@
 export const state = () => ({
+  // Items
   items: [],
   itemCount: null,
   itemsRemaining: true,
+  // Loading
   loading: false,
+  // User
   user: window.localStorage.getItem('user')
 });
 
 export const mutations = {
-  setUser: (state, currentUser) => {
-    if (!currentUser) {
-      state.user = null;
-      window.localStorage.removeItem('user');
-      return;
-    }
-    let theUser = JSON.stringify(currentUser);
-    state.user = theUser;
-    window.localStorage.setItem('user', theUser);
+  // Items
+  addItem(state, item) {
+    state.items.push(item);
+  },
+  addNewItem(state, item) {
+    state.items.unshift(item);
+  },
+  adjustItemsRemaining(state, count) {
+    state.itemsRemaining = count;
+  },
+  deleteItem(state, payload) {
+    const item = state.items.find(item => item._id === payload._id);
+    state.items.splice(state.items.indexOf(item), 1);
+  },
+  editItem(state, payload) {
+    const item = state.items.find(item => item._id === payload._id);
+    state.items.splice(state.items.indexOf(item), 1, payload);
   },
   setItems(state, items) {
     state.items = items;
@@ -26,100 +37,28 @@ export const mutations = {
   searchItems(state, items) {
     state.items = items;
   },
-  addNewItem(state, item) {
-    state.items.unshift(item);
-  },
-  addItem(state, item) {
-    state.items.push(item);
-  },
-  deleteItem(state, payload) {
-    const item = state.items.find(item => item._id === payload._id);
-    state.items.splice(state.items.indexOf(item), 1);
-  },
-  editItem(state, payload) {
-    const item = state.items.find(item => item._id === payload._id);
-    state.items.splice(state.items.indexOf(item), 1, payload);
+  // Loading
+  endBusyState(state) {
+    state.loading = false;
   },
   startBusyState(state) {
     state.loading = true;
   },
-  endBusyState(state) {
-    state.loading = false;
-  },
-  adjustItemsRemaining(state, count) {
-    state.itemsRemaining = count;
+  // User
+  setUser: (state, currentUser) => {
+    if (!currentUser) {
+      state.user = null;
+      window.localStorage.removeItem('user');
+      return;
+    }
+    let theUser = JSON.stringify(currentUser);
+    state.user = theUser;
+    window.localStorage.setItem('user', theUser);
   },
 };
 
 export const actions = {
-  updateUser: ({ commit }, payload) => {
-    commit('setUser', payload.currentUser)
-  },
-  triggerBusyState({ commit }) {
-    commit("startBusyState");
-  },
-  stopBusyState({ commit }) {
-    commit("endBusyState");
-  },
-  async GET_ITEMS({ commit, dispatch }, payload) {
-    dispatch("triggerBusyState");
-    let data = {
-      skip: payload
-    };
-    try {
-      const response = await fetch("/.netlify/functions/all-items", {
-        method: "POST",
-        body: JSON.stringify(data)
-      }).then(res => res.json());
-      commit("setItems", response[0]);
-      commit("setItemsCount", response[1]);
-      if (response[0].length < 1) {
-        commit("adjustItemsRemaining", false);
-      }
-    } catch (err) {
-      console.log(err); // SyntaxError: Unexpected token F in JSON at position 0
-    }
-    dispatch("stopBusyState");
-  },
-  async GET_ADDITIONAL_ITEMS({ commit, dispatch }, payload) {
-    dispatch("triggerBusyState");
-    let data = {
-      skip: payload
-    };
-    try {
-      const response = await fetch("/.netlify/functions/all-items", {
-        method: "POST",
-        body: JSON.stringify(data)
-      }).then(res => res.json());
-      const items = response[0];
-      if (items.length > 0) {
-        items.forEach(item => {
-          commit("addItem", item);
-        });
-      } else {
-        commit("adjustItemsRemaining", false);
-      }
-    } catch (err) {
-      console.log(err);
-    }
-    dispatch("stopBusyState");
-  },
-  async SEARCH_ITEMS({ commit, dispatch }, payload) {
-    dispatch("triggerBusyState");
-    try {
-      let data = {
-        searchTerms: payload
-      };
-      let items = await fetch("/.netlify/functions/find-items", {
-        method: "POST",
-        body: JSON.stringify(data)
-      }).then(res => res.json());
-      commit("searchItems", items);
-    } catch (err) {
-      console.log(err);
-    }
-    dispatch("stopBusyState");
-  },
+  // Items
   async ADD_ITEM({ commit, dispatch }, payload) {
     dispatch("triggerBusyState");
     try {
@@ -176,7 +115,7 @@ export const actions = {
       if (editedItem.matchedCount && editedItem.modifiedCount) {
         dispatch("REFRESH_ITEM", payload.ID);
       } else {
-        // Compose error message
+        // Error
       }
       commit("endBusyState");
       return editedItem;
@@ -184,6 +123,49 @@ export const actions = {
       console.log(err);
     }
     commit("endBusyState");
+  },
+  async GET_ADDITIONAL_ITEMS({ commit, dispatch }, payload) {
+    dispatch("triggerBusyState");
+    let data = {
+      skip: payload
+    };
+    try {
+      const response = await fetch("/.netlify/functions/all-items", {
+        method: "POST",
+        body: JSON.stringify(data)
+      }).then(res => res.json());
+      const items = response[0];
+      if (items.length > 0) {
+        items.forEach(item => {
+          commit("addItem", item);
+        });
+      } else {
+        commit("adjustItemsRemaining", false);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+    dispatch("stopBusyState");
+  },
+  async GET_ITEMS({ commit, dispatch }, payload) {
+    dispatch("triggerBusyState");
+    let data = {
+      skip: payload
+    };
+    try {
+      const response = await fetch("/.netlify/functions/all-items", {
+        method: "POST",
+        body: JSON.stringify(data)
+      }).then(res => res.json());
+      commit("setItems", response[0]);
+      commit("setItemsCount", response[1]);
+      if (response[0].length < 1) {
+        commit("adjustItemsRemaining", false);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+    dispatch("stopBusyState");
   },
   async REFRESH_ITEM({ commit }, id) {
     try {
@@ -195,5 +177,32 @@ export const actions = {
     } catch (err) {
       console.log(err);
     }
-  }
+  },
+  async SEARCH_ITEMS({ commit, dispatch }, payload) {
+    dispatch("triggerBusyState");
+    try {
+      let data = {
+        searchTerms: payload
+      };
+      let items = await fetch("/.netlify/functions/find-items", {
+        method: "POST",
+        body: JSON.stringify(data)
+      }).then(res => res.json());
+      commit("searchItems", items);
+    } catch (err) {
+      console.log(err);
+    }
+    dispatch("stopBusyState");
+  },
+  // Loading
+  stopBusyState({ commit }) {
+    commit("endBusyState");
+  },
+  triggerBusyState({ commit }) {
+    commit("startBusyState");
+  },
+  // User
+  updateUser: ({ commit }, payload) => {
+    commit('setUser', payload.currentUser)
+  },
 };
