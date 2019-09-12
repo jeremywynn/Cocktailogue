@@ -9,6 +9,11 @@ export const state = () => ({
   user: window.localStorage.getItem('user')
 });
 
+export const getters = {
+  getUserStatus: state => !!state.user,
+  getUser: state => JSON.parse(state.user)
+};
+
 export const mutations = {
   // Items
   addItem(state, item) {

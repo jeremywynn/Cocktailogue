@@ -396,10 +396,10 @@ export default {
   },
   computed: {
     isLoggedIn() {
-      return this.$store.state.user;
+      return this.$store.getters.getUserStatus;
     },
     user() {
-      return JSON.parse(this.$store.state.user);
+      return this.$store.getters.getUser;
     },
     items() {
       return this.$store.state.items;
@@ -412,6 +412,7 @@ export default {
     }
   },
   mounted: function() {
+    // console.log(this.user());
     if (this.$refs.itemsFooter) {
       this.configureInfiniteFooter();
     }
