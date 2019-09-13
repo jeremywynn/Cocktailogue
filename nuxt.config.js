@@ -56,7 +56,10 @@ export default {
     // materialIcons: true,
     // treeShake: true
   },
-  modules: ["@nuxtjs/proxy", "@nuxtjs/dotenv"],
+  modules: ['@nuxtjs/proxy', '@nuxtjs/dotenv'],
+  auth: {
+    // Options
+  },
   proxy: {
     "/.netlify": {
       target: "http://localhost:9000",

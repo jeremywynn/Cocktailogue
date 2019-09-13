@@ -182,6 +182,8 @@ netlifyIdentity.init({
   logo: false
 });
 
+const Cookie = process.client ? require('js-cookie') : undefined;
+
 export default {
   watchQuery: ['search'],
   async fetch({ store, query }) {
@@ -229,27 +231,33 @@ export default {
       this.$store.dispatch("updateUser", payload);
     },
     triggerNetlifyIdentityAction(action) {
-      if (action == "login" || action == "signup") {
+      if (action == "login") {
         netlifyIdentity.open(action);
         netlifyIdentity.on(action, user => {
-          this.currentUser = {
-            username: user.user_metadata.full_name,
-            email: user.email,
-            access_token: user.token.access_token,
-            expires_at: user.token.expires_at,
-            refresh_token: user.token.refresh_token,
-            token_type: user.token.token_type
-          };
-          this.updateUser({
-            currentUser: this.currentUser
-          });
+          // this.currentUser = {
+          //   username: user.user_metadata.full_name,
+          //   email: user.email,
+          //   access_token: user.token.access_token,
+          //   expires_at: user.token.expires_at,
+          //   refresh_token: user.token.refresh_token,
+          //   token_type: user.token.token_type
+          // };
+          const auth = user.token.access_token;
+          this.$store.commit("setAuth", auth);
+          Cookie.set('auth', auth);
+          // this.$store.dispatch("updateUser", payload);
+          // this.updateUser({
+          //   currentUser: this.currentUser
+          // });
           netlifyIdentity.close();
         });
       } else if (action == "logout") {
-        this.currentUser = null;
-        this.updateUser({
-          currentUser: this.currentUser
-        });
+        // this.currentUser = null;
+        // this.updateUser({
+        //   currentUser: this.currentUser
+        // });
+        Cookie.remove('auth')
+        this.$store.commit('setAuth', null)
         netlifyIdentity.logout();
       }
     },
@@ -396,11 +404,20 @@ export default {
   },
   computed: {
     isLoggedIn() {
-      return this.$store.getters.getUserStatus;
+      return this.$store.state.auth;
+      // if (Cookie.get('auth') === 
+    },
+    // user() {
+    //   return netlifyIdentity.currentUser();
+    // },
+    /*
+    isLoggedIn() {
+      return this.$store.state.user;
     },
     user() {
-      return this.$store.getters.getUser;
+      return JSON.parse(this.$store.state.user);
     },
+    */
     items() {
       return this.$store.state.items;
     },
@@ -412,7 +429,7 @@ export default {
     }
   },
   mounted: function() {
-    // console.log(this.user());
+
     if (this.$refs.itemsFooter) {
       this.configureInfiniteFooter();
     }
@@ -590,7 +607,7 @@ button {
   top: 10%;
   transform: translateX(-50%);
   width: 100%;
-  z-index: 2;
+  z-index: 10;
 }
 
 .form {

@@ -131,6 +131,8 @@ netlifyIdentity.init({
   logo: false
 });
 
+const Cookie = process.client ? require('js-cookie') : undefined;
+
 export default {
   data: function() {
     return {
@@ -152,10 +154,7 @@ export default {
   },
   computed: {
     isLoggedIn() {
-      return this.$store.state.user;
-    },
-    user() {
-      return JSON.parse(this.$store.state.user);
+      return this.$store.state.auth;
     },
     searchQuery() {
       return this.$route.query.search;
@@ -166,29 +165,34 @@ export default {
       this.$store.dispatch("updateUser", payload);
     },
     triggerNetlifyIdentityAction(action) {
-      if (action == "login" || action == "signup") {
+      if (action == "login") {
         netlifyIdentity.open(action);
         netlifyIdentity.on(action, user => {
-          this.currentUser = {
-            username: user.user_metadata.full_name,
-            email: user.email,
-            access_token: user.token.access_token,
-            expires_at: user.token.expires_at,
-            refresh_token: user.token.refresh_token,
-            token_type: user.token.token_type
-          };
-          this.updateUser({
-            currentUser: this.currentUser
-          });
+          // this.currentUser = {
+          //   username: user.user_metadata.full_name,
+          //   email: user.email,
+          //   access_token: user.token.access_token,
+          //   expires_at: user.token.expires_at,
+          //   refresh_token: user.token.refresh_token,
+          //   token_type: user.token.token_type
+          // };
+          const auth = user.token.access_token;
+          this.$store.commit("setAuth", auth);
+          Cookie.set('auth', auth);
+          // this.$store.dispatch("updateUser", payload);
+          // this.updateUser({
+          //   currentUser: this.currentUser
+          // });
           netlifyIdentity.close();
         });
       } else if (action == "logout") {
-        this.currentUser = null;
-        this.updateUser({
-          currentUser: this.currentUser
-        });
+        // this.currentUser = null;
+        // this.updateUser({
+        //   currentUser: this.currentUser
+        // });
+        Cookie.remove('auth')
+        this.$store.commit('setAuth', null)
         netlifyIdentity.logout();
-        this.$router.push({ name: "Index" });
       }
     },
     disableEditMode() {

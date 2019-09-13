@@ -1,3 +1,5 @@
+const cookieparser = process.server ? require('cookieparser') : undefined
+
 export const state = () => ({
   // Items
   items: [],
@@ -6,7 +8,9 @@ export const state = () => ({
   // Loading
   loading: false,
   // User
-  user: window.localStorage.getItem('user')
+  // user: null,
+  // user: window.localStorage.getItem('user'),
+  auth: null
 });
 
 export const getters = {
@@ -50,82 +54,93 @@ export const mutations = {
     state.loading = true;
   },
   // User
-  setUser: (state, currentUser) => {
-    if (!currentUser) {
-      state.user = null;
-      window.localStorage.removeItem('user');
-      return;
-    }
-    let theUser = JSON.stringify(currentUser);
-    state.user = theUser;
-    window.localStorage.setItem('user', theUser);
-  },
+  // setUser: (state, currentUser) => {
+  //   if (!currentUser) {
+  //     console.log('!currentUser in setUser');
+  //     state.user = null;
+  //     window.localStorage.removeItem('user');
+  //     return;
+  //   }
+  //   console.log('setUser not returned!');
+  //   let theUser = JSON.stringify(currentUser);
+  //   state.user = theUser;
+  //   window.localStorage.setItem('user', theUser);
+  // },
+  setAuth(state, auth) {
+    state.auth = auth;
+  }
 };
 
 export const actions = {
   // Items
-  async ADD_ITEM({ commit, dispatch }, payload) {
+  async ADD_ITEM({ commit, dispatch, state }, payload) {
     dispatch("triggerBusyState");
-    try {
-      let data = {
-        name: payload.name,
-        media: payload.media,
-        content: payload.content,
-        sourceCategory: payload.sourceCategory,
-        sourceIdentifier: payload.sourceIdentifier
-      };
-      const newItem = await fetch("/.netlify/functions/add-item", {
-        method: "POST",
-        body: JSON.stringify(data)
-      }).then(res => res.json());
-      commit("addNewItem", newItem);
-      dispatch("stopBusyState");
-      return newItem;
-    } catch (err) {
-      console.log(err);
-    }
-    dispatch("stopBusyState");
-  },
-  async DELETE_ITEM({ commit, dispatch }, payload) {
-    dispatch("triggerBusyState");
-    try {
-      let data = {
-        ID: payload.ID,
-        media: payload.media
-      };
-      const deletedItem = await fetch("/.netlify/functions/delete-item", {
-        method: "PUT",
-        body: JSON.stringify(data)
-      }).then(res => res.json());
-      commit("deleteItem", deletedItem);
-      dispatch("stopBusyState");
-      return deletedItem;
-    } catch (err) {
-      console.log(err);
-    }
-    dispatch("stopBusyState");
-  },
-  async EDIT_ITEM({ commit, dispatch }, payload) {
-    dispatch("triggerBusyState");
-    try {
-      let data = {
-        ID: payload.ID,
-        name: payload.name,
-        content: payload.content
-      };
-      const editedItem = await fetch("/.netlify/functions/edit-item", {
-        method: "POST",
-        body: JSON.stringify(data)
-      }).then(res => res.json());
-      if (editedItem.matchedCount && editedItem.modifiedCount) {
-        dispatch("REFRESH_ITEM", payload.ID);
-      } else {
-        // Error
+    if (state.auth) {
+      try {
+        let data = {
+          name: payload.name,
+          media: payload.media,
+          content: payload.content,
+          sourceCategory: payload.sourceCategory,
+          sourceIdentifier: payload.sourceIdentifier
+        };
+        const newItem = await fetch("/.netlify/functions/add-item", {
+          method: "POST",
+          body: JSON.stringify(data)
+        }).then(res => res.json());
+        commit("addNewItem", newItem);
+        dispatch("stopBusyState");
+        return newItem;
+      } catch (err) {
+        console.log(err);
       }
-      commit("endBusyState");
-      return editedItem;
-    } catch (err) {
-      console.log(err);
+    }
+    dispatch("stopBusyState");
+  },
+  async DELETE_ITEM({ commit, dispatch, state }, payload) {
+    dispatch("triggerBusyState");
+    if (state.auth) {
+      try {
+        let data = {
+          ID: payload.ID,
+          media: payload.media
+        };
+        const deletedItem = await fetch("/.netlify/functions/delete-item", {
+          method: "PUT",
+          body: JSON.stringify(data)
+        }).then(res => res.json());
+        commit("deleteItem", deletedItem);
+        dispatch("stopBusyState");
+        return deletedItem;
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    dispatch("stopBusyState");
+  },
+  async EDIT_ITEM({ commit, dispatch, state }, payload) {
+    dispatch("triggerBusyState");
+    if (state.auth) {
+      try {
+        let data = {
+          ID: payload.ID,
+          name: payload.name,
+          content: payload.content
+        };
+        const editedItem = await fetch("/.netlify/functions/edit-item", {
+          method: "POST",
+          body: JSON.stringify(data)
+        }).then(res => res.json());
+        if (editedItem.matchedCount && editedItem.modifiedCount) {
+          dispatch("REFRESH_ITEM", payload.ID);
+        } else {
+          // Error
+        }
+        commit("endBusyState");
+        return editedItem;
+      } catch (err) {
+        console.log(err);
+      }
     }
     commit("endBusyState");
   },
@@ -207,7 +222,17 @@ export const actions = {
     commit("startBusyState");
   },
   // User
-  updateUser: ({ commit }, payload) => {
-    commit('setUser', payload.currentUser)
-  },
+  nuxtServerInit({ commit }, { req }) {
+    let auth = null;
+    if (req.headers.cookie) {
+      const parsed = cookieparser.parse(req.headers.cookie);
+      try {
+        auth = JSON.parse(parsed.auth);
+      } catch (err) {
+        // No valid cookie found
+        console.log(err);
+      }
+    }
+    commit('setAuth', auth);
+  }
 };
