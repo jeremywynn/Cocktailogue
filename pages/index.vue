@@ -175,7 +175,7 @@ import item from "@@/components/item.vue";
 import loading from "@@/components/loading.vue";
 import message from "@@/components/message.vue";
 
-// import { mapGetters, mapActions } from "vuex";
+import { mapActions, mapMutations } from "vuex";
 import netlifyIdentity from "netlify-identity-widget";
 
 netlifyIdentity.init({
@@ -189,10 +189,10 @@ export default {
   async fetch({ store, query }) {
     try {
       if (query.search) {
-        await store.dispatch("SEARCH_ITEMS", query.search);
+        await store.dispatch('items/searchItems', query.search);
       }
       else {
-        await store.dispatch("GET_ITEMS");
+        await store.dispatch('items/getItems');
       }
     } catch (err) {
       console.log(err);
@@ -215,6 +215,12 @@ export default {
     };
   },
   methods: {
+    ...mapActions({
+      addItemAction: 'items/addItem'
+    }),
+    ...mapMutations({
+      setAuth: 'user/SET_AUTH'
+    }),
     async searchItems() {
       if (this.searchTerms) {
         this.addingItem = false;
@@ -227,37 +233,20 @@ export default {
         });
       }
     },
-    updateUser(payload) {
-      this.$store.dispatch("updateUser", payload);
-    },
     triggerNetlifyIdentityAction(action) {
       if (action == "login") {
         netlifyIdentity.open(action);
         netlifyIdentity.on(action, user => {
-          // this.currentUser = {
-          //   username: user.user_metadata.full_name,
-          //   email: user.email,
-          //   access_token: user.token.access_token,
-          //   expires_at: user.token.expires_at,
-          //   refresh_token: user.token.refresh_token,
-          //   token_type: user.token.token_type
-          // };
           const auth = user.token.access_token;
-          this.$store.commit("setAuth", auth);
+          // this.$store.commit('SET_AUTH', auth);
+          this.setAuth(auth);
           Cookie.set('auth', auth);
-          // this.$store.dispatch("updateUser", payload);
-          // this.updateUser({
-          //   currentUser: this.currentUser
-          // });
           netlifyIdentity.close();
         });
       } else if (action == "logout") {
-        // this.currentUser = null;
-        // this.updateUser({
-        //   currentUser: this.currentUser
-        // });
-        Cookie.remove('auth')
-        this.$store.commit('setAuth', null)
+        Cookie.remove('auth');
+        // this.$store.commit('SET_AUTH', null);
+        this.setAuth(null);
         netlifyIdentity.logout();
       }
     },
@@ -308,26 +297,27 @@ export default {
       this.saveItems();
     },
     async saveItems() {
+      if (netlifyIdentity.currentUser()) {
+        this.itemAddProcessing = true;
 
-      this.itemAddProcessing = true;
+        let payload = {
+          name: this.$refs.newItemName.textContent,
+          media: this.newItemMedia,
+          content: this.$refs.newItemContent.innerText,
+          sourceCategory: "Instagram",
+          sourceIdentifier: this.newItemSourceIdentifier
+        };
 
-      let payload = {
-        name: this.$refs.newItemName.textContent,
-        media: this.newItemMedia,
-        content: this.$refs.newItemContent.innerText,
-        sourceCategory: "Instagram",
-        sourceIdentifier: this.newItemSourceIdentifier
-      };
-
-      const newItem = await this.$store.dispatch("ADD_ITEM", payload);
-      if (newItem) {
-        this.resetAddForm();
-        this.addingItem = false;
-        this.scrollToTop();
-        this.$root.$emit("transmitMessage", "Item successfully added.");
+        const newItem = await this.addItemAction(payload);
+        if (newItem) {
+          this.resetAddForm();
+          this.addingItem = false;
+          this.scrollToTop();
+          this.$root.$emit("transmitMessage", "Item successfully added.");
+        }
+        
+        this.itemAddProcessing = false;
       }
-      
-      this.itemAddProcessing = false;
 
     },
     resetAddForm() {
@@ -404,31 +394,25 @@ export default {
   },
   computed: {
     isLoggedIn() {
-      return this.$store.state.auth;
-      // if (Cookie.get('auth') === 
+      return this.$store.state.user.auth;
     },
-    // user() {
-    //   return netlifyIdentity.currentUser();
-    // },
-    /*
-    isLoggedIn() {
-      return this.$store.state.user;
-    },
-    user() {
-      return JSON.parse(this.$store.state.user);
-    },
-    */
     items() {
-      return this.$store.state.items;
+      return this.$store.state.items.items;
     },
     searchQuery() {
       return this.$route.query.search;
     },
     grandTotal() {
-      return this.$store.state.itemCount;
+      return this.$store.state.items.itemCount;
     }
   },
   mounted: function() {
+
+    let user = netlifyIdentity.currentUser();
+    if (user) {
+      const auth = user.token.access_token;
+      this.setAuth(auth);
+    }
 
     if (this.$refs.itemsFooter) {
       this.configureInfiniteFooter();

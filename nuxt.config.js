@@ -57,9 +57,23 @@ export default {
     // treeShake: true
   },
   modules: ['@nuxtjs/proxy', '@nuxtjs/dotenv'],
+  /*
   auth: {
     // Options
+    strategies: {
+      local: {
+        endpoints: {
+          login: { url: '/api/auth/login', method: 'post', propertyName: 'token' },
+          logout: { url: '/api/auth/logout', method: 'post' },
+          user: { url: 'https://cocktailogue.netlify.com/.netlify/identity/user', method: 'get', propertyName: 'user' }
+        },
+        tokenName: 'access_token',
+        // tokenRequired: true,
+        // tokenType: 'bearer'
+      }
+    }
   },
+  */
   proxy: {
     "/.netlify": {
       target: "http://localhost:9000",

@@ -37,7 +37,7 @@ export default {
   },
   computed: {
     ...mapState({
-      loading: state => state.loading
+      loading: state => state.loading.loading
     })
   },
   methods: {

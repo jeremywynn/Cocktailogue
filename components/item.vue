@@ -124,7 +124,7 @@
 
 <script>
 
-// import { mapGetters, mapActions } from "vuex";
+import { mapActions, mapMutations } from "vuex";
 import netlifyIdentity from "netlify-identity-widget";
 
 netlifyIdentity.init({
@@ -154,44 +154,35 @@ export default {
   },
   computed: {
     isLoggedIn() {
-      return this.$store.state.auth;
+      return this.$store.state.user.auth;
     },
     searchQuery() {
       return this.$route.query.search;
     }
   },
   methods: {
-    updateUser(payload) {
-      this.$store.dispatch("updateUser", payload);
-    },
+    ...mapActions({
+      editItemAction: 'items/editItem',
+      removeItemAction: 'items/deleteItem'
+    }),
+    ...mapMutations({
+      setAuth: 'user/SET_AUTH'
+    }),
+    // updateUser(payload) {
+    //   this.$store.dispatch("updateUser", payload);
+    // },
     triggerNetlifyIdentityAction(action) {
       if (action == "login") {
         netlifyIdentity.open(action);
         netlifyIdentity.on(action, user => {
-          // this.currentUser = {
-          //   username: user.user_metadata.full_name,
-          //   email: user.email,
-          //   access_token: user.token.access_token,
-          //   expires_at: user.token.expires_at,
-          //   refresh_token: user.token.refresh_token,
-          //   token_type: user.token.token_type
-          // };
           const auth = user.token.access_token;
-          this.$store.commit("setAuth", auth);
+          this.setAuth(auth);
           Cookie.set('auth', auth);
-          // this.$store.dispatch("updateUser", payload);
-          // this.updateUser({
-          //   currentUser: this.currentUser
-          // });
           netlifyIdentity.close();
         });
       } else if (action == "logout") {
-        // this.currentUser = null;
-        // this.updateUser({
-        //   currentUser: this.currentUser
-        // });
-        Cookie.remove('auth')
-        this.$store.commit('setAuth', null)
+        Cookie.remove('auth');
+        this.setAuth(null);
         netlifyIdentity.logout();
       }
     },
@@ -215,34 +206,37 @@ export default {
       }
     },
     async editItem() {
-      this.itemProcessing = true;
-      let payload = {
-        ID: this.$vnode.key,
-        name: this.$refs.itemName.textContent,
-        content: this.$refs.itemContent.innerText
-      };
-      this.editingItem = false;
-      this.$refs.itemName.setAttribute("contenteditable", false);
-      this.$refs.itemContent.setAttribute("contenteditable", false);
-      const editedItem = await this.$store.dispatch("EDIT_ITEM", payload);
-      if (editedItem.matchedCount && editedItem.modifiedCount) {
-        this.$root.$emit("transmitMessage", "Item successfully edited.");
+      if (netlifyIdentity.currentUser()) {
+        this.itemProcessing = true;
+        let payload = {
+          ID: this.$vnode.key,
+          name: this.$refs.itemName.textContent,
+          content: this.$refs.itemContent.innerText
+        };
+        this.editingItem = false;
+        this.$refs.itemName.setAttribute("contenteditable", false);
+        this.$refs.itemContent.setAttribute("contenteditable", false);
+        const editedItem = await this.editItemAction(payload);
+        if (editedItem.matchedCount && editedItem.modifiedCount) {
+          this.$root.$emit("transmitMessage", "Item successfully edited.");
+        }
+        this.itemProcessing = false;
       }
-      this.itemProcessing = false;
     },
     async removeItem() {
-      this.itemProcessing = true;
-      this.confirmRemoval = false;
-      let payload = {
-        ID: this.$vnode.key,
-        media: this.item.media
-      };
-      const deletedItem = await this.$store.dispatch("DELETE_ITEM", payload);
-      // console.log(deletedItem);
-      if (deletedItem) {
-        this.$root.$emit("transmitMessage", "Item successfully deleted.");
+      if (netlifyIdentity.currentUser()) {
+        this.itemProcessing = true;
+        this.confirmRemoval = false;
+        let payload = {
+          ID: this.$vnode.key,
+          media: this.item.media
+        };
+        const deletedItem = await this.removeItemAction(payload);
+        if (deletedItem) {
+          this.$root.$emit("transmitMessage", "Item successfully deleted.");
+        }
+        this.itemProcessing = false;
       }
-      this.itemProcessing = false;
     },
     nextSlide() {
       this.carouselScrollMarker += this.$refs.carousel.clientWidth;
