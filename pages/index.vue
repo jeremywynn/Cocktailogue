@@ -239,14 +239,18 @@ export default {
         netlifyIdentity.on(action, user => {
           const auth = user.token.access_token;
           // this.$store.commit('SET_AUTH', auth);
-          this.setAuth(auth);
+
+          // this.setAuth(auth);
+          this.$auth.setUserToken(auth);
           Cookie.set('auth', auth);
           netlifyIdentity.close();
         });
       } else if (action == "logout") {
         Cookie.remove('auth');
         // this.$store.commit('SET_AUTH', null);
-        this.setAuth(null);
+
+        // this.setAuth(null);
+        this.$auth.setUserToken(null);
         netlifyIdentity.logout();
       }
     },
@@ -394,7 +398,8 @@ export default {
   },
   computed: {
     isLoggedIn() {
-      return this.$store.state.user.auth;
+      // return this.$store.state.user.auth;
+      return this.$auth.loggedIn;
     },
     items() {
       return this.$store.state.items.items;
@@ -407,6 +412,8 @@ export default {
     }
   },
   mounted: function() {
+
+    console.log(this.$auth.user);
 
     let user = netlifyIdentity.currentUser();
     if (user) {

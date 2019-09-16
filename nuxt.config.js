@@ -56,16 +56,18 @@ export default {
     // materialIcons: true,
     // treeShake: true
   },
-  modules: ['@nuxtjs/proxy', '@nuxtjs/dotenv'],
-  /*
+  modules: ['@nuxtjs/proxy', '@nuxtjs/dotenv', '@nuxtjs/auth', '@nuxtjs/axios'],
+  
   auth: {
     // Options
     strategies: {
       local: {
         endpoints: {
-          login: { url: '/api/auth/login', method: 'post', propertyName: 'token' },
-          logout: { url: '/api/auth/logout', method: 'post' },
-          user: { url: 'https://cocktailogue.netlify.com/.netlify/identity/user', method: 'get', propertyName: 'user' }
+          // login: { url: '/api/auth/login', method: 'post', propertyName: 'token' },
+          login: false,
+          // logout: { url: '/api/auth/logout', method: 'post' },
+          logout: false,
+          user: { url: '/.netlify/identity/user', method: 'get', propertyName: 'user' }
         },
         tokenName: 'access_token',
         // tokenRequired: true,
@@ -73,7 +75,7 @@ export default {
       }
     }
   },
-  */
+  
   proxy: {
     "/.netlify": {
       target: "http://localhost:9000",
