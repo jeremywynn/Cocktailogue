@@ -131,8 +131,6 @@ netlifyIdentity.init({
   logo: false
 });
 
-const Cookie = process.client ? require('js-cookie') : undefined;
-
 export default {
   data: function() {
     return {
@@ -154,7 +152,7 @@ export default {
   },
   computed: {
     isLoggedIn() {
-      return this.$store.state.user.auth;
+      return this.$store.state.user.user;
     },
     searchQuery() {
       return this.$route.query.search;
@@ -175,13 +173,10 @@ export default {
       if (action == "login") {
         netlifyIdentity.open(action);
         netlifyIdentity.on(action, user => {
-          const auth = user.token.access_token;
-          this.setAuth(auth);
-          Cookie.set('auth', auth);
+          this.setAuth(user);
           netlifyIdentity.close();
         });
       } else if (action == "logout") {
-        Cookie.remove('auth');
         this.setAuth(null);
         netlifyIdentity.logout();
       }
@@ -206,7 +201,7 @@ export default {
       }
     },
     async editItem() {
-      if (netlifyIdentity.currentUser()) {
+      if (this.isLoggedIn) {
         this.itemProcessing = true;
         let payload = {
           ID: this.$vnode.key,
@@ -224,7 +219,7 @@ export default {
       }
     },
     async removeItem() {
-      if (netlifyIdentity.currentUser()) {
+      if (this.isLoggedIn) {
         this.itemProcessing = true;
         this.confirmRemoval = false;
         let payload = {

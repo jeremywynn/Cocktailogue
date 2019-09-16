@@ -182,8 +182,6 @@ netlifyIdentity.init({
   logo: false
 });
 
-const Cookie = process.client ? require('js-cookie') : undefined;
-
 export default {
   watchQuery: ['search'],
   async fetch({ store, query }) {
@@ -219,7 +217,7 @@ export default {
       addItemAction: 'items/addItem'
     }),
     ...mapMutations({
-      setAuth: 'user/SET_AUTH'
+      setAuth: 'user/SET_USER'
     }),
     async searchItems() {
       if (this.searchTerms) {
@@ -238,19 +236,11 @@ export default {
         netlifyIdentity.open(action);
         netlifyIdentity.on(action, user => {
           const auth = user.token.access_token;
-          // this.$store.commit('SET_AUTH', auth);
-
-          // this.setAuth(auth);
-          this.$auth.setUserToken(auth);
-          Cookie.set('auth', auth);
+          this.setAuth(auth);
           netlifyIdentity.close();
         });
       } else if (action == "logout") {
-        Cookie.remove('auth');
-        // this.$store.commit('SET_AUTH', null);
-
-        // this.setAuth(null);
-        this.$auth.setUserToken(null);
+        this.setAuth(null);
         netlifyIdentity.logout();
       }
     },
@@ -301,7 +291,7 @@ export default {
       this.saveItems();
     },
     async saveItems() {
-      if (netlifyIdentity.currentUser()) {
+      if (this.isLoggedIn) {
         this.itemAddProcessing = true;
 
         let payload = {
@@ -398,8 +388,8 @@ export default {
   },
   computed: {
     isLoggedIn() {
-      // return this.$store.state.user.auth;
-      return this.$auth.loggedIn;
+      return this.$store.state.user.user;
+      // return this.$auth.loggedIn;
     },
     items() {
       return this.$store.state.items.items;
@@ -413,13 +403,13 @@ export default {
   },
   mounted: function() {
 
-    console.log(this.$auth.user);
+    // console.log(this.$auth.user);
 
-    let user = netlifyIdentity.currentUser();
-    if (user) {
-      const auth = user.token.access_token;
-      this.setAuth(auth);
-    }
+    // let user = netlifyIdentity.currentUser();
+    // if (user) {
+    //   const auth = user.token.access_token;
+    //   this.setAuth(auth);
+    // }
 
     if (this.$refs.itemsFooter) {
       this.configureInfiniteFooter();

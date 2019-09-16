@@ -1,11 +1,17 @@
+import netlifyIdentity from "netlify-identity-widget";
+
+netlifyIdentity.init();
+
+const user = netlifyIdentity.currentUser();
+
 export const state = () => ({
   // User
-  auth: null
+  user: user
 });
 
 export const mutations = {
   // User
-  SET_AUTH(state, auth) {
-    state.auth = auth;
+  SET_USER(state, user) {
+    state.user = user;
   }
 };
