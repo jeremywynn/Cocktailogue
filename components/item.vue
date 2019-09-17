@@ -201,7 +201,7 @@ export default {
       }
     },
     async editItem() {
-      if (this.isLoggedIn) {
+      if (netlifyIdentity.currentUser()) {
         this.itemProcessing = true;
         let payload = {
           ID: this.$vnode.key,
@@ -219,7 +219,7 @@ export default {
       }
     },
     async removeItem() {
-      if (this.isLoggedIn) {
+      if (netlifyIdentity.currentUser()) {
         this.itemProcessing = true;
         this.confirmRemoval = false;
         let payload = {

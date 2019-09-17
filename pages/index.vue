@@ -235,8 +235,8 @@ export default {
       if (action == "login") {
         netlifyIdentity.open(action);
         netlifyIdentity.on(action, user => {
-          const auth = user.token.access_token;
-          this.setAuth(auth);
+          // const auth = user.token.access_token;
+          this.setAuth(user);
           netlifyIdentity.close();
         });
       } else if (action == "logout") {
@@ -291,7 +291,7 @@ export default {
       this.saveItems();
     },
     async saveItems() {
-      if (this.isLoggedIn) {
+      if (netlifyIdentity.currentUser()) {
         this.itemAddProcessing = true;
 
         let payload = {
@@ -389,7 +389,6 @@ export default {
   computed: {
     isLoggedIn() {
       return this.$store.state.user.user;
-      // return this.$auth.loggedIn;
     },
     items() {
       return this.$store.state.items.items;
@@ -402,14 +401,6 @@ export default {
     }
   },
   mounted: function() {
-
-    // console.log(this.$auth.user);
-
-    // let user = netlifyIdentity.currentUser();
-    // if (user) {
-    //   const auth = user.token.access_token;
-    //   this.setAuth(auth);
-    // }
 
     if (this.$refs.itemsFooter) {
       this.configureInfiniteFooter();
