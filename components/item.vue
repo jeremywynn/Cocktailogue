@@ -166,9 +166,6 @@ export default {
     ...mapMutations({
       setAuth: 'user/SET_AUTH'
     }),
-    // updateUser(payload) {
-    //   this.$store.dispatch("updateUser", payload);
-    // },
     triggerNetlifyIdentityAction(action) {
       if (action == "login") {
         netlifyIdentity.open(action);

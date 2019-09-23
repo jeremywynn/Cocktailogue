@@ -32,14 +32,14 @@
               <path d="M49.932 256L211.795 94.136c8.077-8.077 8.077-21.172 0-29.249-8.077-8.076-21.172-8.076-29.249 0L6.058 241.375c-8.077 8.077-8.077 21.172 0 29.249l176.488 176.488a20.616 20.616 0 0 0 14.625 6.058 20.616 20.616 0 0 0 14.625-6.058c8.077-8.077 8.077-21.172 0-29.249L49.932 256z"/>
             </svg>
           </nuxt-link>
-          <form @submit.prevent="searchItems" class="form form--search" role="search" aria-label="Search">
+          <form @submit.prevent="searchItems" class="form form--search" id="form--search" role="search" aria-label="Search">
             <fieldset>
               <div class="form-field">
                 <input type="text" id="search-field" v-model="searchTerms" placeholder="Search" />
               </div>
             </fieldset>
           </form>
-          <button class="app-action" v-on:click="addingItem = !addingItem" v-bind:class="{ 'subtle': addingItem }">
+          <button class="app-action" v-on:click="addingItem = !addingItem" v-bind:class="{ 'subtle': addingItem }" id="add-item">
             <span v-if="!addingItem">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 491.86 491.86">
                 <path d="M465.167 211.614H280.245V26.691c0-8.424-11.439-26.69-34.316-26.69s-34.316 18.267-34.316 26.69v184.924H26.69C18.267 211.614 0 223.053 0 245.929s18.267 34.316 26.69 34.316h184.924v184.924c0 8.422 11.438 26.69 34.316 26.69s34.316-18.268 34.316-26.69V280.245H465.17c8.422 0 26.69-11.438 26.69-34.316s-18.27-34.315-26.693-34.315z"/>
@@ -229,6 +229,9 @@ export default {
             search: this.searchTerms
           }
         });
+      }
+      else {
+        return false;
       }
     },
     triggerNetlifyIdentityAction(action) {
