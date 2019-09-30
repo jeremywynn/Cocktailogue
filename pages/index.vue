@@ -39,7 +39,7 @@
               </div>
             </fieldset>
           </form>
-          <button class="app-action" v-on:click="addingItem = !addingItem" v-bind:class="{ 'subtle': addingItem }" id="add-item">
+          <button class="app-action" v-on:click="addingItem = !addingItem" v-bind:class="{ 'subtle': addingItem }" data-entity="open-add-item-menu">
             <span v-if="!addingItem">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 491.86 491.86">
                 <path d="M465.167 211.614H280.245V26.691c0-8.424-11.439-26.69-34.316-26.69s-34.316 18.267-34.316 26.69v184.924H26.69C18.267 211.614 0 223.053 0 245.929s18.267 34.316 26.69 34.316h184.924v184.924c0 8.422 11.438 26.69 34.316 26.69s34.316-18.268 34.316-26.69V280.245H465.17c8.422 0 26.69-11.438 26.69-34.316s-18.27-34.315-26.693-34.315z"/>
@@ -53,7 +53,7 @@
           </button>
         </header>
         <v-expand-transition>
-          <div class="add" v-show="addingItem">
+          <div class="add" v-show="addingItem" data-entity="add-item-menu">
             <div class="add-interior">
               <form @submit.prevent class="form form--add">
                 <fieldset>
@@ -63,7 +63,7 @@
                     </div>
                   </div>
                   <v-expand-transition>
-                    <div class="item-preview" v-show="newItemContent">
+                    <div class="item-preview" v-show="newItemContent" data-entity="item-preview">
                       <div class="item editing">
                         <div class="header-wrap">
                           <div class="item__header">
@@ -124,12 +124,12 @@
                     </div>
                   </v-expand-transition>
                   <footer class="add-footer">
-                    <input type="file" accept="application/json" @change="processFile($event)" ref="jsonFile" />
+                    <input type="file" accept="application/json" @change="processFile($event)" ref="jsonFile" data-entity="choose-json-file" />
                     <div class="add-actions">
-                      <div class="add-action" v-if="isLoggedIn">
+                      <div class="add-action" v-if="isLoggedIn" data-entity="add-item-action">
                         <button v-on:click="addItem" v-show="newItemContent" :disabled="itemAddProcessing">Add Item</button>
                       </div>
-                      <div class="add-action" v-else>
+                      <div class="add-action" v-else data-entity="add-item-action">
                         <button v-on:click="triggerNetlifyIdentityAction('login')" v-show="newItemContent" :disabled="itemAddProcessing" class="unauthorized">Add Item</button>
                       </div>
                       <div class="add-action">
@@ -137,6 +137,7 @@
                         v-on:click="resetAddForm"
                         v-show="newItemContent"
                         :disabled="itemAddProcessing"
+                        data-entity="cancel-add-item"
                       >
                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 47.971 47.971">
                             <path d="M28.228 23.986L47.092 5.122a2.998 2.998 0 0 0 0-4.242 2.998 2.998 0 0 0-4.242 0L23.986 19.744 5.121.88a2.998 2.998 0 0 0-4.242 0 2.998 2.998 0 0 0 0 4.242l18.865 18.864L.879 42.85a2.998 2.998 0 1 0 4.242 4.241l18.865-18.864L42.85 47.091c.586.586 1.354.879 2.121.879s1.535-.293 2.121-.879a2.998 2.998 0 0 0 0-4.242L28.228 23.986z"/>
@@ -394,6 +395,7 @@ export default {
       return this.$store.state.user.user;
     },
     items() {
+      console.log(this.$store.state.items.items);
       return this.$store.state.items.items;
     },
     searchQuery() {
