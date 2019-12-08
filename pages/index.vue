@@ -457,8 +457,8 @@ export default {
 
 <style lang="scss">
 html {
-  background-color: #000;
-  color: #fff;
+  background-color: var(--black);
+  color: var(--white);
 }
 img {
   max-width: 100%;
@@ -487,7 +487,7 @@ img {
 }
 
 .backlink {
-  background-color: rgba(255, 250, 14, 1);
+  background-color: var(--yellow);
   font-size: 2rem;
   line-height: 0;
   transition: box-shadow 400ms;
@@ -495,16 +495,16 @@ img {
     height: 20px;
     width: 20px;
     fill {
-      color: #fff;
+      color: var(--white);
     }
   }
   &:hover, &:focus, &:active {
-    box-shadow: 0 0 8px rgba(255, 250, 14, 1);
+    box-shadow: 0 0 8px var(--yellow);
   }
 }
 
 .carousel > div {
-  color: #fff;
+  color: var(--white);
 }
 
 .lower-brow {
@@ -521,9 +521,9 @@ img {
 .form {
   &--search {
     input {
-      color: rgba(255, 255, 255, 1);
+      color: var(--white);
       &:hover, &:focus, &:active {
-        border-color: rgba(255, 250, 14, 1);
+        border-color: var(--yellow);
       }
     }
   }
@@ -549,21 +549,21 @@ img {
 
 .app-action {
   svg {
-    fill: #000;
+    fill: var(--black);
     height: 20px;
     width: 20px;
   }
 }
 
 .disclaimer {
-  border-top: 2px solid rgba(255, 250, 14, 1);
+  border-top: 2px solid var(--yellow);
 }
 
 .instructions {
-  border-top: 2px solid rgba(255, 250, 14, 1);
+  border-top: 2px solid var(--yellow);
   &__content {
     a {
-      color: rgba(255, 250, 14, 1);
+      color: var(--yellow);
     }
   }
 }
@@ -571,20 +571,20 @@ img {
 .add-action {
   button {
     svg {
-      fill: #fff;
+      fill: var(--white);
       height: 18px;
       width: 18px;
     }
   }
   .subtle {
     svg {
-      fill: #000;
+      fill: var(--black);
     }
   }
 }
 
 .top-link {
-  background-color:rgba(255, 250, 14, 1);
+  background-color: var(--yellow);
   right: 0.5rem;
   transition: opacity 400ms;
   top: 0.5rem;
@@ -594,8 +594,8 @@ img {
     transform: rotate(90deg);
     width: 20px;
     path {
-      fill: rgba(0, 0, 0, 1);
-      stroke: rgba(255, 250, 14, 1);
+      fill: var(--black);
+      stroke: var(--yellow);
       stroke-width: 8px;
       transition: fill 400ms;
     }
@@ -608,7 +608,7 @@ img {
 }
 
 .login-area {
-  color: rgba(255, 250, 14, 1);
+  color: var(--yellow);
 }
 
 </style>

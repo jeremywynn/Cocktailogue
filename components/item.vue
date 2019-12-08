@@ -339,8 +339,8 @@ export default {
     height: 40px;
     width: 40px;
     path {
-      fill: rgba(0, 0, 0, 1);
-      stroke: rgba(255, 250, 14, 1);
+      fill: var(--black);
+      stroke: var(--yellow);
       stroke-width: 8px;
       transition: fill 400ms;
     }
@@ -351,7 +351,7 @@ export default {
     svg {
       path {
         fill: transparent !important;
-        stroke: #fff !important;
+        stroke: var(--white) !important;
         stroke-width: 8px !important;
       }
     }
@@ -360,14 +360,14 @@ export default {
     box-shadow: none !important;
     svg {
       path {
-        fill: rgba(255, 250, 14, 1);
+        fill: var(--yellow);
       }
     }
   }
 }
 
 .item {
-  border: 1px solid rgba(255, 255, 255, 1);
+  border: 1px solid var(--white);
   border-top: 0;
   &__contents {
     font-size: 95%;
@@ -379,7 +379,7 @@ export default {
     }
   }
   &:first-child {
-    border-top: 1px solid rgba(255, 255, 255, 1);
+    border-top: 1px solid var(--white);
   }
   &.reveal {
     .item__media {
@@ -402,7 +402,7 @@ export default {
   transition: box-shadow 200ms;
   &:after,
   &:before {
-    background-color: rgba(255, 250, 14, 1);
+    background-color: var(--yellow);
     content: "";
     display: block;
     opacity: 0;
@@ -428,7 +428,7 @@ export default {
 .title-interior {
   &:after,
   &:before {
-    background-color: rgba(255, 250, 14, 1);
+    background-color: var(--yellow);
     content: "";
     display: block;
     opacity: 0;
@@ -452,14 +452,14 @@ export default {
 
 .item__source-url {
   a {
-    color: rgba(255, 250, 14, 1);
+    color: var(--yellow);
   }
 }
 
 .item__content {
   &:after,
   &:before {
-    background-color: rgba(255, 250, 14, 1);
+    background-color: var(--yellow);
     content: "";
     display: block;
     opacity: 0;
@@ -485,7 +485,7 @@ export default {
   transition: box-shadow 200ms;
   &:after,
   &:before {
-    background-color: rgba(255, 250, 14, 1);
+    background-color: var(--yellow);
     content: "";
     display: block;
     opacity: 0;
@@ -509,7 +509,7 @@ export default {
 }
 
 .highlighted {
-  background-color: rgba(255, 250, 14, 1);
+  background-color: var(--yellow);
   color: #000;
 }
 
@@ -551,7 +551,7 @@ export default {
     &:focus,
     &:active,
     &:hover {
-      box-shadow: 0 0 1rem rgba(255, 250, 14, 1) inset;
+      box-shadow: 0 0 1rem var(--yellow) inset;
     }
   }
   .item__content {
@@ -582,7 +582,7 @@ export default {
     &:focus,
     &:active,
     &:hover {
-      box-shadow: 0 0 1rem rgba(255, 250, 14, 1) inset;
+      box-shadow: 0 0 1rem var(--yellow) inset;
     }
   }
 }

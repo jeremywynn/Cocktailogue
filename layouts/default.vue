@@ -5,6 +5,14 @@
 </template>
 
 <style lang="scss">
+:root {
+  --black: rgba(0, 0, 0, 1);
+  --gray: rgba(149, 150, 145, 1);
+  --red: rgba(216, 33, 55, 1);
+  --white: rgba(255, 255, 255, 1);
+  --yellow: rgba(255, 250, 14, 1);
+}
+
 html {
   font-family: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
     "Helvetica Neue", Arial, sans-serif;
@@ -30,51 +38,51 @@ h6,
 
 textarea,
 input[type="text"] {
-  border: 1px solid rgba(255, 255, 255, 1);
-  outline-color: rgba(255, 250, 14, 1);
+  border: 1px solid var(--yellow);
+  outline-color: var(--yellow);
 }
 
 button {
-  background-color: rgba(255, 250, 14, 1);
-  border: 1px solid rgba(255, 250, 14, 1);
+  background-color: var(--yellow);
+  border: 1px solid var(--yellow);
   color: #000;
   font-family: "Roboto", sans-serif;
   font-weight: 500;
   padding: 0.25rem 0.5rem;
   transition: box-shadow 400ms;
   &.negative {
-    background-color: rgba(216, 33, 55, 1);
-    border-color: rgba(216, 33, 55, 1);
+    background-color: var(--red);
+    border-color: var(--red);
     &:hover,
     &:focus,
     &:active {
-      box-shadow: 0 0 8px rgba(216, 33, 55, 1);
+      box-shadow: 0 0 8px var(--red);
     }
   }
   &.subtle {
-    background-color: rgba(149, 150, 145, 1);
-    border-color: rgba(149, 150, 145, 1);
+    background-color: var(--gray);
+    border-color: var(--gray);
     &:hover,
     &:focus,
     &:active {
-      box-shadow: 0 0 8px rgba(149, 150, 145, 1);
+      box-shadow: 0 0 8px var(--gray);
     }
     &:disabled {
       svg {
-        fill: rgba(149, 150, 145, 1) !important;
+        fill: var(--gray) !important;
       }
     }
   }
   &:hover,
   &:focus,
   &:active {
-    box-shadow: 0 0 8px rgba(255, 250, 14, 1);
+    box-shadow: 0 0 8px var(--yellow);
   }
   &:disabled, &.unauthorized {
     background-color: transparent !important;
-    // border: 1px solid rgba(149, 150, 145, 1) !important;
-    border-color: rgba(149, 150, 145, 1) !important;
-    color: rgba(149, 150, 145, 1) !important;
+    // border: 1px solid var(--gray) !important;
+    border-color: var(--gray) !important;
+    color: var(--gray) !important;
     opacity: 0.5 !important;
     &:hover, &:focus, &:active {
       box-shadow: none !important;
