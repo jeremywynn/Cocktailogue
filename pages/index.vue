@@ -79,7 +79,7 @@
                                 ></div>
                               </div>
                             </div>
-                            <div class="item__media">
+                            <div class="item__media opacity-100">
                               <div class="carousel-wrapper" v-if="newItemMedia.length > 1">
                                 <div class="carousel snap flex relative h-full overflow-hidden w-full whitespace-no-wrap" ref="carousel">
                                   <div class="carousel-item flex items-center justify-center min-h-full min-w-full text-center" v-for="(media, index) in newItemMedia" :key="'media-' + index">
@@ -361,7 +361,6 @@ export default {
               // Get id of last element in state
               let lastItemId = this.items[this.items.length - 1]._id;
               if (this.loading === false && !this.$route.query.search) {
-                console.log('performing lookup');
                 this.getAdditionalItems(lastItemId);
               }
             }
@@ -407,13 +406,11 @@ export default {
 
     let appHeader = document.getElementById('app-header');
     let topLink = document.getElementById('top-link');
-    
     let options = {
       root: null,
       rootMargin: '0px',
       threshold: 1.0
     }
-
     let callback = (entries, observer) => { 
       entries.forEach(entry => {
         if (entry.intersectionRatio != 1) {
@@ -508,13 +505,6 @@ img {
 
 .carousel > div {
   color: #fff;
-  // display: flex;
-}
-
-.add {
-  .item__media {
-    opacity: 1;
-  }
 }
 
 .lower-brow {
