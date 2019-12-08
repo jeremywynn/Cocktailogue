@@ -1,7 +1,7 @@
 <template>
   <div class="app" id="top">
     <div class="container">
-      <div class="apex">
+      <div class="apex flex p-2 justify-between">
         <div class="item-count">
           <div class="search-count" v-if="searchQuery">{{ items.length }} <span v-if="items.length > 1">items</span><span v-else>item</span> found</div>
           <div class="grand-count" v-else>
@@ -9,61 +9,61 @@
           </div>
         </div>
         <div class="login-area">
-          <div v-if="isLoggedIn" v-on:click="triggerNetlifyIdentityAction('logout')">Logout</div>
-          <div v-else v-on:click="triggerNetlifyIdentityAction('login')">Login</div>
+          <div class="cursor-pointer hover:underline" v-if="isLoggedIn" v-on:click="triggerNetlifyIdentityAction('logout')">Logout</div>
+          <div class="cursor-pointer hover:underline" v-else v-on:click="triggerNetlifyIdentityAction('login')">Login</div>
         </div>
       </div>
     </div>
     
-    <a href="#top" class="top-link" id="top-link" v-on:click="scrollToTop">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 492 492">
+    <a href="#top" class="top-link fixed no-underline opacity-0 p-2 pointer-events-none" id="top-link" v-on:click="scrollToTop">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 492 492" class="block mx-auto">
         <path d="M198.608 246.104L382.664 62.04c5.068-5.056 7.856-11.816 7.856-19.024 0-7.212-2.788-13.968-7.856-19.032l-16.128-16.12C361.476 2.792 354.712 0 347.504 0s-13.964 2.792-19.028 7.864L109.328 227.008c-5.084 5.08-7.868 11.868-7.848 19.084-.02 7.248 2.76 14.028 7.848 19.112l218.944 218.932c5.064 5.072 11.82 7.864 19.032 7.864 7.208 0 13.964-2.792 19.032-7.864l16.124-16.12c10.492-10.492 10.492-27.572 0-38.06L198.608 246.104z"/>
       </svg>
     </a>
     <div class="container">
-      <div class="communicator">
+      <div class="communicator fixed text-center w-full z-10">
         <message />
       </div>
-      <main class="main">
-        <header class="app-header" id="app-header">
-          <nuxt-link to="/" v-if="searchQuery" class="backlink">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+      <main class="px-2">
+        <header class="app-header flex mb-2" id="app-header">
+          <nuxt-link to="/" v-if="searchQuery" class="backlink flex flex-none items-center mr-2 no-underline px-2 py-1">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="block mx-auto">
               <path d="M491.318 235.318H20.682C9.26 235.318 0 244.578 0 256c0 11.423 9.26 20.682 20.682 20.682h470.636c11.423 0 20.682-9.259 20.682-20.682 0-11.422-9.259-20.682-20.682-20.682z"/>
               <path d="M49.932 256L211.795 94.136c8.077-8.077 8.077-21.172 0-29.249-8.077-8.076-21.172-8.076-29.249 0L6.058 241.375c-8.077 8.077-8.077 21.172 0 29.249l176.488 176.488a20.616 20.616 0 0 0 14.625 6.058 20.616 20.616 0 0 0 14.625-6.058c8.077-8.077 8.077-21.172 0-29.249L49.932 256z"/>
             </svg>
           </nuxt-link>
-          <form @submit.prevent="searchItems" class="form form--search" id="form--search" role="search" aria-label="Search">
+          <form @submit.prevent="searchItems" class="form form--search flex-auto" id="form--search" role="search" aria-label="Search">
             <fieldset>
-              <div class="form-field">
-                <input type="text" id="search-field" v-model="searchTerms" placeholder="Search" />
+              <div class="form-field flex">
+                <input class="p-2 w-full flex-auto rounded-none bg-transparent" type="text" id="search-field" v-model="searchTerms" placeholder="Search" />
               </div>
             </fieldset>
           </form>
-          <button class="app-action" v-on:click="addingItem = !addingItem" v-bind:class="{ 'subtle': addingItem }" data-entity="open-add-item-menu">
-            <span v-if="!addingItem">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 491.86 491.86">
+          <button class="app-action flex-none ml-2" v-on:click="addingItem = !addingItem" v-bind:class="{ 'subtle': addingItem }" data-entity="open-add-item-menu">
+            <span v-if="!addingItem" class="block">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 491.86 491.86" class="block mx-auto">
                 <path d="M465.167 211.614H280.245V26.691c0-8.424-11.439-26.69-34.316-26.69s-34.316 18.267-34.316 26.69v184.924H26.69C18.267 211.614 0 223.053 0 245.929s18.267 34.316 26.69 34.316h184.924v184.924c0 8.422 11.438 26.69 34.316 26.69s34.316-18.268 34.316-26.69V280.245H465.17c8.422 0 26.69-11.438 26.69-34.316s-18.27-34.315-26.693-34.315z"/>
               </svg>
             </span>
-            <span v-if="addingItem">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 47.971 47.971">
+            <span v-if="addingItem" class="block">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 47.971 47.971" class="block mx-auto">
                 <path d="M28.228 23.986L47.092 5.122a2.998 2.998 0 0 0 0-4.242 2.998 2.998 0 0 0-4.242 0L23.986 19.744 5.121.88a2.998 2.998 0 0 0-4.242 0 2.998 2.998 0 0 0 0 4.242l18.865 18.864L.879 42.85a2.998 2.998 0 1 0 4.242 4.241l18.865-18.864L42.85 47.091c.586.586 1.354.879 2.121.879s1.535-.293 2.121-.879a2.998 2.998 0 0 0 0-4.242L28.228 23.986z"/>
               </svg>
             </span>
           </button>
         </header>
-        <v-expand-transition>
-          <div class="add" v-show="addingItem" data-entity="add-item-menu">
-            <div class="add-interior">
+        <transition-expand>
+          <div class="add w-full" v-show="addingItem" data-entity="add-item-menu">
+            <div class="add-interior pb-2">
               <form @submit.prevent class="form form--add">
                 <fieldset>
-                  <div class="instructions">
-                    <div class="instructions__content">
-                      <p>To add an item, use the file input below to select a JSON file generated from <a href="https://instaloader.github.io/" rel="noreferrer" target="_blank">Instaloader</a>.</p>
+                  <div class="instructions leading-normal pb-2">
+                    <div class="instructions__content px-2 py-3">
+                      <p>To add an item, use the file input below to select a JSON file generated from <a class="underline hover:no-underline" href="https://instaloader.github.io/" rel="noreferrer" target="_blank">Instaloader</a>.</p>
                     </div>
                   </div>
-                  <v-expand-transition>
-                    <div class="item-preview" v-show="newItemContent" data-entity="item-preview">
+                  <transition-expand>
+                    <div class="item-preview mb-2" v-show="newItemContent" data-entity="item-preview">
                       <div class="item editing">
                         <div class="header-wrap">
                           <div class="item__header">
@@ -81,8 +81,8 @@
                             </div>
                             <div class="item__media">
                               <div class="carousel-wrapper" v-if="newItemMedia.length > 1">
-                                <div class="carousel snap" ref="carousel">
-                                  <div class="carousel-item" v-for="media in newItemMedia">
+                                <div class="carousel snap flex relative h-full overflow-hidden w-full whitespace-no-wrap" ref="carousel">
+                                  <div class="carousel-item flex items-center justify-center min-h-full min-w-full text-center" v-for="media in newItemMedia">
                                     <img v-bind:src="media.url" v-if="media.type === 'GraphImage'" alt />
                                     <img v-bind:src="media.url" v-else-if="media.type === 'GraphVideo'" alt />
                                   </div>
@@ -122,24 +122,24 @@
                         </div>
                       </div>
                     </div>
-                  </v-expand-transition>
-                  <footer class="add-footer">
-                    <input type="file" accept="application/json" @change="processFile($event)" ref="jsonFile" data-entity="choose-json-file" />
-                    <div class="add-actions">
-                      <div class="add-action" v-if="isLoggedIn" data-entity="add-item-action">
+                  </transition-expand>
+                  <footer class="add-footer flex flex-auto">
+                    <input class="w-full" type="file" accept="application/json" @change="processFile($event)" ref="jsonFile" data-entity="choose-json-file" />
+                    <div class="add-actions flex flex-none flex-no-wrap">
+                      <div class="add-action ml-2 whitespace-no-wrap" v-if="isLoggedIn" data-entity="add-item-action">
                         <button v-on:click="addItem" v-show="newItemContent" :disabled="itemAddProcessing">Add Item</button>
                       </div>
-                      <div class="add-action" v-else data-entity="add-item-action">
+                      <div class="add-action ml-2 whitespace-no-wrap" v-else data-entity="add-item-action">
                         <button v-on:click="triggerNetlifyIdentityAction('login')" v-show="newItemContent" :disabled="itemAddProcessing" class="unauthorized">Add Item</button>
                       </div>
-                      <div class="add-action">
+                      <div class="add-action ml-2 whitespace-no-wrap">
                         <button class="subtle"
                         v-on:click="resetAddForm"
                         v-show="newItemContent"
                         :disabled="itemAddProcessing"
                         data-entity="cancel-add-item"
                       >
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 47.971 47.971">
+                          <svg class="block mx-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 47.971 47.971">
                             <path d="M28.228 23.986L47.092 5.122a2.998 2.998 0 0 0 0-4.242 2.998 2.998 0 0 0-4.242 0L23.986 19.744 5.121.88a2.998 2.998 0 0 0-4.242 0 2.998 2.998 0 0 0 0 4.242l18.865 18.864L.879 42.85a2.998 2.998 0 1 0 4.242 4.241l18.865-18.864L42.85 47.091c.586.586 1.354.879 2.121.879s1.535-.293 2.121-.879a2.998 2.998 0 0 0 0-4.242L28.228 23.986z"/>
                           </svg>
                         </button>
@@ -150,8 +150,8 @@
               </form>
             </div>
           </div>
-        </v-expand-transition>
-        <div class="items" ref="items" id="items" v-if="items.length">
+        </transition-expand>
+        <div class="items pb-8" ref="items" id="items" v-if="items.length">
           <item
             v-for="(item, index) in items"
             :class="{ 'tease': index === 0 }"
@@ -160,11 +160,11 @@
           />
           <div class="items-footer" ref="itemsFooter"></div>
         </div>
-        <div v-else class="disclaimer">
+        <div v-else class="disclaimer py-4 text-center">
           <p>No items were found.</p>
         </div>
       </main>
-      <div class="lower-brow">
+      <div class="lower-brow bottom-0 fixed pointer-events-none right-0">
         <loading />
       </div>
     </div>
@@ -175,8 +175,9 @@
 import item from "@@/components/item.vue";
 import loading from "@@/components/loading.vue";
 import message from "@@/components/message.vue";
+import TransitionExpand from '@@/components/TransitionExpand.vue'
 
-import { mapActions, mapMutations } from "vuex";
+import { mapActions, mapMutations, mapState } from "vuex";
 import netlifyIdentity from "netlify-identity-widget";
 
 netlifyIdentity.init({
@@ -215,7 +216,8 @@ export default {
   },
   methods: {
     ...mapActions({
-      addItemAction: 'items/addItem'
+      addItemAction: 'items/addItem',
+      getAdditionalItems: 'items/getAdditionalItems'
     }),
     ...mapMutations({
       setAuth: 'user/SET_USER'
@@ -239,7 +241,6 @@ export default {
       if (action == "login") {
         netlifyIdentity.open(action);
         netlifyIdentity.on(action, user => {
-          // const auth = user.token.access_token;
           this.setAuth(user);
           netlifyIdentity.close();
         });
@@ -257,11 +258,9 @@ export default {
           this.newItemName = null;
           this.newItemMedia = [];
           this.newItemContent = null;
-
           this.jsonData = JSON.parse(evt.target.result);
           this.newItemId = this.jsonData.node.id;
           let instaNode = this.jsonData.node;
-
           if (instaNode.hasOwnProperty("edge_sidecar_to_children")) {
             let sidecars = this.jsonData.node.edge_sidecar_to_children.edges;
             sidecars.forEach(function(sidecar) {
@@ -281,7 +280,6 @@ export default {
             }
             this.newItemMedia.push(newMediaToPush);
           }
-
           this.newItemContent = this.jsonData.node.edge_media_to_caption.edges[0].node.text;
           this.newItemSourceIdentifier = this.jsonData.node.shortcode;
         }.bind(this),
@@ -297,7 +295,6 @@ export default {
     async saveItems() {
       if (netlifyIdentity.currentUser()) {
         this.itemAddProcessing = true;
-
         let payload = {
           name: this.$refs.newItemName.textContent,
           media: this.newItemMedia,
@@ -305,7 +302,6 @@ export default {
           sourceCategory: "Instagram",
           sourceIdentifier: this.newItemSourceIdentifier
         };
-
         const newItem = await this.addItemAction(payload);
         if (newItem) {
           this.resetAddForm();
@@ -313,10 +309,8 @@ export default {
           this.scrollToTop();
           this.$root.$emit("transmitMessage", "Item successfully added.");
         }
-        
         this.itemAddProcessing = false;
       }
-
     },
     resetAddForm() {
       // Resetting Addition Form Values
@@ -359,12 +353,10 @@ export default {
               this.observer.unobserve(this.$refs.itemsFooter);
             } else {
               // Get id of last element in state
-              let lastItemId = this.$store.state.items[this.$store.state.items.length - 1]._id;
-              if (this.$store.state.loading === false && !this.$route.query.search) {
-                this.$store.dispatch(
-                  "GET_ADDITIONAL_ITEMS",
-                  lastItemId
-                );
+              let lastItemId = this.items[this.items.length - 1]._id;
+              if (this.loading === false && !this.$route.query.search) {
+                console.log('performing lookup');
+                this.getAdditionalItems(lastItemId);
               }
             }
           }
@@ -391,19 +383,15 @@ export default {
     }
   },
   computed: {
-    isLoggedIn() {
-      return this.$store.state.user.user;
-    },
-    items() {
-      console.log(this.$store.state.items.items);
-      return this.$store.state.items.items;
-    },
+    ...mapState({
+      grandTotal: state => state.items.itemCount,
+      loading: state => state.loading.loading,
+      isLoggedIn: state => state.user.user,
+      items: state => state.items.items
+    }),
     searchQuery() {
       return this.$route.query.search;
     },
-    grandTotal() {
-      return this.$store.state.items.itemCount;
-    }
   },
   mounted: function() {
 
@@ -458,7 +446,8 @@ export default {
   components: {
     item,
     loading,
-    message
+    message,
+    TransitionExpand
   }
 };
 </script>
@@ -471,28 +460,10 @@ html {
 img {
   max-width: 100%;
 }
-textarea {
-  display: block;
-}
-
-button {
-  cursor: pointer;
-}
 
 .container {
   margin: 0 auto;
   max-width: 40rem;
-  padding: 0;
-  // padding: 0 0 2rem;
-  // padding-bottom: 2rem;
-}
-
-.carousel {
-  /* Ensure that the contents flow horizontally */
-  // overflow-x: auto;
-  overflow: hidden;
-  white-space: nowrap;
-  display: flex;
 }
 
 /* 2018 spec - For Safari 11, Chrome 69+ */
@@ -513,21 +484,12 @@ button {
 }
 
 .backlink {
-  align-items: center;
   background-color: rgba(255, 250, 14, 1);
-  // color: rgba(255, 250, 14, 1);
-  display: flex;
-  flex: 0;
   font-size: 2rem;
   line-height: 0;
-  margin-right: 0.5rem;
-  padding: 0.25rem 0.5rem;
-  text-decoration: none;
   transition: box-shadow 400ms;
   svg {
-    display: block;
     height: 20px;
-    margin: 0 auto;
     width: 20px;
     fill {
       color: #fff;
@@ -538,82 +500,34 @@ button {
   }
 }
 
-.carousel {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
 .carousel > div {
-  min-width: 100%;
-  min-height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
   color: #fff;
+  // display: flex;
 }
 
 .add {
-  textarea {
-    width: 100%;
-  }
   .item__media {
     opacity: 1;
   }
 }
 
-.items {
-  margin: 0 auto;
-  padding-bottom: 2rem;
-}
-
 .lower-brow {
-  bottom: 0;
-  pointer-events: none;
-  position: fixed;
-  right: 0;
   z-index: 2;
 }
 
 .communicator {
   left: 50%;
   max-width: 80%;
-  position: fixed;
-  text-align: center;
   top: 10%;
   transform: translateX(-50%);
-  width: 100%;
-  z-index: 10;
 }
 
 .form {
-  fieldset {
-    border: 0;
-    padding: 0;
-  }
   &--search {
-    .form-field {
-      display: flex;
-    }
     input {
-      background-color: transparent;
-      border-radius: 0;
-      flex: 1 1 auto;
-      padding: 0.5rem;
+      color: rgba(255, 255, 255, 1);
       &:hover, &:focus, &:active {
         border-color: rgba(255, 250, 14, 1);
-      }
-    }
-    button {
-      flex: 0;
-      svg {
-        display: block;
-        // fill: #fff;
-        fill: #000;
-        height: 20px;
-        margin: 0 auto;
-        width: 20px;
       }
     }
   }
@@ -637,97 +551,32 @@ button {
   }
 }
 
-.app-header {
-  background-color: #000;
-  display: flex;
-  margin-bottom: 0.5rem;
-  z-index: 2;
-  .form--search {
-    flex: 1 1 auto;
-    .form-field {
-      input[type="text"] {
-        width: 100%;
-      }
-    }
-  }
-}
-
 .app-action {
-  flex: 0;
-  margin-left: 0.5rem;
-  span {
-    display: block;
-  }
   svg {
-    display: block;
-    // fill: #fff;
     fill: #000;
     height: 20px;
-    margin: 0 auto;
     width: 20px;
   }
 }
 
 .disclaimer {
   border-top: 2px solid rgba(255, 250, 14, 1);
-  padding: 1rem 0;
-  text-align: center;
-}
-
-.main {
-  padding: 0 0.5rem;
 }
 
 .instructions {
   border-top: 2px solid rgba(255, 250, 14, 1);
-  line-height: 1.5;
-  padding: 0 0 0.5rem;
   &__content {
-    padding: 0.75rem 0.5rem;
     a {
       color: rgba(255, 250, 14, 1);
-      &:hover {
-        text-decoration: none;
-      }
     }
   }
 }
 
-.add {
-  width: 100%;
-}
-
-.add-interior {
-  padding: 0 0 0.5rem;
-}
-
-.item-preview {
-  margin-bottom: 0.5rem;
-}
-
-.add-footer {
-  display: flex;
-  input[type="file"] {
-    flex: 1;
-    width: 100%;
-  }
-}
-
-.add-actions {
-  display: flex;
-  flex: 0;
-  flex-wrap: nowrap;
-}
-
 .add-action {
-  margin-left: 0.5rem;
   button {
-    white-space: nowrap;
     svg {
-      display: block;
       fill: #fff;
       height: 18px;
-      margin: 0 auto;
       width: 18px;
     }
   }
@@ -740,20 +589,12 @@ button {
 
 .top-link {
   background-color:rgba(255, 250, 14, 1);
-  display: inline-block;
-  opacity: 0;
-  padding: 0.5rem;
-  pointer-events: none;
-  position: fixed;
   right: 0.5rem;
-  text-decoration: none;
   transition: opacity 400ms;
   top: 0.5rem;
   z-index: -1;
   svg {
-    display: block;
     height: 20px;
-    margin: 0 auto;
     transform: rotate(90deg);
     width: 20px;
     path {
@@ -770,35 +611,8 @@ button {
   }
 }
 
-.login-brow {
-  color: rgba(255, 250, 14, 1);
-  margin-bottom: 0.5rem;
-  padding: 0.5rem 0.5rem 0;
-  text-align: right;
-  div {
-    cursor: pointer;
-    text-decoration: none;
-    
-    &:hover, &:focus, &:active {
-      text-decoration: underline;
-    }
-  }
-}
-
-.apex {
-  display: flex;
-  justify-content: space-between;
-  padding: 0.5rem;
-}
-
 .login-area {
   color: rgba(255, 250, 14, 1);
-  div {
-    cursor: pointer;
-    &:hover {
-      text-decoration: underline;
-    }
-  }
 }
 
 </style>

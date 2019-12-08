@@ -38,24 +38,37 @@ export default {
   /*
    ** Global CSS
    */
-  css: ["normalize.css/normalize.css"],
+  css: [],
   /*
    ** Plugins to load before mounting the App
    */
+  // postcss: {
+  //   // Add plugin names as key and arguments as value
+  //   // Install them before as dependencies with npm or yarn
+  //   plugins: {
+  //     // Disable a plugin by passing false as value
+  //     'postcss-url': false,
+  //     'postcss-nested': {},
+  //     'postcss-responsive-type': {},
+  //     'postcss-hexrgba': {}
+  //   },
+  //   preset: {
+  //     // Change the postcss-preset-env settings
+  //     autoprefixer: {
+  //       grid: true
+  //     }
+  //   }
+  // },
   plugins: [],
   /*
    ** Nuxt.js dev-modules
    */
-  buildModules: ["@nuxtjs/vuetify"],
+  buildModules: [
+    '@nuxtjs/tailwindcss'
+  ],
   /*
    ** Nuxt.js modules
    */
-  vuetify: {
-    // css: false,
-    defaultAssets: false,
-    // materialIcons: true,
-    // treeShake: true
-  },
   modules: ['@nuxtjs/proxy', '@nuxtjs/dotenv'],
   // modules: ['@nuxtjs/proxy', '@nuxtjs/dotenv', '@nuxtjs/auth', '@nuxtjs/axios'],
   

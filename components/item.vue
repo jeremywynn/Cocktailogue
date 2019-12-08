@@ -1,18 +1,19 @@
 <template>
-  <div class="item" v-bind:class="{ 'editing': editingItem, 'reveal': revealed }" ref="item">
-    <div class="header-wrap">
-      <div class="item__header" ref="itemHeader">
-        <div class="item__title">
-          <div class="title-interior">
-            <div class="item-name" ref="itemName">{{ itemName }}</div>
+  <div class="item" v-bind:class="['overflow-hidden', { 'editing': editingItem, 'reveal': revealed }]" ref="item">
+    <div class="header-wrap relative">
+      <div class="item__header cursor-pointer relative" ref="itemHeader">
+        <div class="item__title absolute bottom-0 p-2 w-full">
+          <div class="title-interior relative">
+            <div class="item-name px-4 py-2 relative w-full" ref="itemName">{{ itemName }}</div>
           </div>
         </div>
-        <div class="item__media">
-          <div class="carousel-wrapper" v-if="item.media.length > 1">
-            <div class="carousel snap" ref="carousel">
-              <div class="media-item" v-for="media in item.media">
+        <div class="item__media opacity-0">
+          <div class="carousel-wrapper relative" v-if="item.media.length > 1">
+            <div class="carousel snap flex relative h-full overflow-hidden w-full whitespace-no-wrap" ref="carousel">
+              <div class="carousel-item flex items-center justify-center min-h-full min-w-full text-center" v-for="(media, index) in item.media" :key="itemID + '-media-' + index">
                 <img
                   v-bind:src="'https://ik.imagekit.io/' + imageKitID + media.path"
+                  class="block object-contain w-full"
                   v-if="media.path"
                   alt
                 />
@@ -22,47 +23,48 @@
           <div
             class="media-item"
             v-if="item.media.length === 1"
-            v-for="media in item.media"
+            v-for="(media, index) in item.media"
+            :key="itemID + '-media-' + index"
             ref="mediaItem"
           >
-            <img v-bind:src="'https://ik.imagekit.io/' + imageKitID + media.path" v-if="media.path" alt />
-            <img v-bind:src="media.url" v-else alt />
+            <img v-bind:src="'https://ik.imagekit.io/' + imageKitID + media.path" class="block object-contain w-full -z-1" v-if="media.path" alt />
+            <img v-bind:src="media.url" class="block object-contain w-full" v-else alt />
           </div>
           <div class="media-item" v-if="item.media.length === 0">
-            <img src="~/assets/drunk-uncle-720x720-recipe.jpg" alt />
+            <img src="~/assets/drunk-uncle-720x720-recipe.jpg" class="block object-contain w-full -z-1" alt />
           </div>
         </div>
       </div>
-      <div class="carousel-controls" v-if="item.media.length > 1">
-        <button v-on:click="prevSlide" ref="prev" class="node node--prev">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 492 492">
+      <div class="carousel-controls absolute px-4 w-full" v-if="item.media.length > 1">
+        <button v-on:click="prevSlide" ref="prev" class="node node--prev bg-transparent float-left border-0 outline-none rounded-none">
+          <svg class="block mx-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 492 492">
             <path d="M198.608 246.104L382.664 62.04c5.068-5.056 7.856-11.816 7.856-19.024 0-7.212-2.788-13.968-7.856-19.032l-16.128-16.12C361.476 2.792 354.712 0 347.504 0s-13.964 2.792-19.028 7.864L109.328 227.008c-5.084 5.08-7.868 11.868-7.848 19.084-.02 7.248 2.76 14.028 7.848 19.112l218.944 218.932c5.064 5.072 11.82 7.864 19.032 7.864 7.208 0 13.964-2.792 19.032-7.864l16.124-16.12c10.492-10.492 10.492-27.572 0-38.06L198.608 246.104z"/>
           </svg>
         </button>
-        <button v-on:click="nextSlide" ref="next" class="node node--next">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 492 492">
+        <button v-on:click="nextSlide" ref="next" class="node node--next bg-transparent float-right border-0 outline-none rounded-none">
+          <svg class="block mx-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 492 492">
             <path d="M198.608 246.104L382.664 62.04c5.068-5.056 7.856-11.816 7.856-19.024 0-7.212-2.788-13.968-7.856-19.032l-16.128-16.12C361.476 2.792 354.712 0 347.504 0s-13.964 2.792-19.028 7.864L109.328 227.008c-5.084 5.08-7.868 11.868-7.848 19.084-.02 7.248 2.76 14.028 7.848 19.112l218.944 218.932c5.064 5.072 11.82 7.864 19.032 7.864 7.208 0 13.964-2.792 19.032-7.864l16.124-16.12c10.492-10.492 10.492-27.572 0-38.06L198.608 246.104z"/>
           </svg>
         </button>
       </div>
     </div>
     
-    <v-expand-transition>
+    <transition-expand>
       <div class="expander" v-show="revealed">
-        <div class="item__contents">
-          <div class="item__content">
-            <div class="item-content" ref="itemContent" v-html="highlight()"></div>
+        <div class="item__contents p-2 relative">
+          <div class="item__content mb-4 relative whitespace-pre-line">
+            <div class="item-content p-4 leading-relaxed relative" ref="itemContent" v-html="highlight()"></div>
           </div>
-          <div class="item__meta">
+          <div class="item__meta px-4">
             <div class="item__source-category" v-if="sourceCategory">{{ sourceCategory }}</div>
             <div class="item__source-url" v-if="sourceIdentifier">
-              <a :href="reconstructedUrl" target="_blank" rel="noreferrer">{{ reconstructedUrl }}</a>
+              <a class="underline hover:no-underline" :href="reconstructedUrl" target="_blank" rel="noreferrer">{{ reconstructedUrl }}</a>
             </div>
           </div>
-          <div class="item__actions">
-            <div class="action-group action-group--editing">
-              <div class="edit-option" v-if="isLoggedIn">
-                <button v-on:click="triggerEditItem" :disabled="itemProcessing" v-bind:class="{ 'subtle': editingItem }">
+          <div class="item__actions flex items-start justify-between mt-4 pb-4 px-4">
+            <div class="action-group action-group--editing flex justify-between w-full">
+              <div class="edit-option flex justify-between w-full" v-if="isLoggedIn">
+                <button v-on:click="triggerEditItem" :disabled="itemProcessing" v-bind:class="['block whitespace-no-wrap', { 'subtle': editingItem }]">
                   <span v-if="editingItem">Cancel Edits</span>
                   <span v-else>Edit Item</span>
                 </button>
@@ -70,41 +72,42 @@
                   v-on:click="editItem"
                   v-show="editingItem"
                   :disabled="itemProcessing"
+                  class="block whitespace-no-wrap"
                 >Save Edits</button>
               </div>
-              <div class="edit-option" v-else>
-                <button v-on:click="triggerNetlifyIdentityAction('login')" :disabled="itemProcessing" class="unauthorized">
+              <div class="edit-option flex justify-between w-full" v-else>
+                <button v-on:click="triggerNetlifyIdentityAction('login')" :disabled="itemProcessing" class="unauthorized block whitespace-no-wrap">
                   <span>Edit Item</span>
                 </button>
               </div>
             </div>
             <div class="action-group" v-if="!editingItem">
               <transition name="fade">
-                <div class="button-group">
+                <div class="button-group flex ml-8">
                   <transition name="fade" mode="out-in">
-                    <div class="removal-option" v-if="isLoggedIn">
+                    <div class="removal-option flex justify-between w-full" v-if="isLoggedIn">
                       <div class="original-removal" v-if="confirmRemoval === false" key="hideChoice">
                         <button
-                          class="negative"
+                          class="negative block whitespace-no-wrap"
                           v-on:click="confirmRemoval = true"
                           v-show="!editingItem"
                           :disabled="itemProcessing"
                         >Delete Item</button>
                       </div>
-                      <div class="confirm-removal" v-if="confirmRemoval === true" key="showChoice">
+                      <div class="confirm-removal flex ml-2 items-center" v-if="confirmRemoval === true" key="showChoice">
                         <span class="confirm-text">Delete?</span>
-                        <div class="choice">
+                        <div class="choice ml-2">
                           <button v-on:click="removeItem">Yes</button>
                         </div>
-                        <div class="choice">
+                        <div class="choice ml-2">
                           <button class="subtle" v-on:click="confirmRemoval = false">No</button>
                         </div>
                       </div>
                     </div>
-                    <div class="removal-option" v-else>
+                    <div class="removal-option flex justify-between w-full" v-else>
                       <div class="original-removal" v-if="confirmRemoval === false" key="hideChoice">
                         <button
-                          class="negative unauthorized"
+                          class="negative unauthorized block whitespace-no-wrap"
                           v-on:click="triggerNetlifyIdentityAction('login')"
                           v-show="!editingItem"
                           :disabled="itemProcessing"
@@ -118,20 +121,24 @@
           </div>
         </div>
       </div>
-    </v-expand-transition>
+    </transition-expand>
   </div>
 </template>
 
 <script>
 
-import { mapActions, mapMutations } from "vuex";
+import { mapActions, mapMutations, mapState } from "vuex";
 import netlifyIdentity from "netlify-identity-widget";
+import TransitionExpand from '@@/components/TransitionExpand.vue'
 
 netlifyIdentity.init({
   logo: false
 });
 
 export default {
+  components: {
+		TransitionExpand
+	},
   data: function() {
     return {
       carouselScrollMarker: 0,
@@ -139,6 +146,7 @@ export default {
       editingItem: false,
       imageKitID: process.env.IMAGEKIT_ID,
       itemContent: this.item.content,
+      itemID: this.item._id,
       itemName: this.item.name,
       itemProcessing: false,
       mediaCount: this.item.media.length,
@@ -151,9 +159,9 @@ export default {
     };
   },
   computed: {
-    isLoggedIn() {
-      return this.$store.state.user.user;
-    },
+    ...mapState({
+      isLoggedIn: state => state.user.user,
+    }),
     searchQuery() {
       return this.$route.query.search;
     }
@@ -252,19 +260,8 @@ export default {
         return '<span class="highlighted">' + match + '</span>';
       });
     }
-    /*
-      Uncaught TypeError: Cannot read property 'scrollTo' of undefined
-      at VueComponent.resize (pages_index.js:504)
-    */
-    // resize() {
-    //   this.$refs.carousel.scrollTo({
-    //     left: this.$refs.carousel.scrollLeft - 1,
-    //     behavior: "smooth"
-    //   });
-    // }
   },
   mounted: function() {
-
     this.observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (entry.intersectionRatio > 0) {
@@ -315,446 +312,297 @@ export default {
 </script>
 
 <style lang="scss">
-.app {
-  .fade-enter-active,
-  .fade-leave-active {
-    transition: opacity 0.5s;
-  }
-  .fade-enter, .fade-leave-to {
-    opacity: 0;
-  }
 
-  .confirm-removal {
-    align-items: center;
-    display: flex;
-    margin-left: 0.5rem;
-  }
-  .confirm-text {
-    font-size: 80%;
-  }
-  .choice {
-    margin-left: 0.5rem;
-  }
-  .original-removal {
-    button {
-      display: block;
-    }
-  }
-
-  .action-group {
-    &--editing {
-      display: flex;
-      justify-content: space-between;
-      width: 100%;
-    }
-  }
-
-  .button-group {
-    display: flex;
-    margin-left: 2rem;
-  }
-
-  .carousel-wrapper {
-    position: relative;
-  }
-  .carousel-controls {
-    position: absolute;
-    top: 50%;
-    padding: 0 1rem;
-    transform: translateY(-100%);
-    width: 100%;
-  }
-
-  .node {
-    background-color: transparent;
-    border: 0;
-    border-radius: 0;
-    outline: none;
-    transition: opacity 400ms;
-    &--prev {
-      float: left;
-    }
-    &--next {
-      float: right;
-      svg {
-        transform: rotate(180deg);
-      }
-    }
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+.confirm-text {
+  font-size: 80%;
+}
+.carousel-controls {
+  top: 50%;
+  transform: translateY(-100%);
+}
+.node {
+  transition: opacity 400ms;
+  &--next {
     svg {
-      display: block;
-      height: 40px;
-      margin: 0 auto;
-      width: 40px;
+      transform: rotate(180deg);
+    }
+  }
+  svg {
+    height: 40px;
+    width: 40px;
+    path {
+      fill: rgba(0, 0, 0, 1);
+      stroke: rgba(255, 250, 14, 1);
+      stroke-width: 8px;
+      transition: fill 400ms;
+    }
+  }
+  &:disabled {
+    cursor: default;
+    opacity: 0.25;
+    svg {
       path {
-        fill: rgba(0, 0, 0, 1);
-        stroke: rgba(255, 250, 14, 1);
-        stroke-width: 8px;
-        transition: fill 400ms;
-      }
-    }
-    &:disabled {
-      border: 0 !important;
-      opacity: 0.25;
-      svg {
-        path {
-          fill: transparent !important;
-          stroke: #fff !important;
-          stroke-width: 8px !important;
-        }
-      }
-    }
-    &:hover {
-      box-shadow: none !important;
-      svg {
-        path {
-          fill: rgba(255, 250, 14, 1);
-        }
+        fill: transparent !important;
+        stroke: #fff !important;
+        stroke-width: 8px !important;
       }
     }
   }
-
-  .item__actions {
-    align-items: flex-start;
-    display: flex;
-    margin-top: 1rem;
-    justify-content: space-between;
-    padding: 0 1rem 1rem;
-    button {
-      display: block;
-      white-space: nowrap;
-    }
-  }
-
-  .header-wrap {
-    position: relative;
-  }
-  .item__meta {
-    padding: 0 1rem;
-  }
-  .item-content {
-    padding: 1rem;
-  }
-  .item {
-    border: 1px solid rgba(255, 255, 255, 1);
-    border-top: 0;
-    overflow: hidden;
-    &__contents {
-      font-size: 95%;
-      padding: 0.5rem;
-      position: relative;
-    }
-    &__content {
-      position: relative;
-      white-space: pre-line;
-      textarea {
-        -webkit-appearance: none;
-        background: transparent;
-        border: 0;
-        border-radius: 0;
-        color: inherit;
-        font-size: inherit;
-        line-height: inherit;
-        min-height: 20vh;
-        padding: 1rem;
-        resize: none;
-        width: 100%;
+  &:hover {
+    box-shadow: none !important;
+    svg {
+      path {
+        fill: rgba(255, 250, 14, 1);
       }
     }
-    &__media {
-      bottom: 0;
-      left: 0;
-      right: 0;
-      top: 0;
-      opacity: 0;
-      transition: opacity 400ms;
-      &.unveil {
-        opacity: 1;
-      }
-      img {
-        display: block;
-        object-fit: contain;
-
-        width: 100%;
-        z-index: -1;
-      }
-      video {
-        width: 100%;
-      }
-    }
-    &:first-child {
-      border-top: 1px solid rgba(255, 255, 255, 1);
-    }
-    &.reveal {
-      .item__header {
-        display: block;
-        position: relative;
-      }
-      .item__title {
-        bottom: 0;
-        position: absolute;
-      }
-      .item__media {
-        display: block;
-      }
-    }
-  }
-
-  .item__header {
-    cursor: pointer;
-    position: relative;
-  }
-
-  .item__title {
-    background-color: rgba(0, 0, 0, 0.667);
-    bottom: 0;
-    font-size: calc(1rem + 1vw);
-    padding: 0.5rem;
-    position: absolute;
-    text-shadow: 0 0 3px black;
-    width: 100%;
-    @media only all and (min-width: 56em) {
-      font-size: 1.5rem;
-    }
-    .item-name {
-      padding: 0.5rem 1rem;
-      width: 100%;
-    }
-    input[type="text"] {
-      -webkit-appearance: none;
-      background-color: rgba(0, 0, 0, 0.5);
-      border: 0;
-      border-radius: 0;
-      color: inherit;
-      font: inherit;
-      opacity: 0;
-      padding: 0.5rem 1rem;
-      pointer-events: none;
-      position: absolute;
-      width: 100%;
-      z-index: -1;
-    }
-  }
-
-  .item-name {
-    position: relative;
-    transition: box-shadow 200ms;
-    &:after,
-    &:before {
-      background-color: rgba(255, 250, 14, 1);
-      content: "";
-      display: block;
-      opacity: 0;
-      position: absolute;
-      transition: opacity 400ms;
-    }
-    &:after {
-      bottom: 0;
-      height: 1px;
-      left: 1px;
-      transform-origin: left;
-      width: calc(100% - 2px);
-    }
-    &:before {
-      height: calc(100% - 1px);
-      right: 0;
-      top: 1px;
-      transform-origin: top;
-      width: 1px;
-    }
-  }
-
-  .title-interior {
-    position: relative;
-    &:after,
-    &:before {
-      background-color: rgba(255, 250, 14, 1);
-      content: "";
-      display: block;
-      opacity: 0;
-      position: absolute;
-      transition: opacity 400ms;
-    }
-    &:after {
-      height: 1px;
-      top: 0;
-      transform-origin: left;
-      width: 100%;
-    }
-    &:before {
-      height: calc(100% - 1px);
-      left: 0;
-      top: 1px;
-      transform-origin: top;
-      width: 1px;
-    }
-  }
-
-  .item__source-url {
-    a {
-      color: rgba(255, 250, 14, 1);
-      &:hover {
-        text-decoration: none;
-      }
-    }
-  }
-
-  .item__content {
-    margin-bottom: 1rem;
-    position: relative;
-    &:after,
-    &:before {
-      background-color: rgba(255, 250, 14, 1);
-      content: "";
-      display: block;
-      opacity: 0;
-      position: absolute;
-      transition: opacity 400ms;
-    }
-    &:after {
-      height: 1px;
-      top: 0;
-      transform-origin: left;
-      width: 100%;
-    }
-    &:before {
-      height: calc(100% - 1px);
-      left: 0;
-      top: 1px;
-      transform-origin: top;
-      width: 1px;
-    }
-  }
-
-  .item-content {
-    line-height: 1.6;
-    position: relative;
-    transition: box-shadow 200ms;
-    &:after,
-    &:before {
-      background-color: rgba(255, 250, 14, 1);
-      content: "";
-      display: block;
-      opacity: 0;
-      position: absolute;
-      transition: opacity 400ms;
-    }
-    &:after {
-      bottom: 0;
-      height: 1px;
-      left: 1px;
-      transform-origin: left;
-      width: calc(100% - 2px);
-    }
-    &:before {
-      height: calc(100% - 1px);
-      right: 0;
-      top: 1px;
-      transform-origin: top;
-      width: 1px;
-    }
-  }
-
-  .editing {
-    .item__header {
-      cursor: default;
-    }
-    .title-interior {
-      &:after {
-        animation: editIndicatorTopLtR 150ms linear forwards;
-        opacity: 1;
-        transition: none;
-      }
-      &:before {
-        animation: editIndicatorTopLtB 150ms linear forwards;
-        opacity: 1;
-        transition: none;
-      }
-    }
-    .item__title {
-      z-index: 2;
-    }
-    .item-name {
-      cursor: text;
-      &:after {
-        animation: editIndicatorTopLtR 150ms linear forwards 150ms;
-        opacity: 1;
-        transition-delay: 150ms;
-        transition-duration: 0s;
-      }
-      &:before {
-        animation: editIndicatorTopLtB 150ms linear forwards 150ms;
-        opacity: 1;
-        transition-delay: 150ms;
-        transition-duration: 0s;
-      }
-      &:focus,
-      &:active,
-      &:hover {
-        box-shadow: 0 0 1rem rgba(255, 250, 14, 1) inset;
-      }
-    }
-    .item__content {
-      &:after {
-        animation: editIndicatorTopLtR 150ms linear forwards;
-        opacity: 1;
-        transition: none;
-      }
-      &:before {
-        animation: editIndicatorTopLtB 150ms linear forwards;
-        opacity: 1;
-        transition: none;
-      }
-    }
-    .item-content {
-      &:after {
-        animation: editIndicatorTopLtR 150ms linear forwards 150ms;
-        opacity: 1;
-        transition-delay: 150ms;
-        transition-duration: 0s;
-      }
-      &:before {
-        animation: editIndicatorTopLtB 150ms linear forwards 150ms;
-        opacity: 1;
-        transition-delay: 150ms;
-        transition-duration: 0s;
-      }
-      &:focus,
-      &:active,
-      &:hover {
-        box-shadow: 0 0 1rem rgba(255, 250, 14, 1) inset;
-      }
-    }
-  }
-
-  @keyframes editIndicatorTopLtR {
-    0% {
-      transform: scaleX(0);
-    }
-    100% {
-      transform: scaleX(1);
-    }
-  }
-
-  @keyframes editIndicatorTopLtB {
-    0% {
-      transform: scaleY(0);
-    }
-    100% {
-      transform: scaleY(1);
-    }
-  }
-
-  .edit-option, .removal-option {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-  }
-
-  .highlighted {
-    background-color: rgba(255, 250, 14, 1);
-    color: #000;
   }
 }
 
+.item {
+  border: 1px solid rgba(255, 255, 255, 1);
+  border-top: 0;
+  &__contents {
+    font-size: 95%;
+  }
+  &__media {
+    transition: opacity 400ms;
+    &.unveil {
+      opacity: 1;
+    }
+  }
+  &:first-child {
+    border-top: 1px solid rgba(255, 255, 255, 1);
+  }
+  &.reveal {
+    .item__media {
+      display: block;
+    }
+  }
+}
+
+.item__title {
+  background-color: rgba(0, 0, 0, 0.667);
+  font-size: calc(1rem + 1vw);
+  text-shadow: 0 0 3px black;
+  z-index: 2;
+  @media only all and (min-width: 56em) {
+    font-size: 1.5rem;
+  }
+}
+
+.item-name {
+  transition: box-shadow 200ms;
+  &:after,
+  &:before {
+    background-color: rgba(255, 250, 14, 1);
+    content: "";
+    display: block;
+    opacity: 0;
+    position: absolute;
+    transition: opacity 400ms;
+  }
+  &:after {
+    bottom: 0;
+    height: 1px;
+    left: 1px;
+    transform-origin: left;
+    width: calc(100% - 2px);
+  }
+  &:before {
+    height: calc(100% - 1px);
+    right: 0;
+    top: 1px;
+    transform-origin: top;
+    width: 1px;
+  }
+}
+
+.title-interior {
+  &:after,
+  &:before {
+    background-color: rgba(255, 250, 14, 1);
+    content: "";
+    display: block;
+    opacity: 0;
+    position: absolute;
+    transition: opacity 400ms;
+  }
+  &:after {
+    height: 1px;
+    top: 0;
+    transform-origin: left;
+    width: 100%;
+  }
+  &:before {
+    height: calc(100% - 1px);
+    left: 0;
+    top: 1px;
+    transform-origin: top;
+    width: 1px;
+  }
+}
+
+.item__source-url {
+  a {
+    color: rgba(255, 250, 14, 1);
+  }
+}
+
+.item__content {
+  &:after,
+  &:before {
+    background-color: rgba(255, 250, 14, 1);
+    content: "";
+    display: block;
+    opacity: 0;
+    position: absolute;
+    transition: opacity 400ms;
+  }
+  &:after {
+    height: 1px;
+    top: 0;
+    transform-origin: left;
+    width: 100%;
+  }
+  &:before {
+    height: calc(100% - 1px);
+    left: 0;
+    top: 1px;
+    transform-origin: top;
+    width: 1px;
+  }
+}
+
+.item-content {
+  transition: box-shadow 200ms;
+  &:after,
+  &:before {
+    background-color: rgba(255, 250, 14, 1);
+    content: "";
+    display: block;
+    opacity: 0;
+    position: absolute;
+    transition: opacity 400ms;
+  }
+  &:after {
+    bottom: 0;
+    height: 1px;
+    left: 1px;
+    transform-origin: left;
+    width: calc(100% - 2px);
+  }
+  &:before {
+    height: calc(100% - 1px);
+    right: 0;
+    top: 1px;
+    transform-origin: top;
+    width: 1px;
+  }
+}
+
+// Editing Item Mode
+
+.editing {
+  .item__header {
+    cursor: default;
+  }
+  .title-interior {
+    &:after {
+      animation: editIndicatorTopLtR 150ms linear forwards;
+      opacity: 1;
+      transition: none;
+    }
+    &:before {
+      animation: editIndicatorTopLtB 150ms linear forwards;
+      opacity: 1;
+      transition: none;
+    }
+  }
+  .item__title {
+    z-index: 2;
+  }
+  .item-name {
+    cursor: text;
+    &:after {
+      animation: editIndicatorTopLtR 150ms linear forwards 150ms;
+      opacity: 1;
+      transition-delay: 150ms;
+      transition-duration: 0s;
+    }
+    &:before {
+      animation: editIndicatorTopLtB 150ms linear forwards 150ms;
+      opacity: 1;
+      transition-delay: 150ms;
+      transition-duration: 0s;
+    }
+    &:focus,
+    &:active,
+    &:hover {
+      box-shadow: 0 0 1rem rgba(255, 250, 14, 1) inset;
+    }
+  }
+  .item__content {
+    &:after {
+      animation: editIndicatorTopLtR 150ms linear forwards;
+      opacity: 1;
+      transition: none;
+    }
+    &:before {
+      animation: editIndicatorTopLtB 150ms linear forwards;
+      opacity: 1;
+      transition: none;
+    }
+  }
+  .item-content {
+    &:after {
+      animation: editIndicatorTopLtR 150ms linear forwards 150ms;
+      opacity: 1;
+      transition-delay: 150ms;
+      transition-duration: 0s;
+    }
+    &:before {
+      animation: editIndicatorTopLtB 150ms linear forwards 150ms;
+      opacity: 1;
+      transition-delay: 150ms;
+      transition-duration: 0s;
+    }
+    &:focus,
+    &:active,
+    &:hover {
+      box-shadow: 0 0 1rem rgba(255, 250, 14, 1) inset;
+    }
+  }
+}
+
+@keyframes editIndicatorTopLtR {
+  0% {
+    transform: scaleX(0);
+  }
+  100% {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes editIndicatorTopLtB {
+  0% {
+    transform: scaleY(0);
+  }
+  100% {
+    transform: scaleY(1);
+  }
+}
+
+.highlighted {
+  background-color: rgba(255, 250, 14, 1);
+  color: #000;
+}
 
 </style>
