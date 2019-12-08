@@ -23,12 +23,12 @@
           <div
             class="media-item"
             v-if="item.media.length === 1"
-            v-for="(media, index) in item.media"
-            :key="itemID + '-media-' + index"
-            ref="mediaItem"
           >
-            <img v-bind:src="'https://ik.imagekit.io/' + imageKitID + media.path" class="block object-contain w-full -z-1" v-if="media.path" alt />
-            <img v-bind:src="media.url" class="block object-contain w-full" v-else alt />
+            <div class="media-shell" v-for="(media, index) in item.media"
+            :key="itemID + '-media-' + index">
+              <img v-bind:src="'https://ik.imagekit.io/' + imageKitID + media.path" class="block object-contain w-full" v-if="media.path" alt />
+              <img v-bind:src="media.url" class="block object-contain w-full" v-else alt />
+            </div>
           </div>
           <div class="media-item" v-if="item.media.length === 0">
             <img src="~/assets/drunk-uncle-720x720-recipe.jpg" class="block object-contain w-full -z-1" alt />
@@ -508,6 +508,11 @@ export default {
   }
 }
 
+.highlighted {
+  background-color: rgba(255, 250, 14, 1);
+  color: #000;
+}
+
 // Editing Item Mode
 
 .editing {
@@ -598,11 +603,6 @@ export default {
   100% {
     transform: scaleY(1);
   }
-}
-
-.highlighted {
-  background-color: rgba(255, 250, 14, 1);
-  color: #000;
 }
 
 </style>

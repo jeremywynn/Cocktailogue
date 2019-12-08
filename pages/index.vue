@@ -82,7 +82,7 @@
                             <div class="item__media">
                               <div class="carousel-wrapper" v-if="newItemMedia.length > 1">
                                 <div class="carousel snap flex relative h-full overflow-hidden w-full whitespace-no-wrap" ref="carousel">
-                                  <div class="carousel-item flex items-center justify-center min-h-full min-w-full text-center" v-for="media in newItemMedia">
+                                  <div class="carousel-item flex items-center justify-center min-h-full min-w-full text-center" v-for="(media, index) in newItemMedia" :key="'media-' + index">
                                     <img v-bind:src="media.url" v-if="media.type === 'GraphImage'" alt />
                                     <img v-bind:src="media.url" v-else-if="media.type === 'GraphVideo'" alt />
                                   </div>
@@ -100,9 +100,15 @@
                                   </button>
                                 </div>
                               </div>
-                              <div v-for="media in newItemMedia" v-if="newItemMedia.length < 2">
-                                <img v-bind:src="media.url" v-if="media.type === 'GraphImage'" alt />
-                                <img v-bind:src="media.url" v-else-if="media.type === 'GraphVideo'" alt />
+                              <div
+                                class="media-item"
+                                v-if="newItemMedia.length === 1"
+                              >
+                                <div class="media-shell" v-for="(media, index) in item.media"
+                                :key="itemID + '-media-' + index">
+                                  <img v-bind:src="media.url" v-if="media.type === 'GraphImage'" alt />
+                                  <img v-bind:src="media.url" v-else-if="media.type === 'GraphVideo'" alt />
+                                </div>
                               </div>
                               <div class="media-item" v-if="newItemMedia.length === 0">
                                 <img src="~/assets/drunk-uncle-720x720-recipe.jpg" alt />
