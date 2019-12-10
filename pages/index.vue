@@ -328,8 +328,12 @@ export default {
       this.addingItem = false;
       this.resetAddForm();
       this.configureInfiniteFooter();
+      // Improve this
       if (!this.$route.query.search) {
         this.searchTerms = null;
+      }
+      else {
+        this.searchTerms = this.$route.query.search;
       }
     },
     configureInfiniteFooter() {
