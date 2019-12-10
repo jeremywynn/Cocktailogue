@@ -73,6 +73,7 @@
                                 <div
                                   class="item-name px-4 py-2 relative w-full"
                                   contenteditable="true"
+                                  spellcheck="false"
                                   v-html="newItemName"
                                   ref="newItemName"
                                   @paste="stripMarkup"
@@ -102,6 +103,7 @@
                             <div
                               class="item-content p-4 leading-relaxed relative"
                               contenteditable="true"
+                              spellcheck="false"
                               v-html="newItemContent"
                               ref="newItemContent"
                             ></div>
