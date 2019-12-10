@@ -238,41 +238,43 @@ export default {
       }
     },
     processFile(event) {
-      let reader = new FileReader();
-      reader.readAsText(event.target.files[0]);
-      reader.addEventListener(
-        "load",
-        function(evt) {
-          this.newItemName = null;
-          this.newItemMedia = [];
-          this.newItemContent = null;
-          this.jsonData = JSON.parse(evt.target.result);
-          this.newItemId = this.jsonData.node.id;
-          let instaNode = this.jsonData.node;
-          if (instaNode.hasOwnProperty("edge_sidecar_to_children")) {
-            let sidecars = this.jsonData.node.edge_sidecar_to_children.edges;
-            sidecars.forEach(function(sidecar) {
-              let sidecarToPush = {};
-              sidecarToPush["type"] = sidecar.node.__typename;
-              sidecarToPush["id"] = sidecar.node.id; // For file name
-              sidecarToPush["url"] = sidecar.node.display_url;
-              this.newItemMedia.push(sidecarToPush);
-            }, this);
-          } else {
-            let newMediaToPush = {};
-            newMediaToPush["type"] = this.jsonData.node.__typename;
-            newMediaToPush["id"] = this.jsonData.node.id; // For file name
-            newMediaToPush["url"] = this.jsonData.node.display_url;
-            if (newMediaToPush["type"] === "GraphVideo") {
-              newMediaToPush["video_url"] = this.jsonData.node.video_url;
+      if (event.target.files[0]) {
+        let reader = new FileReader();
+        reader.readAsText(event.target.files[0]);
+        reader.addEventListener(
+          "load",
+          function(evt) {
+            this.newItemName = null;
+            this.newItemMedia = [];
+            this.newItemContent = null;
+            this.jsonData = JSON.parse(evt.target.result);
+            this.newItemId = this.jsonData.node.id;
+            let instaNode = this.jsonData.node;
+            if (instaNode.hasOwnProperty("edge_sidecar_to_children")) {
+              let sidecars = this.jsonData.node.edge_sidecar_to_children.edges;
+              sidecars.forEach(function(sidecar) {
+                let sidecarToPush = {};
+                sidecarToPush["type"] = sidecar.node.__typename;
+                sidecarToPush["id"] = sidecar.node.id; // For file name
+                sidecarToPush["url"] = sidecar.node.display_url;
+                this.newItemMedia.push(sidecarToPush);
+              }, this);
+            } else {
+              let newMediaToPush = {};
+              newMediaToPush["type"] = this.jsonData.node.__typename;
+              newMediaToPush["id"] = this.jsonData.node.id; // For file name
+              newMediaToPush["url"] = this.jsonData.node.display_url;
+              if (newMediaToPush["type"] === "GraphVideo") {
+                newMediaToPush["video_url"] = this.jsonData.node.video_url;
+              }
+              this.newItemMedia.push(newMediaToPush);
             }
-            this.newItemMedia.push(newMediaToPush);
-          }
-          this.newItemContent = this.jsonData.node.edge_media_to_caption.edges[0].node.text;
-          this.newItemSourceIdentifier = this.jsonData.node.shortcode;
-        }.bind(this),
-        false
-      );
+            this.newItemContent = this.jsonData.node.edge_media_to_caption.edges[0].node.text;
+            this.newItemSourceIdentifier = this.jsonData.node.shortcode;
+          }.bind(this),
+          false
+        );
+      }
     },
     addItem() {
       if (!this.newItemContent || !this.$refs.newItemContent.innerText) {
