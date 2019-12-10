@@ -21,7 +21,7 @@
       </svg>
     </a>
     <div class="container">
-      <div class="communicator fixed text-center w-full z-10">
+      <div class="communicator fixed text-center w-full">
         <message />
       </div>
       <main class="px-2">
@@ -66,12 +66,12 @@
                     <div class="item-preview mb-2" v-show="newItemContent" data-entity="item-preview">
                       <div class="item editing">
                         <div class="header-wrap">
-                          <div class="item__header">
-                            <div class="item__title">
+                          <div class="item__header relative">
+                            <div class="item__title absolute bottom-0 p-2 w-full">
                               <label>Title</label>
-                              <div class="title-interior">
+                              <div class="title-interior relative">
                                 <div
-                                  class="item-name"
+                                  class="item-name px-4 py-2 relative w-full"
                                   contenteditable="true"
                                   v-html="newItemName"
                                   ref="newItemName"
@@ -86,7 +86,7 @@
                                 v-if="newItemMedia.length === 1"
                               >
                                 <div class="media-shell" v-for="(media, index) in newItemMedia"
-                                :key="itemID + '-media-' + index">
+                                :key="'new-item-media-' + index">
                                   <img v-bind:src="media.url" v-if="media.type === 'GraphImage'" alt />
                                   <img v-bind:src="media.url" v-else-if="media.type === 'GraphVideo'" alt />
                                 </div>
@@ -97,10 +97,10 @@
                             </div>
                           </div>
                         </div>
-                        <div class="item__contents">
-                          <div class="item__content">
+                        <div class="item__contents p-2 relative">
+                          <div class="item__content mb-4 relative whitespace-pre-line">
                             <div
-                              class="item-content"
+                              class="item-content p-4 leading-relaxed relative"
                               contenteditable="true"
                               v-html="newItemContent"
                               ref="newItemContent"
@@ -120,11 +120,10 @@
                         <button v-on:click="triggerNetlifyIdentityAction('login')" v-show="newItemContent" :disabled="itemAddProcessing" class="unauthorized">Add Item</button>
                       </div>
                       <div class="add-action ml-2 whitespace-no-wrap">
-                        <button class="subtle"
+                        <button class="subtle h-full"
                         v-on:click="resetAddForm"
                         v-show="newItemContent"
                         :disabled="itemAddProcessing"
-                        data-entity="cancel-add-item"
                       >
                           <svg class="block mx-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 47.971 47.971">
                             <path d="M28.228 23.986L47.092 5.122a2.998 2.998 0 0 0 0-4.242 2.998 2.998 0 0 0-4.242 0L23.986 19.744 5.121.88a2.998 2.998 0 0 0-4.242 0 2.998 2.998 0 0 0 0 4.242l18.865 18.864L.879 42.85a2.998 2.998 0 1 0 4.242 4.241l18.865-18.864L42.85 47.091c.586.586 1.354.879 2.121.879s1.535-.293 2.121-.879a2.998 2.998 0 0 0 0-4.242L28.228 23.986z"/>
@@ -448,6 +447,7 @@ img {
   max-width: 80%;
   top: 10%;
   transform: translateX(-50%);
+  z-index: 10;
 }
 
 .form {

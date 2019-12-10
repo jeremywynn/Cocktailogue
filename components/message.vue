@@ -1,8 +1,8 @@
 <template>
-  <div class="message" v-if="message">
+  <div class="message items-center px-4 py-2 text-left" v-if="message">
     <div class="message__body">{{ message }}</div>
     <div class="message__status">
-      <canvas height="24" width="24" ref="lifespan"></canvas>
+      <canvas class="block mx-auto overflow-visible" height="24" width="24" ref="lifespan"></canvas>
     </div>
   </div>
 </template>
@@ -30,7 +30,8 @@ export default {
       this.canvas = this.$refs.lifespan;
       this.ctx = this.canvas.getContext("2d");
       this.ctx.lineWidth = 5;
-      this.ctx.strokeStyle = "rgba(255, 250, 14, 1)";
+      this.ctx.strokeStyle = getComputedStyle(document.documentElement)
+    .getPropertyValue('--yellow');
       this.ctx.beginPath();
       this.ctx.arc(this.canvas.width / 2, this.canvas.height / 2, this.radius, -(this.startAngle), endAngle, true);
       this.ctx.stroke();
@@ -89,21 +90,13 @@ export default {
 
 <style lang="scss">
   .message {
-    align-items: center;
-    background-color: rgba(0, 0, 0, 1);
-    border-top: 2px solid rgba(255, 250, 14, 1);
+    background-color: var(--black);
+    border-top: 2px solid var(--yellow);
     box-shadow: 0 0 5px rgba(255, 250, 14, 0.25);
-    color: rgba(255, 255, 255, 1);
+    color: var(--white);
     display: inline-grid;
     grid-column-gap: 1rem;
     grid-template-columns: auto 32px;
     line-height: 1.2;
-    padding: 0.5rem 1rem;
-    text-align: left;
-    canvas {
-      display: block;
-      margin: 0 auto;
-      overflow: visible;
-    }
   }
 </style>
