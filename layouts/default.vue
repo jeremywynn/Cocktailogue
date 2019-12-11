@@ -78,16 +78,18 @@ button {
   &:active {
     box-shadow: 0 0 8px var(--yellow);
   }
-  &:disabled, &.unauthorized {
+  &:disabled,
+  &.unauthorized {
     background-color: transparent !important;
     /* border: 1px solid var(--gray) !important; */
     border-color: var(--gray) !important;
     color: var(--gray) !important;
     opacity: 0.5 !important;
-    &:hover, &:focus, &:active {
+    &:hover,
+    &:focus,
+    &:active {
       box-shadow: none !important;
     }
   }
 }
-
 </style>

@@ -2,7 +2,7 @@ export const state = () => ({
   // Items
   items: [],
   itemCount: null,
-  itemsRemaining: true,
+  itemsRemaining: true
 });
 
 export const mutations = {
@@ -29,7 +29,7 @@ export const mutations = {
   },
   SET_ITEMS_COUNT(state, itemCount) {
     state.itemCount = itemCount;
-  },
+  }
 };
 
 export const actions = {
@@ -37,7 +37,7 @@ export const actions = {
   async addItem({ commit, dispatch, state }, payload) {
     dispatch("loading/triggerBusyState", null, { root: true });
     try {
-      let data = {
+      const data = {
         name: payload.name,
         media: payload.media,
         content: payload.content,
@@ -59,7 +59,7 @@ export const actions = {
   async deleteItem({ commit, dispatch, state }, payload) {
     dispatch("loading/triggerBusyState", null, { root: true });
     try {
-      let data = {
+      const data = {
         ID: payload.ID,
         media: payload.media
       };
@@ -78,7 +78,7 @@ export const actions = {
   async editItem({ commit, dispatch, state }, payload) {
     dispatch("loading/triggerBusyState", null, { root: true });
     try {
-      let data = {
+      const data = {
         ID: payload.ID,
         name: payload.name,
         content: payload.content
@@ -101,7 +101,7 @@ export const actions = {
   },
   async getAdditionalItems({ commit, dispatch }, payload) {
     dispatch("loading/triggerBusyState", null, { root: true });
-    let data = {
+    const data = {
       skip: payload
     };
     try {
@@ -124,7 +124,7 @@ export const actions = {
   },
   async getItems({ commit, dispatch }, payload) {
     dispatch("loading/triggerBusyState", null, { root: true });
-    let data = {
+    const data = {
       skip: payload
     };
     try {
@@ -156,10 +156,10 @@ export const actions = {
   async searchItems({ commit, dispatch }, payload) {
     dispatch("loading/triggerBusyState", null, { root: true });
     try {
-      let data = {
+      const data = {
         searchTerms: payload
       };
-      let items = await fetch("/.netlify/functions/find-items", {
+      const items = await fetch("/.netlify/functions/find-items", {
         method: "POST",
         body: JSON.stringify(data)
       }).then(res => res.json());
@@ -168,5 +168,5 @@ export const actions = {
       console.log(err);
     }
     dispatch("loading/stopBusyState", null, { root: true });
-  },
+  }
 };

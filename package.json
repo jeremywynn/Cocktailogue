@@ -13,6 +13,8 @@
     "start": "nuxt start",
     "start:server": "netlify-lambda serve functions -c ./webpack.functions.js",
     "generate": "nuxt generate",
+    "lint": "eslint --ext .js,.vue --ignore-path .gitignore .",
+    "lintfix": "eslint --fix --ext .js,.vue --ignore-path .gitignore .",
     "test": "jest ."
   },
   "dependencies": {
@@ -29,17 +31,27 @@
   "devDependencies": {
     "@babel/core": "^7.7.5",
     "@babel/preset-env": "^7.7.6",
+    "@nuxtjs/eslint-config": "^2.0.0",
+    "@nuxtjs/eslint-module": "^1.1.0",
     "@nuxtjs/tailwindcss": "^1.2.0",
     "@vue/test-utils": "^1.0.0-beta.30",
     "babel-core": "^7.0.0-bridge.0",
+    "babel-eslint": "^10.0.3",
     "babel-jest": "^24.9.0",
     "cypress": "^3.7.0",
     "cypress-file-upload": "^3.5.1",
+    "eslint": "^6.7.2",
+    "eslint-config-prettier": "^6.7.0",
+    "eslint-loader": "^3.0.3",
+    "eslint-plugin-nuxt": "^0.5.0",
+    "eslint-plugin-prettier": "^3.1.1",
+    "eslint-plugin-vue": "^6.0.1",
     "jest": "^24.9.0",
     "jest-serializer-vue": "^2.0.2",
     "netlify-lambda": "^1.6.3",
     "node-sass": "^4.13.0",
     "npm-run-all": "^4.1.5",
+    "prettier": "^1.19.1",
     "vue-jest": "^3.0.5"
   }
 }

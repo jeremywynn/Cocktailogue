@@ -1,16 +1,20 @@
 <template>
-  <div class="message items-center px-4 py-2 text-left" v-if="message">
+  <div v-if="message" class="message items-center px-4 py-2 text-left">
     <div class="message__body">{{ message }}</div>
     <div class="message__status">
-      <canvas class="block mx-auto overflow-visible" height="24" width="24" ref="lifespan"></canvas>
+      <canvas
+        ref="lifespan"
+        class="block mx-auto overflow-visible"
+        height="24"
+        width="24"
+      ></canvas>
     </div>
   </div>
 </template>
 
 <script>
-
 export default {
-  data: function() {
+  data() {
     return {
       animationRequest: null,
       canvas: null,
@@ -24,16 +28,35 @@ export default {
       startAngle: Math.PI / 2
     };
   },
+  mounted() {
+    this.$root.$on("transmitMessage", message => {
+      this.transmitMessage(message);
+    });
+  },
+  updated() {
+    if (this.message) {
+      this.setupMessageTimer();
+      this.drawMessageTimer(performance.now());
+    }
+  },
   methods: {
     setupMessageTimer() {
-      let endAngle = Math.PI * 1.5;
+      const endAngle = Math.PI * 1.5;
       this.canvas = this.$refs.lifespan;
       this.ctx = this.canvas.getContext("2d");
       this.ctx.lineWidth = 5;
-      this.ctx.strokeStyle = getComputedStyle(document.documentElement)
-    .getPropertyValue('--yellow');
+      this.ctx.strokeStyle = getComputedStyle(
+        document.documentElement
+      ).getPropertyValue("--yellow");
       this.ctx.beginPath();
-      this.ctx.arc(this.canvas.width / 2, this.canvas.height / 2, this.radius, -(this.startAngle), endAngle, true);
+      this.ctx.arc(
+        this.canvas.width / 2,
+        this.canvas.height / 2,
+        this.radius,
+        -this.startAngle,
+        endAngle,
+        true
+      );
       this.ctx.stroke();
       this.ctx.closePath();
     },
@@ -48,14 +71,29 @@ export default {
       }
       if (timestamp - this.start <= this.duration) {
         this.ctx.beginPath();
-        this.ctx.arc(this.canvas.width / 2, this.canvas.height / 2, this.radius, -(this.startAngle), ((this.circum) * remainder) - this.startAngle, true);
+        this.ctx.arc(
+          this.canvas.width / 2,
+          this.canvas.height / 2,
+          this.radius,
+          -this.startAngle,
+          this.circum * remainder - this.startAngle,
+          true
+        );
         this.ctx.stroke();
         this.ctx.closePath();
-        this.animationRequest = window.requestAnimationFrame(this.drawMessageTimer);
-      }
-      else {
+        this.animationRequest = window.requestAnimationFrame(
+          this.drawMessageTimer
+        );
+      } else {
         this.ctx.beginPath();
-        this.ctx.arc(this.canvas.width / 2, this.canvas.height / 2, this.radius, -(this.startAngle), -(this.startAngle), true);
+        this.ctx.arc(
+          this.canvas.width / 2,
+          this.canvas.height / 2,
+          this.radius,
+          -this.startAngle,
+          -this.startAngle,
+          true
+        );
         this.ctx.stroke();
         this.ctx.closePath();
         window.cancelAnimationFrame(this.animationRequest);
@@ -73,30 +111,19 @@ export default {
         this.message = null;
       }, this.duration);
     }
-  },
-  mounted: function() {
-    this.$root.$on("transmitMessage", (message) => {
-      this.transmitMessage(message);
-    });
-  },
-  updated: function() {
-    if (this.message) {
-      this.setupMessageTimer();
-      this.drawMessageTimer(performance.now());
-    }
   }
 };
 </script>
 
 <style lang="postcss">
-  .message {
-    background-color: var(--black);
-    border-top: 2px solid var(--yellow);
-    box-shadow: 0 0 5px rgba(255, 250, 14, 0.25);
-    color: var(--white);
-    display: inline-grid;
-    grid-column-gap: 1rem;
-    grid-template-columns: auto 32px;
-    line-height: 1.2;
-  }
+.message {
+  background-color: var(--black);
+  border-top: 2px solid var(--yellow);
+  box-shadow: 0 0 5px rgba(255, 250, 14, 0.25);
+  color: var(--white);
+  display: inline-grid;
+  grid-column-gap: 1rem;
+  grid-template-columns: auto 32px;
+  line-height: 1.2;
+}
 </style>

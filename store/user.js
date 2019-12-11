@@ -6,7 +6,7 @@ const user = netlifyIdentity.currentUser();
 
 export const state = () => ({
   // User
-  user: user
+  user
 });
 
 export const mutations = {

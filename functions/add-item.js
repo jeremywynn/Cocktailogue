@@ -1,6 +1,3 @@
-var ImageKit = require("imagekit");
-require("dotenv").config();
-
 import {
   Stitch,
   StitchAppClientConfiguration,
@@ -9,18 +6,23 @@ import {
   UserApiKeyCredential
 } from "mongodb-stitch-server-sdk";
 
+const ImageKit = require("imagekit");
+require("dotenv").config();
+
 let cachedDb = null;
-let dataDirectory = '';
+let dataDirectory = "";
 
 const isLambda = !!(process.env.LAMBDA_TASK_ROOT || false);
 
 if (isLambda) {
-  dataDirectory = '/tmp';
+  dataDirectory = "/tmp";
 }
 
 const client = Stitch.initializeDefaultAppClient(
   process.env.MONGODB_STITCH_APP_ID,
-  new StitchAppClientConfiguration.Builder().withDataDirectory(dataDirectory).build()
+  new StitchAppClientConfiguration.Builder()
+    .withDataDirectory(dataDirectory)
+    .build()
 );
 const mongoClient = client.getServiceClient(
   RemoteMongoClient.factory,
@@ -28,7 +30,7 @@ const mongoClient = client.getServiceClient(
 );
 const credential = new UserApiKeyCredential(process.env.MONGODB_API_KEY);
 
-var imagekit = new ImageKit({
+const imagekit = new ImageKit({
   imagekitId: process.env.IMAGEKIT_ID,
   apiKey: process.env.IMAGEKIT_PUBLIC_API_KEY,
   apiSecret: process.env.IMAGEKIT_API_SECRET
@@ -40,7 +42,6 @@ const headers = {
 };
 
 exports.handler = async (event, context, callback) => {
-
   try {
     context.callbackWaitsForEmptyEventLoop = false;
 
@@ -61,9 +62,8 @@ exports.handler = async (event, context, callback) => {
 };
 
 async function connectToDatabase(uri) {
-
   try {
-    if (cachedDb && (typeof cachedDb.serverConfig != 'undefined')) {
+    if (cachedDb && typeof cachedDb.serverConfig !== "undefined") {
       if (cachedDb.serverConfig.isConnected()) {
         return Promise.resolve(cachedDb);
       }
@@ -72,8 +72,7 @@ async function connectToDatabase(uri) {
     const db = mongoClient.db("catalogue");
     cachedDb = db;
     return cachedDb;
-  }
-  catch (error) {
+  } catch (error) {
     console.log(error);
     return error;
   }
@@ -90,21 +89,21 @@ async function processEvent(event, context, callback) {
   }
 }
 
-async function queryDatabase(db, event) {   
-  var jsonContents = JSON.parse(JSON.stringify(event));
-  
+async function queryDatabase(db, event) {
+  let jsonContents = JSON.parse(JSON.stringify(event));
+
   if (event.body !== null && event.body !== undefined) {
     jsonContents = JSON.parse(event.body);
   }
 
-  let data = jsonContents;
-  let media = data.media;
+  const data = jsonContents;
+  const media = data.media;
 
   try {
     if (media) {
-      let uploadPromises = media.map(async function(mediaItem) {
+      const uploadPromises = media.map(async function(mediaItem) {
         try {
-          let uploadPromise = await imagekit.uploadViaURL(mediaItem.url, {
+          const uploadPromise = await imagekit.uploadViaURL(mediaItem.url, {
             filename: mediaItem.id,
             folder: "/"
           });
@@ -115,7 +114,7 @@ async function queryDatabase(db, event) {
         }
       });
 
-      let uploadedMedia = await Promise.all(uploadPromises);
+      const uploadedMedia = await Promise.all(uploadPromises);
       uploadedMedia.forEach(function(singleUpload, index) {
         if (singleUpload.imagePath) {
           this[index].path = singleUpload.imagePath;
@@ -124,10 +123,10 @@ async function queryDatabase(db, event) {
 
       const itemsCollection = db.collection("items");
 
-      let newItem = {
+      const newItem = {
         owner_id: client.auth.user.id,
         name: data.name,
-        media: media,
+        media,
         content: data.content,
         sourceCategory: data.sourceCategory,
         sourceIdentifier: data.sourceIdentifier
@@ -139,15 +138,13 @@ async function queryDatabase(db, event) {
       });
 
       return newlyCreatedItem;
-
     } else {
-
       const itemsCollection = db.collection("items");
 
-      let newItem = {
+      const newItem = {
         owner_id: client.auth.user.id,
         name: data.name,
-        media: media,
+        media,
         content: data.content,
         sourceCategory: data.sourceCategory,
         sourceIdentifier: data.sourceIdentifier

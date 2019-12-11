@@ -12,14 +12,28 @@ export default {
         hid: "description",
         name: "description",
         content: process.env.npm_package_description || ""
-      },
+      }
       // { name: 'og:image', content: '/static/cocktail.jpg' },
     ],
     link: [
       { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
-      { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png" },
-      { rel: "icon", type: "image/png", sizes: "32x32", href: "/favicon-32x32.png" },
-      { rel: "icon", type: "image/png", sizes: "16x16", href: "/favicon-16x16.png" },
+      {
+        rel: "apple-touch-icon",
+        sizes: "180x180",
+        href: "/apple-touch-icon.png"
+      },
+      {
+        rel: "icon",
+        type: "image/png",
+        sizes: "32x32",
+        href: "/favicon-32x32.png"
+      },
+      {
+        rel: "icon",
+        type: "image/png",
+        sizes: "16x16",
+        href: "/favicon-16x16.png"
+      },
       { rel: "manifest", href: "/site.webmanifest" },
       { rel: "mask-icon", color: "#fffa0e", href: "/safari-pinned-tab.svg" },
       {
@@ -47,39 +61,16 @@ export default {
    ** Nuxt.js dev-modules
    */
   buildModules: [
-    '@nuxtjs/tailwindcss'
+    // Doc: https://github.com/nuxt-community/eslint-module
+    "@nuxtjs/eslint-module",
+    // Doc: https://github.com/nuxt-community/nuxt-tailwindcss
+    "@nuxtjs/tailwindcss"
   ],
   /*
    ** Nuxt.js modules
    */
-  modules: ['@nuxtjs/proxy', '@nuxtjs/dotenv'],
-  // modules: ['@nuxtjs/proxy', '@nuxtjs/dotenv', '@nuxtjs/auth', '@nuxtjs/axios'],
-  
-  /*
-  auth: {
-    // Options
-    strategies: {
-      local: {
-        endpoints: {
-          // login: { url: '/api/auth/login', method: 'post', propertyName: 'token' },
-          login: false,
-          // logout: { url: '/api/auth/logout', method: 'post' },
-          logout: false,
-          // https://cocktailogue.netlify.com/.netlify/identity/logout
-          user: { url: 'https://cocktailogue.netlify.com/.netlify/identity/user', method: 'get', propertyName: 'user' }
-        },
-        tokenName: 'access_token',
-        // tokenRequired: true,
-        // tokenType: 'bearer'
-      }
-    }
-  },
+  modules: ["@nuxtjs/proxy", "@nuxtjs/dotenv"],
 
-  axios: {
-    credentials: false
-  },
-  */
-  
   proxy: {
     "/.netlify": {
       target: "http://localhost:9000",
@@ -98,14 +89,24 @@ export default {
      ** You can extend webpack config here
      */
     // analyze: true,
-    extend(config, ctx) {},
+    extend(config, ctx) {
+      // Run ESLint on save
+      if (ctx.isDev && ctx.isClient) {
+        config.module.rules.push({
+          enforce: "pre",
+          test: /\.(js|vue)$/,
+          loader: "eslint-loader",
+          exclude: /(node_modules)/
+        });
+      }
+    },
     postcss: {
       // Add plugin names as key and arguments as value
       // Install them before as dependencies with npm or yarn
       plugins: {
         // Disable a plugin by passing false as value
         // 'postcss-url': false,
-        'postcss-nested': {},
+        "postcss-nested": {}
         // 'postcss-responsive-type': {},
         // 'postcss-hexrgba': {}
       },
@@ -115,12 +116,12 @@ export default {
           grid: true
         }
       }
-    },
+    }
   },
   loadingIndicator: {
-    name: 'pulse',
-    color: 'rgb(255, 250, 14)',
-    background: '#000000'
+    name: "pulse",
+    color: "rgb(255, 250, 14)",
+    background: "#000000"
   },
   env: {
     IMAGEKIT_ID: process.env.IMAGEKIT_ID

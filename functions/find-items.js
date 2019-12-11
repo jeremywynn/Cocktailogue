@@ -1,5 +1,3 @@
-require("dotenv").config();
-
 import {
   Stitch,
   StitchAppClientConfiguration,
@@ -8,18 +6,22 @@ import {
   UserApiKeyCredential
 } from "mongodb-stitch-server-sdk";
 
+require("dotenv").config();
+
 let cachedDb = null;
-let dataDirectory = '';
+let dataDirectory = "";
 
 const isLambda = !!(process.env.LAMBDA_TASK_ROOT || false);
 
 if (isLambda) {
-  dataDirectory = '/tmp';
+  dataDirectory = "/tmp";
 }
 
 const client = Stitch.initializeDefaultAppClient(
   process.env.MONGODB_STITCH_APP_ID,
-  new StitchAppClientConfiguration.Builder().withDataDirectory(dataDirectory).build()
+  new StitchAppClientConfiguration.Builder()
+    .withDataDirectory(dataDirectory)
+    .build()
 );
 const mongoClient = client.getServiceClient(
   RemoteMongoClient.factory,
@@ -36,7 +38,6 @@ RegExp.escape = function(s) {
 };
 
 exports.handler = async (event, context, callback) => {
-
   try {
     context.callbackWaitsForEmptyEventLoop = false;
 
@@ -58,9 +59,8 @@ exports.handler = async (event, context, callback) => {
 };
 
 async function connectToDatabase(uri) {
-
   try {
-    if (cachedDb && (typeof cachedDb.serverConfig != 'undefined')) {
+    if (cachedDb && typeof cachedDb.serverConfig !== "undefined") {
       if (cachedDb.serverConfig.isConnected()) {
         return Promise.resolve(cachedDb);
       }
@@ -69,8 +69,7 @@ async function connectToDatabase(uri) {
     const db = mongoClient.db("catalogue");
     cachedDb = db;
     return cachedDb;
-  }
-  catch (error) {
+  } catch (error) {
     console.log(error);
     return error;
   }
@@ -87,11 +86,11 @@ async function processEvent(event, context, callback) {
   }
 }
 
-async function queryDatabase(db, event) {   
-  var jsonContents = JSON.parse(JSON.stringify(event));
-  
+async function queryDatabase(db, event) {
+  let jsonContents = JSON.parse(JSON.stringify(event));
+
   if (event.body !== null && event.body !== undefined) {
-      jsonContents = JSON.parse(event.body);
+    jsonContents = JSON.parse(event.body);
   }
 
   const searchTerms = jsonContents.searchTerms;
@@ -105,19 +104,18 @@ async function queryDatabase(db, event) {
 
   try {
     const itemsCollection = db.collection("items");
-    
+
     const items = await itemsCollection
       .find({ content: searchRegex }, { score: { $meta: "textScore" } })
       // .sort({ score: { $meta: "textScore" } })
       .toArray();
-    
+
     /*
     const pipeline = [{ $match: { content: { $regex: searchTerms, $options: 'i' } } }, { $sort: { $score: { $meta: "textScore" } } }, { $limit: 10 }];
     const items = await itemsCollection.aggregate(pipeline).toArray();
     */
 
     return items;
-
   } catch (error) {
     return error;
   }

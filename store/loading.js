@@ -1,6 +1,6 @@
 export const state = () => ({
   // Loading
-  loading: false,
+  loading: false
 });
 
 export const mutations = {
@@ -10,7 +10,7 @@ export const mutations = {
   },
   START_BUSY_STATE(state) {
     state.loading = true;
-  },
+  }
 };
 
 export const actions = {
@@ -20,5 +20,5 @@ export const actions = {
   },
   triggerBusyState({ commit }) {
     commit("START_BUSY_STATE");
-  },
+  }
 };

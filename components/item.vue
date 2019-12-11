@@ -1,94 +1,170 @@
 <template>
-  <div class="item" v-bind:class="['overflow-hidden', { 'editing': editingItem, 'reveal': revealed }]" ref="item">
+  <div
+    ref="item"
+    class="item"
+    :class="['overflow-hidden', { editing: editingItem, reveal: revealed }]"
+  >
     <div class="header-wrap relative">
       <div class="item__header cursor-pointer relative" @click="revealItem">
         <div class="item__title absolute bottom-0 p-2 w-full">
           <div class="title-interior relative">
-            <div class="item-name px-4 py-2 relative w-full" ref="itemName">{{ itemName }}</div>
+            <div ref="itemName" class="item-name px-4 py-2 relative w-full">
+              {{ itemName }}
+            </div>
           </div>
         </div>
         <div class="item__media opacity-0">
-          <carousel v-if="item.media.length > 1" :itemMedia="item.media" />
-          <div
-            class="media-item"
-            v-if="item.media.length === 1"
-          >
-            <div class="media-shell" v-for="(media, index) in item.media"
-            :key="itemID + '-media-' + index">
-              <img v-bind:src="'https://ik.imagekit.io/' + imageKitID + media.path" class="block object-contain w-full" v-if="media.path" alt />
-              <img v-bind:src="media.url" class="block object-contain w-full" v-else alt />
+          <carousel v-if="item.media.length > 1" :item-media="item.media" />
+          <div v-if="item.media.length === 1" class="media-item">
+            <div
+              v-for="(media, index) in item.media"
+              :key="itemID + '-media-' + index"
+              class="media-shell"
+            >
+              <img
+                v-if="media.path"
+                :src="'https://ik.imagekit.io/' + imageKitID + media.path"
+                class="block object-contain w-full"
+                alt
+              />
+              <img
+                v-else
+                :src="media.url"
+                class="block object-contain w-full"
+                alt
+              />
             </div>
           </div>
-          <div class="media-item" v-if="item.media.length === 0">
-            <img src="~/assets/drunk-uncle-720x720-recipe.jpg" class="block object-contain w-full -z-1" alt />
+          <div v-if="item.media.length === 0" class="media-item">
+            <img
+              src="~/assets/drunk-uncle-720x720-recipe.jpg"
+              class="block object-contain w-full -z-1"
+              alt
+            />
           </div>
         </div>
       </div>
     </div>
-    
+
     <transition-expand>
-      <div class="expander" v-show="revealed">
+      <div v-show="revealed" class="expander">
         <div class="item__contents p-2 relative">
           <div class="item__content mb-4 relative whitespace-pre-line">
-            <div class="item-content p-4 leading-relaxed relative" ref="itemContent" v-html="highlight()"></div>
+            <div
+              ref="itemContent"
+              class="item-content p-4 leading-relaxed relative"
+              v-html="highlight()"
+            ></div>
           </div>
           <div class="item__meta px-4">
-            <div class="item__source-category" v-if="sourceCategory">{{ sourceCategory }}</div>
-            <div class="item__source-url" v-if="sourceIdentifier">
-              <a class="underline hover:no-underline" :href="reconstructedUrl" target="_blank" rel="noreferrer">{{ reconstructedUrl }}</a>
+            <div v-if="sourceCategory" class="item__source-category">
+              {{ sourceCategory }}
+            </div>
+            <div v-if="sourceIdentifier" class="item__source-url">
+              <a
+                class="underline hover:no-underline"
+                :href="reconstructedUrl"
+                target="_blank"
+                rel="noreferrer"
+                >{{ reconstructedUrl }}</a
+              >
             </div>
           </div>
-          <div class="item__actions flex items-start justify-between mt-4 pb-4 px-4">
-            <div class="action-group action-group--editing flex justify-between w-full">
-              <div class="edit-option flex justify-between w-full" v-if="isLoggedIn">
-                <button v-on:click="triggerEditItem" :disabled="itemProcessing" v-bind:class="['block whitespace-no-wrap', { 'subtle': editingItem }]">
+          <div
+            class="item__actions flex items-start justify-between mt-4 pb-4 px-4"
+          >
+            <div
+              class="action-group action-group--editing flex justify-between w-full"
+            >
+              <div
+                v-if="isLoggedIn"
+                class="edit-option flex justify-between w-full"
+              >
+                <button
+                  :disabled="itemProcessing"
+                  :class="['block whitespace-no-wrap', { subtle: editingItem }]"
+                  @click="triggerEditItem"
+                >
                   <span v-if="editingItem">Cancel Edits</span>
                   <span v-else>Edit Item</span>
                 </button>
                 <button
-                  v-on:click="editItem"
                   v-show="editingItem"
                   :disabled="itemProcessing"
                   class="block whitespace-no-wrap"
-                >Save Edits</button>
+                  @click="editItem"
+                >
+                  Save Edits
+                </button>
               </div>
-              <div class="edit-option flex justify-between w-full" v-else>
-                <button v-on:click="triggerNetlifyIdentityAction('login')" :disabled="itemProcessing" class="unauthorized block whitespace-no-wrap">
+              <div v-else class="edit-option flex justify-between w-full">
+                <button
+                  :disabled="itemProcessing"
+                  class="unauthorized block whitespace-no-wrap"
+                  @click="triggerNetlifyIdentityAction('login')"
+                >
                   <span>Edit Item</span>
                 </button>
               </div>
             </div>
-            <div class="action-group" v-if="!editingItem">
+            <div v-if="!editingItem" class="action-group">
               <transition name="fade">
                 <div class="button-group flex ml-8">
                   <transition name="fade" mode="out-in">
-                    <div class="removal-option flex justify-between w-full" v-if="isLoggedIn">
-                      <div class="original-removal" v-if="confirmRemoval === false" key="hideChoice">
+                    <div
+                      v-if="isLoggedIn"
+                      class="removal-option flex justify-between w-full"
+                    >
+                      <div
+                        v-if="confirmRemoval === false"
+                        key="hideChoice"
+                        class="original-removal"
+                      >
                         <button
-                          class="negative block whitespace-no-wrap"
-                          v-on:click="confirmRemoval = true"
                           v-show="!editingItem"
+                          class="negative block whitespace-no-wrap"
                           :disabled="itemProcessing"
-                        >Delete Item</button>
+                          @click="confirmRemoval = true"
+                        >
+                          Delete Item
+                        </button>
                       </div>
-                      <div class="confirm-removal flex ml-2 items-center" v-if="confirmRemoval === true" key="showChoice">
+                      <div
+                        v-if="confirmRemoval === true"
+                        key="showChoice"
+                        class="confirm-removal flex ml-2 items-center"
+                      >
                         <span class="confirm-text">Delete?</span>
                         <div class="choice ml-2">
-                          <button v-on:click="removeItem">Yes</button>
+                          <button @click="removeItem">Yes</button>
                         </div>
                         <div class="choice ml-2">
-                          <button class="subtle" v-on:click="confirmRemoval = false">No</button>
+                          <button
+                            class="subtle"
+                            @click="confirmRemoval = false"
+                          >
+                            No
+                          </button>
                         </div>
                       </div>
                     </div>
-                    <div class="removal-option flex justify-between w-full" v-else>
-                      <div class="original-removal" v-if="confirmRemoval === false" key="hideChoice">
+                    <div
+                      v-else
+                      class="removal-option flex justify-between w-full"
+                    >
+                      <div
+                        v-if="confirmRemoval === false"
+                        key="hideChoice"
+                        class="original-removal"
+                      >
                         <button
-                          class="negative unauthorized block whitespace-no-wrap"
-                          v-on:click="triggerNetlifyIdentityAction('login')"
                           v-show="!editingItem"
+                          class="negative unauthorized block whitespace-no-wrap"
                           :disabled="itemProcessing"
-                        >Delete Item</button>
+                          @click="triggerNetlifyIdentityAction('login')"
+                        >
+                          Delete Item
+                        </button>
                       </div>
                     </div>
                   </transition>
@@ -103,11 +179,10 @@
 </template>
 
 <script>
-
 import { mapActions, mapMutations, mapState } from "vuex";
 import carousel from "@@/components/carousel.vue";
 import netlifyIdentity from "netlify-identity-widget";
-import TransitionExpand from '@@/components/TransitionExpand.vue'
+import TransitionExpand from "@@/components/TransitionExpand.vue";
 
 netlifyIdentity.init({
   logo: false
@@ -116,9 +191,9 @@ netlifyIdentity.init({
 export default {
   components: {
     carousel,
-		TransitionExpand
-	},
-  data: function() {
+    TransitionExpand
+  },
+  data() {
     return {
       confirmRemoval: false,
       editingItem: false,
@@ -138,7 +213,7 @@ export default {
   },
   computed: {
     ...mapState({
-      isLoggedIn: state => state.user.user,
+      isLoggedIn: state => state.user.user
     }),
     searchQuery() {
       return this.$route.query.search;
@@ -146,20 +221,20 @@ export default {
   },
   methods: {
     ...mapActions({
-      editItemAction: 'items/editItem',
-      removeItemAction: 'items/deleteItem'
+      editItemAction: "items/editItem",
+      removeItemAction: "items/deleteItem"
     }),
     ...mapMutations({
-      setAuth: 'user/SET_AUTH'
+      setAuth: "user/SET_AUTH"
     }),
     triggerNetlifyIdentityAction(action) {
-      if (action == "login") {
+      if (action === "login") {
         netlifyIdentity.open(action);
         netlifyIdentity.on(action, user => {
           this.setAuth(user);
           netlifyIdentity.close();
         });
-      } else if (action == "logout") {
+      } else if (action === "logout") {
         this.setAuth(null);
         netlifyIdentity.logout();
       }
@@ -168,7 +243,7 @@ export default {
       this.$refs.itemContent.setAttribute("contenteditable", false);
       this.$refs.itemName.setAttribute("contenteditable", false);
       this.$refs.itemName.textContent = this.item.name;
-      this.$refs.itemContent.innerText = this.item.content;
+      this.$refs.itemContent.textContent = this.item.content;
       this.editingItem = false;
     },
     enableEditMode() {
@@ -191,10 +266,10 @@ export default {
     async editItem() {
       if (netlifyIdentity.currentUser()) {
         this.itemProcessing = true;
-        let payload = {
+        const payload = {
           ID: this.$vnode.key,
           name: this.$refs.itemName.textContent,
-          content: this.$refs.itemContent.innerText
+          content: this.$refs.itemContent.textContent
         };
         this.editingItem = false;
         this.$refs.itemName.setAttribute("contenteditable", false);
@@ -210,7 +285,7 @@ export default {
       if (netlifyIdentity.currentUser()) {
         this.itemProcessing = true;
         this.confirmRemoval = false;
-        let payload = {
+        const payload = {
           ID: this.$vnode.key,
           media: this.item.media
         };
@@ -222,15 +297,18 @@ export default {
       }
     },
     highlight() {
-      if(!this.searchQuery) {
+      if (!this.searchQuery) {
         return this.itemContent;
       }
-      return this.itemContent.replace(new RegExp(this.searchQuery, "gi"), match => {
-        return '<span class="highlighted">' + match + '</span>';
-      });
+      return this.itemContent.replace(
+        new RegExp(this.searchQuery, "gi"),
+        match => {
+          return '<span class="highlighted">' + match + "</span>";
+        }
+      );
     }
   },
-  mounted: function() {
+  mounted() {
     this.observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (entry.intersectionRatio > 0) {
@@ -240,7 +318,7 @@ export default {
       });
     });
     this.$el.querySelectorAll(".item__media").forEach(item => {
-      let imageElement = item.querySelector('img');
+      const imageElement = item.querySelector("img");
       if (imageElement) {
         imageElement.addEventListener("load", () => {
           this.observer.observe(item);
@@ -253,7 +331,6 @@ export default {
 </script>
 
 <style lang="postcss">
-
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.5s;
@@ -504,5 +581,4 @@ export default {
     transform: scaleY(1);
   }
 }
-
 </style>
