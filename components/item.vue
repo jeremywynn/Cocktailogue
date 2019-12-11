@@ -252,7 +252,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="postcss">
 
 .fade-enter-active,
 .fade-leave-active {
@@ -413,7 +413,7 @@ export default {
   color: #000;
 }
 
-// Editing Item Mode
+/* Editing Item Mode */
 
 .editing {
   .item__header {

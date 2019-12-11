@@ -42,23 +42,6 @@ export default {
   /*
    ** Plugins to load before mounting the App
    */
-  // postcss: {
-  //   // Add plugin names as key and arguments as value
-  //   // Install them before as dependencies with npm or yarn
-  //   plugins: {
-  //     // Disable a plugin by passing false as value
-  //     'postcss-url': false,
-  //     'postcss-nested': {},
-  //     'postcss-responsive-type': {},
-  //     'postcss-hexrgba': {}
-  //   },
-  //   preset: {
-  //     // Change the postcss-preset-env settings
-  //     autoprefixer: {
-  //       grid: true
-  //     }
-  //   }
-  // },
   plugins: [],
   /*
    ** Nuxt.js dev-modules
@@ -115,7 +98,24 @@ export default {
      ** You can extend webpack config here
      */
     // analyze: true,
-    extend(config, ctx) {}
+    extend(config, ctx) {},
+    postcss: {
+      // Add plugin names as key and arguments as value
+      // Install them before as dependencies with npm or yarn
+      plugins: {
+        // Disable a plugin by passing false as value
+        // 'postcss-url': false,
+        'postcss-nested': {},
+        // 'postcss-responsive-type': {},
+        // 'postcss-hexrgba': {}
+      },
+      preset: {
+        // Change the postcss-preset-env settings
+        autoprefixer: {
+          grid: true
+        }
+      }
+    },
   },
   loadingIndicator: {
     name: 'pulse',

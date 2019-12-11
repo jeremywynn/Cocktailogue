@@ -88,7 +88,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="postcss">
   .message {
     background-color: var(--black);
     border-top: 2px solid var(--yellow);

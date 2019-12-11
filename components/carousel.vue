@@ -72,7 +72,7 @@
   }
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 /* 2018 spec - For Safari 11, Chrome 69+ */
 .carousel.snap {
   scroll-snap-type: x mandatory;

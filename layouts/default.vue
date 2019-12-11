@@ -4,7 +4,7 @@
   </div>
 </template>
 
-<style lang="scss">
+<style lang="postcss">
 :root {
   --black: rgba(0, 0, 0, 1);
   --gray: rgba(149, 150, 145, 1);
@@ -80,7 +80,7 @@ button {
   }
   &:disabled, &.unauthorized {
     background-color: transparent !important;
-    // border: 1px solid var(--gray) !important;
+    /* border: 1px solid var(--gray) !important; */
     border-color: var(--gray) !important;
     color: var(--gray) !important;
     opacity: 0.5 !important;

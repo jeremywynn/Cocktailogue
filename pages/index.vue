@@ -431,7 +431,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="postcss">
 html {
   background-color: var(--black);
   color: var(--white);

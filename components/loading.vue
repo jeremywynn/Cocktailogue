@@ -4,7 +4,7 @@
   </div>
 </template>
 
-<style lang="scss">
+<style lang="postcss">
 .loading-indicator {
   canvas {
     display: block;
