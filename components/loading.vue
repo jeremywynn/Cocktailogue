@@ -29,7 +29,6 @@ export default {
       duration: 666.667,
       durationRadiance: 2000,
       radius: 18,
-
       timeoutID: null
     };
   },
