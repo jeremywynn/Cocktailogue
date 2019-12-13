@@ -265,7 +265,11 @@ export default {
 			isLoggedIn: state => state.user.user
 		}),
 		searchQuery() {
-			return this.$route.query.search
+			if (this.$route.query.search) {
+				return this.$route.query.search
+			} else {
+				return ''
+			}
 		}
 	},
 	mounted() {
