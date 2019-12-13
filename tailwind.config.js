@@ -5,14 +5,14 @@
  ** Default: https://github.com/tailwindcss/tailwindcss/blob/master/stubs/defaultConfig.stub.js
  */
 module.exports = {
-  theme: {
-    zIndex: {
-      "-1": "-1"
-    }
-  },
-  variants: {},
-  plugins: [],
-  corePlugins: {
-    container: false
-  }
-};
+	theme: {
+		zIndex: {
+			'-1': '-1'
+		}
+	},
+	variants: {},
+	plugins: [],
+	corePlugins: {
+		container: false
+	}
+}

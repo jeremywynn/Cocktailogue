@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "My online saved Instagram posts of cocktails.",
   "author": "Jeremy Wynn",
+  "license": "BSD-3-Clause",
   "private": true,
   "scripts": {
     "dev": "nuxt",
@@ -25,7 +26,8 @@
     "imagekit": "^2.0.1",
     "mongodb-stitch-server-sdk": "^4.7.1",
     "netlify-identity-widget": "^1.5.6",
-    "nuxt": "^2.10.2"
+    "nuxt": "^2.10.2",
+    "vue-text-highlight": "^2.0.10"
   },
   "devDependencies": {
     "@babel/core": "^7.7.5",
@@ -42,6 +44,8 @@
     "eslint": "^6.7.2",
     "eslint-config-prettier": "^6.7.0",
     "eslint-loader": "^3.0.3",
+    "eslint-plugin-cypress": "^2.8.0",
+    "eslint-plugin-no-loops": "^0.3.0",
     "eslint-plugin-nuxt": "^0.5.0",
     "eslint-plugin-prettier": "^3.1.1",
     "eslint-plugin-vue": "^6.0.1",
