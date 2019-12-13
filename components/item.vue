@@ -369,17 +369,6 @@ export default {
 				this.itemProcessing = false
 			}
 		}
-		// highlight() {
-		// 	if (!this.searchQuery) {
-		// 		return this.itemContent
-		// 	}
-		// 	return this.itemContent.replace(
-		// 		new RegExp(this.searchQuery, 'gi'),
-		// 		match => {
-		// 			return '<span class="highlighted">' + match + '</span>'
-		// 		}
-		// 	)
-		// }
 	}
 }
 </script>
