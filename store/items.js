@@ -124,14 +124,24 @@ export const actions = {
 	},
 	async getItems({ commit, dispatch }, payload) {
 		dispatch('loading/triggerBusyState', null, { root: true })
-		const data = {
-			skip: payload
-		}
+		// const data = {
+		// 	skip: payload
+		// }
 		try {
-			const response = await fetch('/.netlify/functions/all-items', {
-				method: 'POST',
-				body: JSON.stringify(data)
-			}).then(res => res.json())
+			// const response = await this.$axios
+			// 	.$get('/.netlify/functions/all-items', {
+			// 		method: 'POST',
+			// 		body: JSON.stringify(data)
+			// 	})
+			// 	.then(res => res.json())
+			const response = await this.$axios.$post(
+				'/.netlify/functions/all-items',
+				{
+					skip: payload
+				}
+			)
+			// .then(res => res.json())
+			// console.log(response)
 			commit('SET_ITEMS', response[0])
 			commit('SET_ITEMS_COUNT', response[1])
 			if (response[0].length < 1) {

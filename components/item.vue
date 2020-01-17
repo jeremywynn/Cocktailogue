@@ -69,9 +69,12 @@
 							ref="itemContent"
 							class="item-content p-4 leading-relaxed relative"
 						>
+							<!--
 							<text-highlight :queries="searchQuery">{{
 								itemContent
 							}}</text-highlight>
+							-->
+							{{ itemContent }}
 						</div>
 					</div>
 					<div class="item__meta px-4">
@@ -98,7 +101,7 @@
 							class="action-group action-group--editing flex justify-between w-full"
 						>
 							<div
-								v-if="isLoggedIn"
+								v-if="$auth.loggedIn"
 								class="edit-option flex justify-between w-full"
 							>
 								<button
@@ -128,9 +131,7 @@
 								<button
 									:disabled="itemProcessing"
 									class="unauthorized block whitespace-no-wrap"
-									@click="
-										triggerNetlifyIdentityAction('login')
-									"
+									@click="$root.$emit('login')"
 								>
 									<span>Edit Item</span>
 								</button>
@@ -141,7 +142,7 @@
 								<div class="button-group flex ml-8">
 									<transition name="fade" mode="out-in">
 										<div
-											v-if="isLoggedIn"
+											v-if="$auth.loggedIn"
 											class="removal-option flex justify-between w-full"
 										>
 											<div
@@ -199,9 +200,7 @@
 													class="negative unauthorized block whitespace-no-wrap"
 													:disabled="itemProcessing"
 													@click="
-														triggerNetlifyIdentityAction(
-															'login'
-														)
+														$root.$emit('login')
 													"
 												>
 													Delete Item
@@ -220,20 +219,15 @@
 </template>
 
 <script>
-import { mapActions, mapMutations, mapState } from 'vuex'
+import { mapActions, mapMutations } from 'vuex'
 import carousel from '@@/components/carousel.vue'
-import netlifyIdentity from 'netlify-identity-widget'
-import TextHighlight from 'vue-text-highlight'
+// import TextHighlight from 'vue-text-highlight'
 import TransitionExpand from '@@/components/TransitionExpand.vue'
-
-netlifyIdentity.init({
-	logo: false
-})
 
 export default {
 	components: {
 		carousel,
-		TextHighlight,
+		// TextHighlight,
 		TransitionExpand
 	},
 	props: {
@@ -261,9 +255,6 @@ export default {
 		}
 	},
 	computed: {
-		...mapState({
-			isLoggedIn: state => state.user.user
-		}),
 		searchQuery() {
 			if (this.$route.query.search) {
 				return this.$route.query.search
@@ -276,7 +267,7 @@ export default {
 		this.observer = new IntersectionObserver(entries => {
 			entries.forEach(entry => {
 				if (entry.intersectionRatio > 0) {
-					entry.target.classList.add('unveil')
+					entry.target.classList.remove('opacity-0')
 					this.observer.unobserve(entry.target)
 				}
 			})
@@ -284,9 +275,13 @@ export default {
 		this.$el.querySelectorAll('.item__media').forEach(item => {
 			const imageElement = item.querySelector('img')
 			if (imageElement) {
-				imageElement.addEventListener('load', () => {
+				if (imageElement.complete) {
 					this.observer.observe(item)
-				})
+				} else {
+					imageElement.addEventListener('load', () => {
+						this.observer.observe(item)
+					})
+				}
 			}
 		})
 	},
@@ -298,18 +293,6 @@ export default {
 		...mapMutations({
 			setAuth: 'user/SET_AUTH'
 		}),
-		triggerNetlifyIdentityAction(action) {
-			if (action === 'login') {
-				netlifyIdentity.open(action)
-				netlifyIdentity.on(action, user => {
-					this.setAuth(user)
-					netlifyIdentity.close()
-				})
-			} else if (action === 'logout') {
-				this.setAuth(null)
-				netlifyIdentity.logout()
-			}
-		},
 		disableEditMode() {
 			this.$refs.itemContent.setAttribute('contenteditable', false)
 			this.$refs.itemName.setAttribute('contenteditable', false)
@@ -335,7 +318,7 @@ export default {
 			}
 		},
 		async editItem() {
-			if (netlifyIdentity.currentUser()) {
+			if (this.$auth.loggedIn) {
 				this.itemProcessing = true
 				const payload = {
 					ID: this.$vnode.key,
@@ -356,7 +339,7 @@ export default {
 			}
 		},
 		async removeItem() {
-			if (netlifyIdentity.currentUser()) {
+			if (this.$auth.loggedIn) {
 				this.itemProcessing = true
 				this.confirmRemoval = false
 				const payload = {
@@ -401,9 +384,6 @@ export default {
 	}
 	&__media {
 		transition: opacity 400ms;
-		&.unveil {
-			opacity: 1;
-		}
 	}
 	&:first-child {
 		border-top: 1px solid var(--white);

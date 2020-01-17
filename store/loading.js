@@ -1,10 +1,8 @@
 export const state = () => ({
-	// Loading
 	loading: false
 })
 
 export const mutations = {
-	// Loading
 	END_BUSY_STATE(state) {
 		state.loading = false
 	},
@@ -14,7 +12,6 @@ export const mutations = {
 }
 
 export const actions = {
-	// Loading
 	stopBusyState({ commit }) {
 		commit('END_BUSY_STATE')
 	},

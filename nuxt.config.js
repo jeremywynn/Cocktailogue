@@ -1,8 +1,5 @@
 export default {
-	mode: 'spa',
-	/*
-	 ** Headers of the page
-	 */
+	mode: 'universal',
 	head: {
 		title: process.env.npm_package_name || '',
 		meta: [
@@ -16,7 +13,6 @@ export default {
 				name: 'description',
 				content: process.env.npm_package_description || ''
 			}
-			// { name: 'og:image', content: '/static/cocktail.jpg' },
 		],
 		link: [
 			{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
@@ -53,9 +49,7 @@ export default {
 	/*
 	 ** Customize the progress-bar color
 	 */
-	// loading: '~/components/loading.vue',
 	loading: false,
-	// loading: { color: "#fff" },
 	/*
 	 ** Global CSS
 	 */
@@ -76,16 +70,40 @@ export default {
 	/*
 	 ** Nuxt.js modules
 	 */
-	modules: ['@nuxtjs/proxy', '@nuxtjs/dotenv'],
-
+	modules: [
+		'@nuxtjs/axios',
+		'@nuxtjs/proxy',
+		'@nuxtjs/dotenv',
+		'@nuxtjs/auth',
+		'nuxt-validate'
+	],
+	axios: {
+		baseURL: 'http://localhost:3000'
+	},
+	auth: {
+		strategies: {
+			local: {
+				endpoints: {
+					login: {
+						url: '/api/auth/login',
+						method: 'post',
+						propertyName: 'token.secret'
+					},
+					logout: { url: '/api/auth/logout', method: 'post' },
+					user: {
+						url: '/api/auth/user',
+						method: 'get',
+						propertyName: 'user'
+					}
+				}
+			}
+		}
+	},
+	serverMiddleware: ['~/api/login.js', '~/api/logout.js', '~/api/user.js'],
 	proxy: {
 		'/.netlify': {
 			target: 'http://localhost:9000',
 			pathRewrite: { '^/.netlify/functions': '' }
-		},
-		'/.netlify/identity': {
-			target: 'https://cocktailogue.netlify.com',
-			pathRewrite: { '^/.netlify/identity': '' }
 		}
 	},
 	/*
@@ -112,10 +130,7 @@ export default {
 			// Install them before as dependencies with npm or yarn
 			plugins: {
 				// Disable a plugin by passing false as value
-				// 'postcss-url': false,
 				'postcss-nested': {}
-				// 'postcss-responsive-type': {},
-				// 'postcss-hexrgba': {}
 			},
 			preset: {
 				// Change the postcss-preset-env settings
@@ -124,11 +139,6 @@ export default {
 				}
 			}
 		}
-	},
-	loadingIndicator: {
-		name: 'pulse',
-		color: 'rgb(255, 250, 14)',
-		background: '#000000'
 	},
 	env: {
 		IMAGEKIT_ID: process.env.IMAGEKIT_ID

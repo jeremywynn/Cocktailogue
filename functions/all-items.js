@@ -83,7 +83,8 @@ async function processEvent(event, context, callback) {
 }
 
 async function queryDatabase(db, event) {
-	let jsonContents = JSON.parse(JSON.stringify(event))
+	// let jsonContents = JSON.parse(JSON.stringify(event))
+	let jsonContents = 0
 
 	if (event.body !== null && event.body !== undefined) {
 		jsonContents = JSON.parse(event.body)

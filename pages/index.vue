@@ -1,5 +1,12 @@
 <template>
 	<div id="top" class="app">
+		<userLoginForm
+			:closeoverlay="closeOverlay"
+			:submitform="loginUser"
+			:message="loginMessage"
+			:active="loginActive"
+			:processing="loginProcessing"
+		/>
 		<div class="container">
 			<div class="apex flex p-2 justify-between">
 				<div class="item-count">
@@ -15,18 +22,18 @@
 				</div>
 				<div class="login-area">
 					<div
-						v-if="isLoggedIn"
+						v-if="$auth.loggedIn"
 						class="cursor-pointer hover:underline"
-						@click="triggerNetlifyIdentityAction('logout')"
+						@click="logout"
 					>
-						Logout
+						Log Out
 					</div>
 					<div
 						v-else
 						class="cursor-pointer hover:underline"
-						@click="triggerNetlifyIdentityAction('login')"
+						@click="login"
 					>
-						Login
+						Log In
 					</div>
 				</div>
 			</div>
@@ -280,7 +287,7 @@
 											class="add-actions flex flex-none flex-no-wrap"
 										>
 											<div
-												v-if="isLoggedIn"
+												v-if="$auth.loggedIn"
 												class="add-action ml-2 whitespace-no-wrap"
 												data-entity="add-item-action"
 											>
@@ -305,11 +312,7 @@
 														itemAddProcessing
 													"
 													class="unauthorized"
-													@click="
-														triggerNetlifyIdentityAction(
-															'login'
-														)
-													"
+													@click="login"
 												>
 													Add Item
 												</button>
@@ -349,12 +352,7 @@
 					ref="items"
 					class="items pb-8"
 				>
-					<item
-						v-for="(item, index) in items"
-						:key="item._id"
-						:class="{ tease: index === 0 }"
-						:item="item"
-					/>
+					<item v-for="item in items" :key="item._id" :item="item" />
 					<div ref="itemsFooter" class="items-footer"></div>
 				</div>
 				<div v-else class="disclaimer py-4 text-center">
@@ -374,13 +372,9 @@ import item from '@@/components/item.vue'
 import loading from '@@/components/loading.vue'
 import message from '@@/components/message.vue'
 import TransitionExpand from '@@/components/TransitionExpand.vue'
+import userLoginForm from '@@/components/loginForm.vue'
 
-import { mapActions, mapMutations, mapState } from 'vuex'
-import netlifyIdentity from 'netlify-identity-widget'
-
-netlifyIdentity.init({
-	logo: false
-})
+import { mapActions, mapState } from 'vuex'
 
 export default {
 	watchQuery: ['search'],
@@ -389,24 +383,47 @@ export default {
 		item,
 		loading,
 		message,
-		TransitionExpand
+		TransitionExpand,
+		userLoginForm
 	},
-	async fetch({ store, query }) {
+	// async fetch({ store, query }) {
+	// 	try {
+	// 		if (query.search) {
+	// 			await store.dispatch('items/searchItems', query.search)
+	// 			// await context.searchItems(query.search)
+	// 		} else {
+	// 			await store.dispatch('items/getItems')
+	// 			// await context.getItems
+	// 		}
+	// 	} catch (err) {}
+	// },
+	fetch({ store, query }) {
 		try {
 			if (query.search) {
-				await store.dispatch('items/searchItems', query.search)
+				return store.dispatch('items/searchItems', query.search)
 			} else {
-				await store.dispatch('items/getItems')
+				return store.dispatch('items/getItems')
 			}
 		} catch (err) {}
 	},
+	// asyncData({ store, query }) {
+	// 	try {
+	// 		if (query.search) {
+	// 			store.dispatch('items/searchItems', query.search)
+	// 		} else {
+	// 			store.dispatch('items/getItems')
+	// 		}
+	// 	} catch (err) {}
+	// },
 	data() {
 		return {
 			addingItem: false,
-			currentUser: null,
 			itemIncrementer: 0,
 			itemAddProcessing: false,
 			jsonData: null,
+			loginActive: false,
+			loginMessage: null,
+			loginProcessing: false,
 			newItemMedia: [],
 			newItemContent: null,
 			newItemName: null,
@@ -418,9 +435,8 @@ export default {
 	computed: {
 		...mapState({
 			grandTotal: state => state.items.itemCount,
-			loading: state => state.loading.loading,
-			isLoggedIn: state => state.user.user,
-			items: state => state.items.items
+			items: state => state.items.items,
+			loading: state => state.loading.loading
 		}),
 		searchQuery() {
 			return this.$route.query.search
@@ -430,6 +446,9 @@ export default {
 		$route: 'prepareForRouteChange'
 	},
 	mounted() {
+		this.$root.$on('login', () => {
+			this.login()
+		})
 		if (this.$refs.itemsFooter) {
 			this.configureInfiniteFooter()
 		}
@@ -459,9 +478,37 @@ export default {
 			addItemAction: 'items/addItem',
 			getAdditionalItems: 'items/getAdditionalItems'
 		}),
-		...mapMutations({
-			setAuth: 'user/SET_USER'
-		}),
+		closeOverlay() {
+			this.loginActive = false
+		},
+		async loginUser(loginInfo) {
+			this.loginProcessing = true
+			this.$store.dispatch('loading/triggerBusyState')
+			this.loginMessage = null
+			await this.$auth
+				.loginWith('local', {
+					data: loginInfo
+				})
+				.then(() => {
+					this.loginActive = false
+					this.$root.$emit('transmitMessage', 'Login successful.')
+				})
+				.catch(e => {
+					// console.log(e)
+					this.loginMessage = 'Authentication failed'
+				})
+			this.$store.dispatch('loading/stopBusyState')
+			this.loginProcessing = false
+		},
+		login() {
+			this.loginActive = true
+		},
+		async logout() {
+			this.$store.dispatch('loading/triggerBusyState')
+			await this.$auth.logout()
+			this.$store.dispatch('loading/stopBusyState')
+			this.$root.$emit('transmitMessage', 'Logout successful.')
+		},
 		searchItems() {
 			if (this.searchTerms) {
 				this.addingItem = false
@@ -474,18 +521,6 @@ export default {
 				})
 			} else {
 				return false
-			}
-		},
-		triggerNetlifyIdentityAction(action) {
-			if (action === 'login') {
-				netlifyIdentity.open(action)
-				netlifyIdentity.on(action, user => {
-					this.setAuth(user)
-					netlifyIdentity.close()
-				})
-			} else if (action === 'logout') {
-				this.setAuth(null)
-				netlifyIdentity.logout()
 			}
 		},
 		setEndOfContenteditable(contentEditableElement) {
@@ -555,7 +590,7 @@ export default {
 			this.saveItems()
 		},
 		async saveItems() {
-			if (netlifyIdentity.currentUser()) {
+			if (this.$auth.loggedIn) {
 				this.itemAddProcessing = true
 				const payload = {
 					name: this.$refs.newItemName.textContent,
@@ -684,7 +719,7 @@ img {
 }
 
 .lower-brow {
-	z-index: 2;
+	z-index: 100;
 }
 
 .communicator {
