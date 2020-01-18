@@ -77,10 +77,11 @@ export default {
 		'@nuxtjs/auth',
 		'nuxt-validate'
 	],
-	axios: {
-		baseURL: 'http://localhost:3000'
-	},
+	// axios: {
+	// 	baseURL: 'http://localhost:3000'
+	// },
 	auth: {
+		redirect: false,
 		strategies: {
 			local: {
 				endpoints: {
@@ -97,7 +98,8 @@ export default {
 					}
 				}
 			}
-		}
+		},
+		watchedLoggedIn: false
 	},
 	serverMiddleware: ['~/api/login.js', '~/api/logout.js', '~/api/user.js'],
 	proxy: {

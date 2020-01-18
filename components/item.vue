@@ -2,7 +2,10 @@
 	<div
 		ref="item"
 		class="item"
-		:class="['overflow-hidden', { editing: editingItem, reveal: revealed }]"
+		:class="[
+			'overflow-hidden',
+			{ editing: editingItem, observed: observed, reveal: revealed }
+		]"
 	>
 		<div class="header-wrap relative">
 			<div
@@ -247,6 +250,7 @@ export default {
 			itemProcessing: false,
 			mediaCount: this.item.media.length,
 			mediaUrl: null,
+			observed: false,
 			reconstructedUrl:
 				'https://www.instagram.com/p/' + this.item.sourceIdentifier,
 			revealed: false,
@@ -267,7 +271,7 @@ export default {
 		this.observer = new IntersectionObserver(entries => {
 			entries.forEach(entry => {
 				if (entry.intersectionRatio > 0) {
-					entry.target.classList.remove('opacity-0')
+					this.observed = true
 					this.observer.unobserve(entry.target)
 				}
 			})
@@ -391,6 +395,12 @@ export default {
 	&.reveal {
 		.item__media {
 			display: block;
+			opacity: 1;
+		}
+	}
+	&.observed {
+		.item__media {
+			opacity: 1;
 		}
 	}
 }
