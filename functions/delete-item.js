@@ -1,15 +1,12 @@
 import {
 	Stitch,
 	StitchAppClientConfiguration,
-	RemoteMongoClient,
-	BSON,
 	UserApiKeyCredential
 } from 'mongodb-stitch-server-sdk'
 
 const ImageKit = require('imagekit')
 require('dotenv').config()
 
-let cachedDb = null
 let dataDirectory = ''
 
 const isLambda = !!(process.env.LAMBDA_TASK_ROOT || false)
@@ -24,16 +21,12 @@ const client = Stitch.initializeDefaultAppClient(
 		.withDataDirectory(dataDirectory)
 		.build()
 )
-const mongoClient = client.getServiceClient(
-	RemoteMongoClient.factory,
-	'mongodb-atlas'
-)
 const credential = new UserApiKeyCredential(process.env.MONGODB_API_KEY)
 
 const imagekit = new ImageKit({
-	imagekitId: process.env.IMAGEKIT_ID,
-	apiKey: process.env.IMAGEKIT_PUBLIC_API_KEY,
-	apiSecret: process.env.IMAGEKIT_API_SECRET
+	publicKey: process.env.IMAGEKIT_PUBLIC_API_KEY,
+	privateKey: process.env.IMAGEKIT_API_SECRET,
+	urlEndpoint: 'https://ik.imagekit.io/94ka2dfnz/'
 })
 
 const headers = {
@@ -43,71 +36,18 @@ const headers = {
 
 exports.handler = async (event, context, callback) => {
 	try {
-		context.callbackWaitsForEmptyEventLoop = false
+		const jsonContents = JSON.parse(event.body)
+		const media = jsonContents.media
+		const mediaToDelete = []
 
-		const response = await processEvent(event, context, callback)
-		return {
-			statusCode: 200,
-			headers,
-			body: JSON.stringify(response)
+		if (media) {
+			media.forEach(function(singleMedia) {
+				if (singleMedia.path) {
+					mediaToDelete.push(singleMedia.path)
+				}
+			})
 		}
-	} catch (error) {
-		console.log(error)
-		return {
-			statusCode: 500,
-			headers,
-			body: JSON.stringify(error)
-		}
-	}
-}
 
-async function connectToDatabase(uri) {
-	try {
-		if (cachedDb && typeof cachedDb.serverConfig !== 'undefined') {
-			if (cachedDb.serverConfig.isConnected()) {
-				return Promise.resolve(cachedDb)
-			}
-		}
-		await client.auth.loginWithCredential(credential)
-		const db = mongoClient.db('catalogue')
-		cachedDb = db
-		return cachedDb
-	} catch (error) {
-		console.log(error)
-		return error
-	}
-}
-
-async function processEvent(event, context, callback) {
-	try {
-		const db = await connectToDatabase()
-		const result = await queryDatabase(db, event)
-		return result
-	} catch (error) {
-		console.log(error) // output to netlify function log
-		return error
-	}
-}
-
-async function queryDatabase(db, event) {
-	let jsonContents = JSON.parse(JSON.stringify(event))
-
-	if (event.body !== null && event.body !== undefined) {
-		jsonContents = JSON.parse(event.body)
-	}
-
-	const media = jsonContents.media
-	const mediaToDelete = []
-
-	if (media) {
-		media.forEach(function(singleMedia) {
-			if (singleMedia.path) {
-				mediaToDelete.push(singleMedia.path)
-			}
-		})
-	}
-
-	try {
 		if (mediaToDelete) {
 			const deletePromises = mediaToDelete.map(async function(
 				mediaItemPath
@@ -124,19 +64,23 @@ async function queryDatabase(db, event) {
 			await Promise.all(deletePromises)
 		}
 
-		const itemsCollection = db.collection('items')
-		const response = await itemsCollection.deleteOne({
-			_id: new BSON.ObjectId(jsonContents.ID)
-		})
-
-		if (response.deletedCount) {
-			// Should we query for the deleted document to make doubly sure it was deleted?
-			const payload = {
-				_id: jsonContents.ID
-			}
-			return payload
+		await client.auth.loginWithCredential(credential)
+		await client.callFunction('removeItem', [jsonContents.ID])
+		// console.log(response) // null
+		const response = {
+			_id: jsonContents.ID
+		}
+		return {
+			statusCode: 200,
+			headers,
+			body: JSON.stringify(response)
 		}
 	} catch (error) {
-		return error
+		// console.log(error)
+		return {
+			statusCode: 500,
+			headers,
+			body: JSON.stringify(error)
+		}
 	}
 }

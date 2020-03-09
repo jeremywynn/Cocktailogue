@@ -1,12 +1,10 @@
 export const state = () => ({
-	// Items
 	items: [],
 	itemCount: null,
 	itemsRemaining: true
 })
 
 export const mutations = {
-	// Items
 	ADD_ITEM(state, item) {
 		state.items.push(item)
 	},
@@ -15,6 +13,9 @@ export const mutations = {
 	},
 	ADJUST_ITEMS_REMAINING(state, count) {
 		state.itemsRemaining = count
+	},
+	CLEAR_ITEMS(state) {
+		state.items = []
 	},
 	DELETE_ITEM(state, payload) {
 		const item = state.items.find(item => item._id === payload._id)
@@ -33,7 +34,9 @@ export const mutations = {
 }
 
 export const actions = {
-	// Items
+	clearItems({ commit }) {
+		commit('CLEAR_ITEMS')
+	},
 	async addItem({ commit, dispatch, state }, payload) {
 		dispatch('loading/triggerBusyState', null, { root: true })
 		try {
@@ -56,17 +59,20 @@ export const actions = {
 		}
 		dispatch('loading/stopBusyState', null, { root: true })
 	},
-	async deleteItem({ commit, dispatch, state }, payload) {
+	async deleteItem({ commit, dispatch }, payload) {
 		dispatch('loading/triggerBusyState', null, { root: true })
 		try {
-			const data = {
-				ID: payload.ID,
-				media: payload.media
-			}
-			const deletedItem = await fetch('/.netlify/functions/delete-item', {
-				method: 'PUT',
-				body: JSON.stringify(data)
-			}).then(res => res.json())
+			// const data = {
+			// 	ID: payload.ID,
+			// 	media: payload.media
+			// }
+			const deletedItem = await this.$axios.$post(
+				'/.netlify/functions/delete-item',
+				{
+					ID: payload.ID,
+					media: payload.media
+				}
+			)
 			commit('DELETE_ITEM', deletedItem)
 			dispatch('loading/stopBusyState', null, { root: true })
 			return deletedItem
@@ -87,28 +93,22 @@ export const actions = {
 				method: 'POST',
 				body: JSON.stringify(data)
 			}).then(res => res.json())
-			if (editedItem.matchedCount && editedItem.modifiedCount) {
-				dispatch('refreshItem', payload.ID)
-			} else {
-				// Error
-			}
 			dispatch('loading/stopBusyState', null, { root: true })
+			// Redo this, edit Item in State
 			return editedItem
 		} catch (err) {
 			console.log(err)
 		}
 		dispatch('loading/stopBusyState', null, { root: true })
 	},
-	async getAdditionalItems({ commit, dispatch }, payload) {
+	async getItems({ commit, dispatch }, payload) {
 		dispatch('loading/triggerBusyState', null, { root: true })
-		const data = {
-			skip: payload
-		}
 		try {
-			const response = await fetch('/.netlify/functions/all-items', {
-				method: 'POST',
-				body: JSON.stringify(data)
-			}).then(res => res.json())
+			const response = await this.$axios.$post(
+				'/.netlify/functions/all-items',
+				payload
+			)
+			// commit('SET_ITEMS', response[0])
 			const items = response[0]
 			if (items.length > 0) {
 				items.forEach(item => {
@@ -117,32 +117,6 @@ export const actions = {
 			} else {
 				commit('ADJUST_ITEMS_REMAINING', false)
 			}
-		} catch (err) {
-			console.log(err)
-		}
-		dispatch('loading/stopBusyState', null, { root: true })
-	},
-	async getItems({ commit, dispatch }, payload) {
-		dispatch('loading/triggerBusyState', null, { root: true })
-		// const data = {
-		// 	skip: payload
-		// }
-		try {
-			// const response = await this.$axios
-			// 	.$get('/.netlify/functions/all-items', {
-			// 		method: 'POST',
-			// 		body: JSON.stringify(data)
-			// 	})
-			// 	.then(res => res.json())
-			const response = await this.$axios.$post(
-				'/.netlify/functions/all-items',
-				{
-					skip: payload
-				}
-			)
-			// .then(res => res.json())
-			// console.log(response)
-			commit('SET_ITEMS', response[0])
 			commit('SET_ITEMS_COUNT', response[1])
 			if (response[0].length < 1) {
 				commit('ADJUST_ITEMS_REMAINING', false)
@@ -152,16 +126,14 @@ export const actions = {
 		}
 		dispatch('loading/stopBusyState', null, { root: true })
 	},
-	async refreshItem({ commit }, id) {
+	async findItem({ commit }, id) {
 		try {
-			const refreshedItem = await fetch(
-				'/.netlify/functions/refresh-item',
-				{
-					method: 'POST',
-					body: JSON.stringify(id)
-				}
-			).then(res => res.json())
-			commit('EDIT_ITEM', refreshedItem)
+			const requestedItem = await fetch('/.netlify/functions/find-item', {
+				method: 'POST',
+				body: JSON.stringify(id)
+			}).then(res => res.json())
+			// Either rename this or make this more distinguishable from editItem action
+			commit('EDIT_ITEM', requestedItem)
 		} catch (err) {
 			console.log(err)
 		}
@@ -169,13 +141,12 @@ export const actions = {
 	async searchItems({ commit, dispatch }, payload) {
 		dispatch('loading/triggerBusyState', null, { root: true })
 		try {
-			const data = {
-				searchTerms: payload
-			}
-			const items = await fetch('/.netlify/functions/find-items', {
-				method: 'POST',
-				body: JSON.stringify(data)
-			}).then(res => res.json())
+			const items = await this.$axios.$post(
+				'/.netlify/functions/find-items',
+				{
+					searchTerms: payload
+				}
+			)
 			commit('SET_ITEMS', items)
 		} catch (err) {
 			console.log(err)

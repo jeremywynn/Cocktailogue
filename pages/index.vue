@@ -355,9 +355,10 @@
 					<item v-for="item in items" :key="item._id" :item="item" />
 					<div ref="itemsFooter" class="items-footer"></div>
 				</div>
-				<div v-else class="disclaimer py-4 text-center">
+				<!-- {{ Future No Items }} -->
+				<!-- <div v-else class="disclaimer py-4 text-center">
 					<p>No items were found.</p>
-				</div>
+				</div> -->
 			</main>
 			<div class="lower-brow bottom-0 fixed pointer-events-none right-0">
 				<loading />
@@ -398,11 +399,13 @@ export default {
 	// 	} catch (err) {}
 	// },
 	fetch({ store, query }) {
+		store.dispatch('items/clearItems')
 		try {
 			if (query.search) {
+				// console.log('query search detected!!!') // Works
 				return store.dispatch('items/searchItems', query.search)
 			} else {
-				return store.dispatch('items/getItems')
+				return store.dispatch('items/getItems', { limit: 20 })
 			}
 		} catch (err) {}
 	},
@@ -476,7 +479,7 @@ export default {
 	methods: {
 		...mapActions({
 			addItemAction: 'items/addItem',
-			getAdditionalItems: 'items/getAdditionalItems'
+			getItems: 'items/getItems'
 		}),
 		closeOverlay() {
 			this.loginActive = false
@@ -651,7 +654,11 @@ export default {
 								this.loading === false &&
 								!this.$route.query.search
 							) {
-								this.getAdditionalItems(lastItemId)
+								// console.log(typeof lastItemId) // String
+								this.getItems({
+									limit: 20,
+									waypointID: lastItemId
+								})
 							}
 						}
 					}

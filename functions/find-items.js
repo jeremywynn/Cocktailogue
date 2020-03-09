@@ -46,7 +46,6 @@ exports.handler = async (event, context, callback) => {
 			body: JSON.stringify(items)
 		}
 	} catch (error) {
-		console.log(error)
 		return {
 			statusCode: 500,
 			headers,
@@ -67,7 +66,6 @@ async function connectToDatabase(uri) {
 		cachedDb = db
 		return cachedDb
 	} catch (error) {
-		console.log(error)
 		return error
 	}
 }
@@ -78,7 +76,6 @@ async function processEvent(event, context, callback) {
 		const result = await queryDatabase(db, event)
 		return result
 	} catch (error) {
-		console.log(error) // output to netlify function log
 		return error
 	}
 }
@@ -99,13 +96,7 @@ async function queryDatabase(db, event) {
 
 		const items = await itemsCollection
 			.find({ content: searchRegex }, { score: { $meta: 'textScore' } })
-			// .sort({ score: { $meta: "textScore" } })
 			.toArray()
-
-		/*
-    const pipeline = [{ $match: { content: { $regex: searchTerms, $options: 'i' } } }, { $sort: { $score: { $meta: "textScore" } } }, { $limit: 10 }];
-    const items = await itemsCollection.aggregate(pipeline).toArray();
-    */
 
 		return items
 	} catch (error) {

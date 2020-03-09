@@ -18,5 +18,11 @@
   "vetur.validation.template": false,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
-  }
+  },
+  "azureFunctions.deploySubpath": "azure-functions",
+  "azureFunctions.projectLanguage": "JavaScript",
+  "azureFunctions.projectRuntime": "~3",
+  "debug.internalConsoleOptions": "neverOpen",
+  "azureFunctions.preDeployTask": "npm prune",
+  "editor.tabSize": 2
 }

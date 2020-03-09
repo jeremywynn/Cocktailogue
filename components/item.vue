@@ -332,13 +332,8 @@ export default {
 				this.editingItem = false
 				this.$refs.itemName.setAttribute('contenteditable', false)
 				this.$refs.itemContent.setAttribute('contenteditable', false)
-				const editedItem = await this.editItemAction(payload)
-				if (editedItem.matchedCount && editedItem.modifiedCount) {
-					this.$root.$emit(
-						'transmitMessage',
-						'Item successfully edited.'
-					)
-				}
+				await this.editItemAction(payload)
+				this.$root.$emit('transmitMessage', 'Item successfully edited.')
 				this.itemProcessing = false
 			}
 		},

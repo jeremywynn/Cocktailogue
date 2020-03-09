@@ -1,5 +1,5 @@
 export default {
-	mode: 'spa',
+	mode: 'universal',
 	head: {
 		title: process.env.npm_package_name || '',
 		meta: [
@@ -136,9 +136,6 @@ export default {
 			},
 			preset: {
 				// Change the postcss-preset-env settings
-				autoprefixer: {
-					grid: true
-				}
 			}
 		}
 	},

@@ -30,25 +30,16 @@ const headers = {
 
 exports.handler = async (event, context, callback) => {
 	try {
-		let limit = 20
-		let waypointID = null
-		if (event.body !== null && event.body !== undefined) {
-			const jsonContents = JSON.parse(event.body)
-			if (jsonContents.limit) {
-				limit = jsonContents.limit
-			}
-			if (jsonContents.waypointID) {
-				waypointID = jsonContents.waypointID
-			}
-		}
+		const itemID = JSON.parse(event.body)
 		await client.auth.loginWithCredential(credential)
-		const items = await client.callFunction('getItems', [waypointID, limit])
+		const response = await client.callFunction('getItem', [itemID])
 		return {
 			statusCode: 200,
 			headers,
-			body: JSON.stringify(items)
+			body: JSON.stringify(response)
 		}
 	} catch (error) {
+		console.log(error)
 		return {
 			statusCode: 500,
 			headers,
