@@ -34,6 +34,7 @@
     "vue-text-highlight": "^2.0.10"
   },
   "devDependencies": {
+    "@architect/sandbox": "^1.7.2",
     "@babel/core": "^7.7.5",
     "@babel/preset-env": "^7.7.6",
     "@nuxtjs/eslint-config": "^2.0.0",
